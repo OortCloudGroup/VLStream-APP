@@ -1,0 +1,31 @@
+// 背景颜色$primary-color: #306555; // 全局主色
+$bg-w: #fff;
+$bg-w7: #F7F7F7;
+$bg-b: #000;
+
+$main-color:  var(--el-color-primary);
+$main-color-light: var(--el-color-primary-light-3);
+// 字体颜色
+$font-color-w: #fff;
+$font-color-b: #000;
+$font-color-b3: #333;
+$font-color-b6: #666;
+$font-color-b9: #999;
+
+// 设置一些公用的flex 少写几行代码
+.flexRow {
+  display: flex;
+  flex-direction: row;
+}
+
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexCenter {
+  justify-content: center;
+  align-items: center;
+}
+
+@import './pngEditor.scss';

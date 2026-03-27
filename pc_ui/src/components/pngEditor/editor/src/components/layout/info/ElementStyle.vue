@@ -1,0 +1,122 @@
+<template>
+  <el-form
+    v-if="store.current && store.current.selected"
+    :model="store.current"
+    label-width="80px"
+    label-position="left"
+  >
+    <div class="color-list">
+      <div
+        v-for="style in itemList"
+        class="color-item"
+        :style="style"
+        @click="handleColorClick(style)"
+      />
+    </div>
+
+    <el-divider />
+
+    <template v-if="store.current.style">
+      <Background v-model="elementBg" />
+      <el-divider />
+
+      <el-row :gutter="10">
+        <el-col :span="10">
+          透明度:
+        </el-col>
+        <el-col :span="14">
+          <el-slider
+            :model-value="opacity"
+            :step="0.01"
+            :min="0"
+            :max="1"
+            size="small"
+            @input="onChange('opacity', $event)"
+          />
+        </el-col>
+      </el-row>
+
+      <el-divider />
+      <TextStyle />
+
+      <el-divider />
+      <Border />
+
+      <el-divider />
+      <Shadow />
+    </template>
+  </el-form>
+</template>
+
+<script setup lang="ts">
+import { ref, CSSProperties, computed } from 'vue'
+import TextStyle from './TextStyle.vue'
+import { useEditorStore } from '@/components/pngEditor/editor/src/store'
+import Background from '../components/Background.vue'
+import Border from '../components/Border.vue'
+import Shadow from '../components/Shadow.vue'
+
+const store = useEditorStore()
+const itemList = ref<CSSProperties[]>([
+  { backgroundColor: '#ff0000' },
+  { backgroundColor: '#FFFF00' },
+  { backgroundColor: '#000000' },
+  { backgroundColor: '#FFFFFF' }
+])
+
+const elementBg = computed<any>({
+  get: () => store.current.style!.background || store.current.style!.backgroundColor,
+  set: (val) => {
+    store.current.style!.background = val
+  }
+})
+
+const opacity = computed<any>({
+  get: () => (store.current.style!.hasOwnProperty('opacity') ? store.current.style!.opacity : 1),
+  set: (val) => {
+    store.current.style!.opacity = val
+  }
+})
+
+const handleColorClick = (style: CSSProperties) => {
+  if (!store.current.selected) return
+  store.current.style = { ...store.current.style, ...style }
+}
+
+function onChange(key: string, value: any) {
+  (store.current.style as any)[key] = value
+}
+</script>
+
+<style lang="scss" scoped>
+.color-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  .color-item {
+    cursor: pointer;
+    width: 22%;
+    height: 28px;
+    margin-top: 10px;
+  }
+}
+.es-col {
+  display: flex;
+  align-items: center;
+}
+.text-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  height: 100%;
+  border-radius: 4px;
+  cursor: pointer;
+  &:hover {
+    background-color: var(--el-fill-color-light);
+  }
+  :deep(.es-icon) {
+    margin-right: 4px;
+  }
+}
+</style>

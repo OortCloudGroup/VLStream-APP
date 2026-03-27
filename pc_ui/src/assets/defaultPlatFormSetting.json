@@ -1,0 +1,188 @@
+{
+  "logo": "http://192.168.88.119:31610/oort/oortcloud-policefront/news_manange/img/logo_color.4d7b778c.png",
+  "logoWhite": "http://192.168.88.119:31610/oort/oortcloud-policefront/news_manange/img/logo_color.4d7b778c.png",
+  "login_bottom": "奥尔特云（深圳）智慧科技有限公司",
+  "loginPageFlag1": "开放包容，助力发展",
+  "loginPageFlag2": "统一的标准，统一的管理体系，实现所有系统用户、认证的管理",
+  "common": {
+    "login_logo_text": "信息资源服务平台",
+    "login_title": "管理员管控",
+    "rightInfoItems": [
+      {
+        "label": "个人中心",
+        "labelKey":"myCenter",
+        "isShow": true
+      },
+      {
+        "label": "我的云盘",
+        "labelKey":"myCloudDisk",
+        "isShow": true
+      },
+      {
+        "label": "我的收藏",
+        "labelKey":"myCollect",
+        "isShow": true
+      }
+    ]
+  },
+  "platform": {
+    "console_manage": {
+      "name": "控制台",
+      "login_logo_text": "信息资源服务平台",
+      "login_title": "控制台",
+      "loginPageFlag1": "开放包容，助力发展",
+      "loginPageFlag2": "统一的标准，统一的管理体系，实现所有系统用户、认证的管理",
+      "pageArr": [
+        {
+          "name": "首页",
+          "app": "jingwubao_home",
+          "isShow": true
+        },
+        {
+          "name": "控制台",
+          "app": "pcAppMarket",
+          "isShow": true
+        },
+        {
+          "name": "关于",
+          "app": "home",
+          "isShow": true
+        }
+      ],
+      "console_manage_admin_appList": [
+        {
+          "appName": "组织中台",
+          "app": "userservice_manage",
+          "isShow": true,
+          "apk_url": "/userservice_manage/index.html"
+        },
+        {
+          "appName": "管理员管控平台",
+          "app": "admin_manage",
+          "isShow": true,
+          "apk_url": "/admin_manage/index.html"
+        },
+        {
+          "appName": "开发者开放平台",
+          "app": "supplier_manage",
+          "apk_url": "/supplier_manage/index.html",
+          "isShow": true
+        },
+        {
+          "appName": "设备管理",
+          "app": "device_manage",
+          "isShow": false
+        },
+        {
+          "appName": "一张图Web端",
+          "app": "oneMap_web",
+          "isShow": false
+        },
+        {
+          "appName": "离线管理",
+          "app": "offline_mange",
+          "isShow": false
+        },
+        {
+          "appName": "现场态势分屏播放",
+          "app": "video_mange",
+          "isShow": false
+        },
+        {
+          "appName": "边海防一张图",
+          "app": "bhf_onemap",
+          "isShow": false
+        },
+        {
+          "appName": "智慧监狱平台",
+          "app": "zhjy_onemap",
+          "isShow": false
+        }
+      ]
+    },
+    "desktop": {
+      "name": "统一门户",
+      "login_logo_text": "统一门户",
+      "login_title": "统一门户",
+      "loginPageFlag1": "开放包容，助力发展",
+      "loginPageFlag2": "统一的标准，统一的管理体系，实现所有系统用户、认证的管理"
+    },
+    "adminmanage": {
+      "name": "管理员平台",
+      "login_logo_text": "信息资源服务平台",
+      "login_title": "管理员管控",
+      "loginPageFlag1": "开放包容，助力发展",
+      "loginPageFlag2": "统一的标准，统一的管理体系，实现所有系统用户、认证的管理"
+    },
+    "supplier": {
+      "name": "开发者平台",
+      "login_logo_text": "开发者开放平台",
+      "login_title": "开发者平台",
+      "loginPageFlag1": "开发者平台 1.0",
+      "loginPageFlag2": "统一的标准，统一的管理体系，实现所有系统用户、认证的管理"
+    },
+    "userservice": {
+      "name": "统一用户平台",
+      "login_logo_text": "信息资源服务平台",
+      "login_title": "统一用户",
+      "loginPageFlag1": "统一认证和用户身份管控1.0",
+      "loginPageFlag2": "统一的标准，统一的管理体系，实现所有系统用户、认证的管理"
+    },
+    "device_manage_web": {
+      "name": "设备管理平台",
+      "login_logo_text": "信息资源服务平台",
+      "login_title": "设备管理",
+      "loginPageFlag1": "创造无限可能",
+      "loginPageFlag2": "公共安全“私有云智能化应用建设解决方案”提供商"
+    },
+    "cloudClass": {
+      "name": "云课堂管理平台",
+      "login_logo_text": "云课堂管理平台",
+      "login_title": "云课堂管理平台",
+      "loginPageFlag1": "知识改变未来",
+      "loginPageFlag2": " "
+    },
+    "qafeedBack": {
+      "name": "问题管理管理平台",
+      "login_logo_text": "信息资源服务平台",
+      "login_title": "问题管理",
+      "loginPageFlag1": "海纳百川 , 有容乃大",
+      "loginPageFlag2": "问题管理，问题追踪，交流互动"
+    },
+    "offline_manage_web": {
+      "name": "离线管理平台",
+      "login_logo_text": "信息资源服务平台",
+      "login_title": "离线管理",
+      "loginPageFlag1": "开放包容，助力发展",
+      "loginPageFlag2": "统一的标准，统一的管理体系，实现所有系统用户、认证的管理"
+    },
+    "releaseNews": {
+      "name": "新闻管理平台",
+      "login_logo_text": "信息资源服务平台",
+      "login_title": "新闻管理",
+      "loginPageFlag1": "海纳百川 , 有容乃大",
+      "loginPageFlag2": "新闻管理，新闻追踪，交流互动"
+    },
+    "data_picture": {
+      "name": "一张图数据管理平台",
+      "login_logo_text": "信息资源服务平台",
+      "login_title": "一张图数据管理",
+      "loginPageFlag1": "一张图数据管理1.0",
+      "loginPageFlag2": " "
+    },
+    "police110_manage": {
+      "name": "110警情管理平台",
+      "login_logo_text": "信息资源服务平台",
+      "login_title": "110警情管理平台",
+      "loginPageFlag1": "110警情管理平台1.0",
+      "loginPageFlag2": " "
+    },
+    "oortcloud_dynamic": {
+      "name": "工作动态管理后台",
+      "login_logo_text": "工作动态管理后台",
+      "login_title": "工作动态管理后台",
+      "loginPageFlag1": "工作动态管理后台",
+      "loginPageFlag2": " "
+    }
+  }
+}
