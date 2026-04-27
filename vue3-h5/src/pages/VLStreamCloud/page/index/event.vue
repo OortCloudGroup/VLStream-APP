@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import bgImg from '@/assets/img/VLStreamCloud/bg.png'
-import eventPat from '@/pages/eventManagement/page/components/eventPat.vue'
+import eventPat from '@/pages/VLStreamCloud/page/components/event/eventPat.vue'
 
 // 事件类型 1:事件拍传 2:主动安全
 const currentModType = ref(2)

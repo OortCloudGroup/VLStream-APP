@@ -92,36 +92,36 @@ const routes = [
     path: '/myWorkorder',
     name: 'myWorkorder',
     meta: { title: '我的工单' },
-    component: () => import('@/pages/eventManagement/page/myWorkorder/myWorkorder.vue')
+    component: () => import('@/pages/VLStreamCloud/page/components/event/myWorkorder.vue')
   },
   {
     path: '/workorder-detail',
     name: 'WorkorderDetail',
     meta: { title: '工单详情' },
-    component: () => import('@/pages/eventManagement/page/myWorkorder/workorderDetail.vue')
+    component: () => import('@/pages/VLStreamCloud/page/components/event/workorderDetail.vue')
   },
   {
     path: '/eventBuilt',
     name: 'eventBuilt',
     meta: { title: '马上新建' },
-    component: () => import('@/pages/eventManagement/page/eventBuilt.vue')
+    component: () => import('@/pages/VLStreamCloud/page/components/event/eventBuilt.vue')
   },
   {
     path: '/feedbackRecord',
     name: 'feedbackRecord',
     meta: { title: '反馈记录' },
-    component: () => import('@/pages/eventManagement/page/feedbackRecord.vue')
+    component: () => import('@/pages/VLStreamCloud/page/components/event/feedbackRecord.vue')
   },
   {
     path: '/feedbackRecordAdd',
     name: 'feedbackRecordAdd',
     meta: { title: '添加反馈' },
-    component: () => import('@/pages/eventManagement/page/feedbackRecordBuilt.vue')
+    component: () => import('@/pages/VLStreamCloud/page/components/event/feedbackRecordBuilt.vue')
   },
   {
     path: '/event-detail',
     name: 'EventDetail',
-    component: () => import('@/pages/eventManagement/page/components/eventDetail.vue'),
+    component: () => import('@/pages/VLStreamCloud/page/components/event/eventDetail.vue'),
     meta: {
       index: 103,
       title: '事件详情'
@@ -130,7 +130,7 @@ const routes = [
   {
     path: '/deviceDetail',
     name: 'deviceDetail',
-    component: () => import('@/pages/eventManagement/page/components/eventDeviceDetail.vue'),
+    component: () => import('@/pages/VLStreamCloud/page/components/event/eventDeviceDetail.vue'),
     meta: {
       index: 103,
       title: '事件详情'

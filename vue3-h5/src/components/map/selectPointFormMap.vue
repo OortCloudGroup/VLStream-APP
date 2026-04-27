@@ -102,7 +102,7 @@ const handleComplete = () => {
 const props = defineProps({
   appId: {
     type: String,
-    default: AppConfig.commandDispatch.appId
+    default: AppConfig.VLStreamCloud.appId
   },
   //  是否开启周边搜索的模式
   isAroundSearch: {

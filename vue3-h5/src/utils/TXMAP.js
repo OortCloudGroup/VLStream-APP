@@ -4,7 +4,7 @@
  */
 export function TMap(key) {
   if (!key) {
-    key = '腾讯地图 API Key'
+    key = 'QJ2BZ-UC26D-DR64X-HDFRX-L6KRE-VABBM'
   }
   return new Promise(function(resolve, reject) {
     window.initMap = function() {
@@ -41,7 +41,7 @@ export function TMapLocation() {
 // 加载百度地图
 export function BDMap(ak) {
   if (!ak) {
-    ak = '百度地图 API Key'
+    ak = '4x4imCTxeh3mKBsv8mjAeanDGm1ZAODQ'
   }
   return new Promise(function(resolve, reject) {
     window.initBDMap = function() {

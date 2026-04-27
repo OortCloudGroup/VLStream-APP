@@ -30,7 +30,7 @@ const mapClick = (e) => {
 const props = defineProps({
   appId: {
     type: String,
-    default: AppConfig.smart_graden.appId
+    default: AppConfig.VLStreamCloud.appId
   }
 })
 // 使用地图配置store
