@@ -1,3 +1,189 @@
 # VLStream-APP
 
-VLStream APP
+> VLStream multi-platform application suite — cross-platform clients for Video & Location Stream scenarios, currently centered on the H5 mobile web client (Vue 3).
+
+English | [简体中文](./README.zh-CN.md)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![Vue](https://img.shields.io/badge/Vue-3.5-42b883.svg)](https://vuejs.org/)
+[![Vite](https://img.shields.io/badge/Vite-4-646cff.svg)](https://vitejs.dev/)
+[![Vant](https://img.shields.io/badge/Vant-4-ff6034.svg)](https://vant-ui.github.io/)
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Repository Structure](#repository-structure)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Multi-Project Mechanism](#multi-project-mechanism)
+- [Build & Deployment](#build--deployment)
+- [Code Conventions](#code-conventions)
+- [Related Documentation](#related-documentation)
+- [License](#license)
+
+---
+
+## Overview
+
+VLStream-APP is a **multi-platform client repository** organized by target platform. It adopts a "multi-project frontend collection" design: a single codebase can host multiple sub-projects, and the currently active project (for development / build) is selected via environment variables.
+
+At present, the native platform directories are placeholders, while the **implemented and ready-to-use H5 mobile client lives in [`vue3-h5`](./vue3-h5)**. It hosts the sub-project **VLStreamCloud (VLStream Cloud Platform)** — a mobile application combining map trajectories, video playback, event management, contacts, and more.
+
+## Repository Structure
+
+```
+VLStream-APP/
+├── Android/        # Android client (planned)
+├── Harmony OS/     # HarmonyOS client (planned)
+├── Kylin OS/       # Kylin OS client (planned)
+├── Linux/          # Linux client (planned)
+├── Mac OS/         # macOS client (planned)
+├── Windows/        # Windows client (planned)
+├── iOS/            # iOS client (planned)
+├── vue3-h5/        # ✅ H5 mobile client (Vue 3 + Vite) — core project
+├── LICENSE
+└── README.md
+```
+
+> Note: With the exception of `vue3-h5`, the platform directories above are currently `.gitkeep` placeholders and will be populated in future iterations.
+
+## Features
+
+- 🗺️ **Map & Trajectory**: Built on Leaflet, with trajectory playback (`leaflet-trackplayer`), animated paths (`leaflet-ant-path`), and marker clustering (`leaflet.markercluster`).
+- 🎬 **Video Playback**: Built-in `OPlayer` video player component.
+- 📋 **Event Management**: Event Management business module.
+- 📇 **Contacts**: Organization / contact tree component (`contactTree`), often used together with the popup component.
+- 🖼️ **Images & Upload**: Image preview (both functional and component forms) and file uploader components.
+- 📝 **Dynamic Forms**: Mobile form engine based on `vform3-mobile`.
+- 🌍 **Internationalization**: Multi-language support via `vue-i18n`.
+- 📱 **Mobile Adaptation**: Automatic px → vw conversion via `postcss-px-to-viewport` (design width 360px).
+
+## Tech Stack
+
+| Category | Technology |
+| --- | --- |
+| Framework | Vue 3.5 (`<script setup>` + JSX) |
+| Build Tool | Vite 4 |
+| Language | TypeScript |
+| UI Library | Vant 4 |
+| State Management | Pinia 3 |
+| Routing | Vue Router 4 |
+| Maps | Leaflet + trackplayer + ant-path + markercluster |
+| HTTP | axios |
+| Forms | vform3-mobile-builds |
+| i18n | vue-i18n 11 |
+| Utilities | lodash-es, dayjs, moment, qs, mitt, jsencrypt, gcoord |
+| Code Quality | ESLint + Husky + commitlint + lint-staged |
+| Auto Import | unplugin-auto-import, unplugin-vue-components |
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js ≥ 16
+- Package manager: [pnpm](https://pnpm.io/) recommended (the project ships a `pnpm-lock.yaml`; npm / yarn also work)
+
+### Install & Run
+
+```bash
+cd vue3-h5
+
+# Install dependencies
+pnpm install        # or: npm install / yarn
+
+# Start the dev server
+pnpm start          # equivalent to: vite
+```
+
+Then open **http://localhost:8080** (the dev server is bound to `0.0.0.0:8080`, so you can debug on a real device over the same LAN).
+
+> The project launched by default is determined by `VITE_PROJECT_DIR` in [`vue3-h5/.env`](./vue3-h5/.env) — currently `VLStreamCloud`.
+
+## Multi-Project Mechanism
+
+`vue3-h5` is a **single-page, multi-project collection** codebase: switch the active project via `.env`, and compile a specific project via the `package.json` scripts + `build.sh`. A recompile is required after each switch.
+
+- **Switch in development**: edit [`vue3-h5/.env`](./vue3-h5/.env) and set `VITE_PROJECT_DIR=<project-name>` (matching a directory under `src/pages/`).
+- **Entry resolution**: Vite uses `src/pages/<project-name>/main.ts` as the entry for that project.
+
+```
+vue3-h5/src/
+├── api/          # Network requests per project
+├── assets/       # Assets (fonts / images / shared styles)
+├── components/   # Shared components (contacts, map, popup, uploader, form, etc.)
+├── config/       # Project config (AppConfig / env & network / UI config / pageConfig)
+├── hooks/        # Composables
+├── lang/         # i18n language packs
+├── pages/        # Per-project code (currently: VLStreamCloud)
+├── store/        # Pinia state management
+├── types/        # TypeScript type definitions
+└── utils/        # Utilities (http, bus, etc.)
+```
+
+For the full directory layout and component library docs, see [`vue3-h5/README.md`](./vue3-h5/README.md).
+
+## Build & Deployment
+
+### Build a Single Project
+
+Pass the project name to `build.sh` for a production build (it writes `NODE_BUILDTARGET` into `.env.production` and then runs `vite build`):
+
+```bash
+cd vue3-h5
+sh ./build.sh VLStreamCloud
+# or use the preset script
+pnpm run build:VLStreamCloud
+```
+
+Build output goes to `vue3-h5/dist`. The repository also provides `moveTodepoly.sh` to move artifacts into the deployment directory for Git-based auto-deployment.
+
+### Add a New Project
+
+1. Create a new folder named after the project under `src/pages/` (recommended: copy an existing project and modify it).
+2. Add the project's config in `src/config/pageConfig.ts`.
+3. Configure the project's launch entry in `.env`.
+4. Add a corresponding `build:<project-name>` entry to the `scripts` in `package.json`.
+
+> ⚠️ The project name must be identical across all of the above.
+
+## Code Conventions
+
+### Commit Convention
+
+The project uses [commitlint](https://commitlint.js.org/) to enforce commit message format. Only the following types are allowed (the type must be followed by a colon and a space, e.g. `fix: resolve login bug`):
+
+| Type | Description |
+| --- | --- |
+| `feat` | A new feature |
+| `fix` | A bug fix |
+| `upd` | An update (neither `feat` nor `fix`) |
+| `docs` | Documentation changes |
+| `style` | Formatting (no runtime impact) |
+| `refactor` | Code refactoring |
+| `revert` | Revert a previous commit |
+| `test` | Adding tests |
+| `chore` | Build process or auxiliary tooling changes |
+
+### ESLint Rules
+
+- `v-for` must have a bound `:key`.
+- Prefer strict equality `===` when the value type is known.
+- Unused variables / imports / components must be removed or commented out.
+- Declare arrays with `[]` and objects with `{}`.
+- No trailing commas.
+
+For details, see [`vue3-h5/.eslintrc.cjs`](./vue3-h5/.eslintrc.cjs) and [`vue3-h5/REFRENCE.md`](./vue3-h5/REFRENCE.md).
+
+## Related Documentation
+
+- [vue3-h5 detailed guide (directory layout / component library / workflow)](./vue3-h5/README.md)
+- [Code style reference](./vue3-h5/REFRENCE.md)
+- [Commit convention config](./vue3-h5/commitlint.config.js)
+- [Vite build config](./vue3-h5/vite.config.ts)
+
+## License
+
+This project is licensed under the [MIT License](./LICENSE).

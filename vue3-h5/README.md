@@ -1,184 +1,181 @@
-## 目录
+English | [简体中文](./README.zh-CN.md)
 
-1. [前端多项目集合](#前端多项目集合)
-1. [目录结构](#目录结构)
-1. [快速上手](#快速上手)
-1. [开发](#开发)
-1. [发布](#发布)
-1. [新建项目](#新建项目)
-1. [commit 规范](#commit规范)
-1. [eslint 规范](#eslint规范)
-1. [图片资源命名规范](#图片资源命名规范)
-1. [其他](#其他)
+## Table of Contents
 
-# 前端多项目集合
+1. [Multi-Project Frontend Collection](#multi-project-frontend-collection)
+1. [Directory Structure](#directory-structure)
+1. [Quick Start](#quick-start)
+1. [Development](#development)
+1. [Build](#build)
+1. [Create a New Project](#create-a-new-project)
+1. [Commit Convention](#commit-convention)
+1. [ESLint Rules](#eslint-rules)
+1. [Image Asset Naming Convention](#image-asset-naming-convention)
+1. [Miscellaneous](#miscellaneous)
 
-code 为多个单页面 vue 项目的合集，利用.env 文件配置启动具体的项目以及
-package.json 的 script 编译项目。
+# Multi-Project Frontend Collection
 
-## 目录结构
+The codebase is a collection of single-page Vue projects. The `.env` file selects which project to launch, and the `package.json` scripts compile a specific project.
+
+## Directory Structure
 
 ```js
-├── dist                                 # 执行build后生成的文件夹
-├── pubilc                               # 移动端H5项目的模板文件夹
+├── dist                                 # Output folder generated after build
+├── public                               # Template folder for the mobile H5 project
 ├── src
-│   ├── api                              # 各个项目网络请求api
-│   ├── assets                           # 资源文件夹
-│   │   ├── @font-face                   # 字体
-│   │   ├── img                          # 各个项目的图片文件夹，文件以项目区分；包含公共的img
-│   │   ├── css                          # 公共的css
-│   │   ├── styles                       # 公共的styles，主要配置一些公共的css变量
-│   │   ├── theme                        # 公共的主题文件夹，尚未用到
-│   ├── components                       # 公共的组件,用于存放封装的一些公共组件（开发项目中，需谨慎修改，防止修改其他项目出问题）
-│   ├── config                           # 各个项目的配置
-│   │   ├── AppConfig.js                 # 移动端H5项目的配置，appid 密钥等
-│   │   ├── index.js                     # 环境以及网络ip的配置
-│   │   ├── UIConfig.js                  # UI显示以及logo等的配置
-│   ├── mock                             # mock网络请求的文件夹，目前尚未用到
-│   ├── pages                            # 各个项目的代码文件夹（这里展开两个 一个pc（管理员平台），一个移动端（奥陌陌首页H5）其他的类似）
-移动端项目目录示例
-│   │   ├── aomomo_home                  # pc 端项目文件夹展开示例
+│   ├── api                              # Per-project network request APIs
+│   ├── assets                           # Asset folder
+│   │   ├── @font-face                   # Fonts
+│   │   ├── img                          # Per-project image folders (organized by project); also includes shared images
+│   │   ├── css                          # Shared CSS
+│   │   ├── styles                       # Shared styles, mainly defines common CSS variables
+│   │   ├── theme                        # Shared theme folder, not yet used
+│   ├── components                       # Shared components; holds encapsulated common components (be careful when modifying during development to avoid breaking other projects)
+│   ├── config                           # Per-project configuration
+│   │   ├── AppConfig.js                 # Config for the mobile H5 project: appid, secrets, etc.
+│   │   ├── index.js                     # Environment and network IP configuration
+│   │   ├── UIConfig.js                  # UI display and logo configuration
+│   ├── mock                             # Mock network request folder, not yet used
+│   ├── pages                            # Per-project code folders (e.g. a PC admin platform and a mobile H5 homepage; others are similar)
+Example mobile project directory
+│   │   ├── aomomo_home                  # Example PC-side project folder
 │   │   │   ├── index
-│   │   │   │   ├── components           # 项目公用的组件文件夹
-│   │   │   │   ├── page                 # 路由页文件夹
-│   │   │   │   ├── router               # 项目路由配置文件夹
-│   │   │   │   ├── index.js             # 项目入口
-│   │   │   │   ├── index.vue            # 组件入口
-│   │   │   ├── store                    # vuex
-│   │   │   │   ├── modules              # vuex 模块文件
-│   │   │   │   ├── index.js             # vuex 配置入口
-│   │   │   │   ├── getters.js           # vuex getter文件
-│   │   │   ├── App.css                  # 项目公用的css（当样式与全局的样式冲突时，需要修改的css 应放在这里）
+│   │   │   │   ├── components           # Project-level shared component folder
+│   │   │   │   ├── page                 # Route page folder
+│   │   │   │   ├── router               # Project routing configuration folder
+│   │   │   │   ├── index.js             # Project entry
+│   │   │   │   ├── index.vue            # Component entry
+│   │   │   ├── store                    # pinia
+│   │   │   │   ├── modules              # pinia module files
+│   │   │   │   ├── index.js             # pinia configuration entry
+│   │   │   │   ├── getters.js           # pinia getters file
+│   │   │   ├── App.css                  # Project-level shared CSS (place CSS here when it conflicts with global styles)
 
-│   ├── route                            # 项目公共路由文件，如h5应用的关于页面等
-│   ├── util                             # 项目工具文件，如http.js, bus.js 等文件
-├── tempLib                              # 临时文件夹
-├── .env                                 # 开发 env 的配置文件，可 切换项目；注意；每次切换都需要重新编译运行
-├── .env.production                      # build 模式下，各个项目的配置文件夹
+│   ├── route                            # Shared route files, e.g. the about page of the H5 app
+│   ├── util                             # Project utility files, e.g. http.js, bus.js
+├── tempLib                              # Temporary folder
+├── .env                                 # Dev env config file; switch projects here. Note: a recompile is required after each switch
+├── .env.production                      # Per-project configuration under build mode
 
-├── .eslintignore                        # eslint 忽略文件配置
-├── .eslintrc.js                         # eslint 文件配置
-├── .gitignore.js                        # git 忽略文件配置
-├── babel.config.js                      # babel 文件配置
-├── commitlint.config.js                 # git commit 规范文件配置
+├── .eslintignore                        # ESLint ignore configuration
+├── .eslintrc.js                         # ESLint configuration
+├── .gitignore.js                        # Git ignore configuration
+├── babel.config.js                      # Babel configuration
+├── commitlint.config.js                 # Git commit convention configuration
 ├── package.json
-├── vite.config.js                        # vue 3.0 配置
+├── vite.config.js                        # Vue 3.0 configuration
 
 ```
 
-## 快速上手
+## Quick Start
 
-执行以下命令可以快速运行项目
+Run the following commands to start the project quickly:
 
 1. yarn install
 2. yarn start
-3. 访问 http://localhost:8080
+3. Open http://localhost:8080
 
-## 开发
+## Development
 
-1. 在 .env 文件中找到需要开发的项目，打开注释，注意只能有一个打开的注释，若有多个，则以最后一个为准
+1. In the `.env` file, find the project you want to develop and uncomment it. Note: only one project may be uncommented at a time; if multiple are uncommented, the last one takes effect.
 2. yarn start
-3. 访问 http://localhost:8080
-4. 在 src/pages 下找到对应的项目开发
+3. Open http://localhost:8080
+4. Find the corresponding project under `src/pages` and start developing.
 
-## 发布
+## Build
 
-#### 单个项目编译
+#### Compile a single project
 
-- pnpm run build: 相应的项目文件夹名称 或者运行 webstorm 的配置
-- 生成的文件夹 为 dist
+- `pnpm run build:<project-folder-name>`, or run the WebStorm configuration
+- Output is generated in the `dist` folder
 
-## 新建项目
+## Create a New Project
 
-    注意 ： 项目名称保持一致
+    Note: keep the project name consistent across all places.
 
-1. src 下创建项目名称的文件夹（最后复制原有的项目后做删除操作，可最大避免一些乱七八糟的问题）
-2. src/config/pageConfig 下创建项目名称的文件 （最好复制原有的项目后做删除操作，可最大避免一些乱七八糟的问题）
-3. .env 配置好项目名称的启动
-4. package.json 文件新增 build 配置
+1. Create a folder named after the project under `src/` (recommended: copy an existing project and then remove what you don't need — this avoids many common issues).
+2. Create a file named after the project under `src/config/pageConfig` (recommended: copy an existing one and trim it down — this avoids many common issues).
+3. Configure the project's launch entry in `.env`.
+4. Add a build configuration for the project in `package.json`.
 
-## commit 规范
+## Commit Convention
 
-项目使用了 commitlint 来规范提交 log
-以下说明 commit 的类别，只允许使用下面 7 个标识，提交时类别不能为空，且提交内容不能为空
+The project uses commitlint to enforce the commit message format.
+The following type identifiers are allowed. The type is required (cannot be empty), and the commit description cannot be empty either.
 
-- upd：更新某功能（不是 feat, 不是 fix）
-- feat：新功能（feature）
-- fix：修补 bug
-- docs：文档（documentation）
-- style： 格式（不影响代码运行的变动）
-- refactor：重构（即不是新增功能，也不是修改 bug 的代码变动）
-- revert：回滚
-- test：增加测试
-- chore：构建过程或辅助工具的变动
+- upd: update a feature (neither feat nor fix)
+- feat: a new feature
+- fix: a bug fix
+- docs: documentation
+- style: formatting (changes that do not affect runtime behavior)
+- refactor: refactoring (neither a new feature nor a bug fix)
+- revert: revert a commit
+- test: add tests
+- chore: build process or auxiliary tooling changes
 
-注意： 类型后台冒号空格 例: fix: 修复 bug
+Note: a colon followed by a space is required after the type. Example: `fix: resolve login bug`
 
-## eslint 规范
+## ESLint Rules
 
-- webstorm 建议安装 eslint 插件，每次编辑完文件后，eslint fix 修复或者养成良好的编码习惯
-  具体规范： 自行查阅配置文件或者阅读 [Airbnb JavaScript 风格指南](http://192.168.88.110:32433/oortfrontgroup/oort_h5/blob/master/REFRENCE.md)
+- For WebStorm, installing the ESLint plugin is recommended. After editing a file, run ESLint --fix, or cultivate good coding habits.
+  For the full rules, check the configuration file or read the [Airbnb JavaScript Style Guide](http://192.168.88.110:32433/oortfrontgroup/oort_h5/blob/master/REFRENCE.md).
 
-常见规范也是本项目基本规范：
+Common rules that are also the baseline for this project:
 
-- v-for :key 必须
+- `v-for` must have a `:key`
 
 ```vue
 <service-items v-for="(item, index) in tableData" :key="index" :data="item" />
 ```
 
-- 等于号 在确定值得类型情况下，尽量使用 三等号 ===
+- When the value type is known, prefer strict equality `===`
 
-- 未用到得变量声明 要注释或者去除 包括 import ,变量， 组件
+- Unused declarations — including imports, variables, and components — should be commented out or removed
 
-- 声明数组用 [] ,对象 {}
+- Declare arrays with `[]` and objects with `{}`
 
-- 结尾逗号要去除
+- Remove trailing commas
 
-## 图片资源命名规范
+## Image Asset Naming Convention
 
-1. 不用出现中文名称
-2. 不要出现命名空格
+1. No Chinese characters in names
+2. No spaces in names
 
-## 其他
+## Miscellaneous
 
-### 出错了怎么办
+### What if something goes wrong?
 
-1. 看报错信息，分析报错信息，deepseek 搞一下
+1. Read the error message, analyze it, and consult DeepSeek for help.
 
-## 移动端 app index.vue
+## Mobile app index.vue
 
-使用了多个 mixins ，为了提供通用的代码
-devLogin pc 调试登录界面
-routeAnimate 动画路由相关
-backButton 移动端返回键监听的
-getTokenAndGateway 获取 token 和网关
+Multiple mixins are used to provide reusable code:
+devLogin — PC debug login screen
+routeAnimate — route transition animations
+backButton — mobile back-button listener
+getTokenAndGateway — fetch token and gateway
 
-## NavHeaderBanner 移动端 banner 统一组件
+## NavHeaderBanner — unified mobile banner component
 
 [NavHeaderBanner](./src/components/navHeaderBanner/)
 
-## 评论组件
-
-[NavHeaderBanner](/src/components/comment_system/)
-
-## oort-popup 组件
+## oort-popup Component
 
 [oort-popup](/src/components/popup/)
 
-## oort-field 组件
+## oort-field Component
 
 [oort-field](/src/components/field/)
 
-## oort-image-preivew 组件
+## oort-image-preview Component
 
-[oort-image-preivew](/src/components/imagePreview/)
-注意：image 组件分为函数式和组件式
+[oort-image-preview](/src/components/imagePreview/)
+Note: the image component comes in both a functional form and a component form.
 
-## oort-uploader 组件
+## oort-uploader Component
 
 [oort-uploader](/src/components/uploader/)
 
-## 通讯录组件 一般结合 oort-popup 使用
+## Contacts Component — usually used together with oort-popup
 
 [Contact](/src/components/contactTree/)
