@@ -13,7 +13,7 @@
  *
  * 通用能力（拍照、退出、定位）由官方 @capacitor-ohos/app/camera/geolocation 提供。
  */
-import { CapacitorPlugin, PluginCall } from 'openHarmony-capacitor';
+import { CapacitorPlugin, PluginCall } from 'harmony-capacitor';
 
 const APP_GATEWAY: string = 'https://workup-dev.myoumuamua.com:6433';
 const APP_ID: string = '747aa0fa18d047c8b526e242142e0a6c';
@@ -98,18 +98,11 @@ export class NativeBridgePlugin extends CapacitorPlugin {
   }
 
   /**
-   * 取状态栏高度（vp）。鸿蒙全局窗口避让区可通过 UIAbility 拿到，
-   * 这里用资源 system 资源近似：status_bar_height 不存在于鸿蒙资源，
-   * 改用窗口实例的 avoidArea。插件内拿不到 window，暂返回 0，
-   * 由 H5 侧 env(safe-area-inset-top) / JS bridge 兜底。
-   * 如需精确值，可在 EntryAbility 注入到 globalThis 后这里读取。
+   * 取状态栏高度（vp）。EntryAbility.onCreate 已把避让区高度存入
+   * AppStorage('__safeAreaTop')，这里读取注入 H5。
    */
   getSafeAreaTopVp(): number {
-    try {
-      const v: number = (globalThis as Record<string, number>)['__safeAreaTop'] ?? 0;
-      return v;
-    } catch (e) {
-      return 0;
-    }
+    const v: number = AppStorage.get<number>('__safeAreaTop') ?? 0;
+    return v;
   }
 }
