@@ -130,9 +130,14 @@ export default defineConfig(({ command, mode }) => {
       copy({
         targets: copyTarget
       }),
-      legacy({
-        targets: ['defaults', 'not IE 11']
-      })
+      // legacy 兼容旧浏览器；Android WebView 等现代环境通过 VITE_DISABLE_LEGACY=1 禁用，
+      // 避免 file:// 离线包下 origin=null 触发 legacy 兜底，导致主入口 module 被 CORS 拦截白屏。
+      // 用 loadEnv 加载的 env（覆盖 .env / .env.[mode]），比 process.env 更可靠。
+      ...((env.VITE_DISABLE_LEGACY === '1' || process.env.VITE_DISABLE_LEGACY === '1')
+        ? []
+        : [legacy({
+          targets: ['defaults', 'not IE 11']
+        })])
     ],
     assetsInclude: [
       '**/*.ttf',
