@@ -1,4 +1,4 @@
-import { MainPage, pageBackPress, pageHideEvent, pageShowEvent, MainPageOnBackPress, PluginEntry } from 'openHarmony-capacitor';
+import { MainPage, pageBackPress, pageHideEvent, pageShowEvent, MainPageOnBackPress, PluginEntry } from 'harmony-capacitor';
 import { NativeBridgePlugin } from '../plugins/NativeBridgePlugin';
 
 @Entry
