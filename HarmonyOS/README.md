@@ -7,18 +7,18 @@
 ## 目录结构
 
 ```
-Harmony OS/
+HarmonyOS/
 ├── AppScope/
 │   ├── app.json5                          # 应用级配置（bundleName/version/icon/label）
 │   └── resources/base/
 │       ├── element/string.json            # app_name = VLStream
-│       └── media/app_icon.png             # 应用图标（VLS logo）
+│       └── media/app_icon.png             # 应用图标（VLS logo，白底）
 ├── entry/                                 # 主入口 HAP 模块
 │   ├── build-profile.json5 / oh-package.json5 / hvigorfile.ts
 │   └── src/main/
 │       ├── module.json5                   # abilities + 权限（INTERNET/CAMERA/相册/定位）
 │       ├── ets/
-│       │   ├── entryability/EntryAbility.ets   # UIAbility：WebView 引擎初始化 + 沉浸式状态栏
+│       │   ├── entryability/EntryAbility.ets   # UIAbility：WebView 引擎初始化 + 沉浸式状态栏（AppStorage 传值）
 │       │   ├── pages/Index.ets                  # @Entry 页面：挂 MainPage + 注册 NativeBridge plugin
 │       │   └── plugins/NativeBridgePlugin.ets   # 自研 ArkTS 业务 plugin
 │       └── resources/
@@ -26,14 +26,15 @@ Harmony OS/
 │           └── rawfile/
 │               ├── capacitor.config.json        # 框架配置（含 packageClassList）
 │               ├── capacitor.plugins.json        # 已登记 App/Camera/Geolocation 三个官方插件
-│               └── www/                          # ← vue3-h5/dist 离线包
+│               └── www/                          # ← vue3-h5/dist 离线包（gitignore，手动同步）
 ├── capacitor/                             # openHarmony-capacitor HAR 模块（已集成 3 个官方插件源码）
 │   ├── libs/{arm64-v8a,x86_64}/           # openssl 动态库（libssl.so.3 / libcrypto.so.3）
 │   ├── src/main/cpp/                      # C++ 层：capacitor 核心 + App/Camera/Geolocation 插件 + openssl 头
 │   └── src/main/ets/components/           # ArkTS 层：capacitor 核心 + 官方插件 ets
-├── build-profile.json5                    # 工程级：products + modules（entry + capacitor）
-├── oh-package.json5                       # 工程级依赖
-└── hvigorfile.ts
+├── hvigor/hvigor-config.json5            # hvigor 配置（modelVersion 5.0.1）
+├── build-profile.json5                    # 工程级：products + modules（entry + capacitor）+ strictMode
+├── oh-package.json5                       # 工程级依赖（harmony-capacitor）
+└── hvigorfile.ts                          # appTasks
 ```
 
 ## 集成的官方插件（鸿蒙版）
@@ -82,28 +83,32 @@ cd vue3-h5
 pnpm install
 pnpm build:VLStreamCloud          # 产物在 vue3-h5/dist
 # 手动同步到鸿蒙 rawfile（openHarmony-capacitor 无 cap copy，需手动）：
-rm -rf "../Harmony OS/entry/src/main/resources/rawfile/www"
-mkdir -p "../Harmony OS/entry/src/main/resources/rawfile/www"
-cp -r dist/. "../Harmony OS/entry/src/main/resources/rawfile/www/"
+rm -rf "../HarmonyOS/entry/src/main/resources/rawfile/www"
+mkdir -p "../HarmonyOS/entry/src/main/resources/rawfile/www"
+cp -r dist/. "../HarmonyOS/entry/src/main/resources/rawfile/www/"
 ```
 
 ### 2. 用 DevEco Studio 打开构建
 
-1. DevEco Studio → Open → 选 `Harmony OS/` 目录（识别为 HarmonyOS 工程）。
+1. DevEco Studio → Open → 选 `HarmonyOS/` 目录（识别为 HarmonyOS 工程）。
 2. 等待 `ohpm install` / `hvigor` 同步（首次会下载 `@ohos/hvigor-ohos-plugin` 等）。
 3. 配置签名：File → Project Structure → Signing Configs（选 Automatic 或手动证书）。
 4. 选设备（模拟器 x86_64 / 真机 arm64-v8a）→ Run。
 
-或命令行：
+或命令行（需先设 `DEVECO_SDK_HOME` 指向 DevEco 的 sdk 目录）：
 ```bash
-cd "Harmony OS"
-hvigorw assembleHap              # 产物 entry/build/default/outputs/default/entry-default-signed.hap
-hdc install entry/build/default/outputs/default/entry-default-signed.hap
+cd HarmonyOS
+hvigorw assembleHap -p product=default --mode module -p module=entry@default
+# 产物 entry/build/default/outputs/default/entry-default-unsigned.hap
+hdc install entry/build/default/outputs/default/entry-default-unsigned.hap
+hdc shell aa start -a EntryAbility -b com.oort.vlstream.app
 ```
 
 ### 3. 沉浸式状态栏
 
-`EntryAbility.onCreate` 计算状态栏高度（px→vp）挂到 `globalThis.__safeAreaTop`，`onWindowStageCreate` 调 `setWindowLayoutFullScreen(true)` 开启沉浸式；`NativeBridgePlugin.handleOnPageStart` 把 `__safeAreaTop` 注入 H5，供 LoginDev/workbench 顶部留白（与 Android 端 edge-to-edge 一致）。
+`EntryAbility.onWindowStageCreate` 调 `getMainWindowSync()` 取避让区高度（px→vp，经 `display.densityPixels` 换算）存入 `AppStorage('__safeAreaTop')`，并调 `setWindowLayoutFullScreen(true)` 开启沉浸式；`NativeBridgePlugin.handleOnPageStart` 从 `AppStorage` 读出并通过 `runJavaScript` 注入 H5 的 `window.__safeAreaTop`，供 LoginDev/workbench 顶部留白（与 Android 端 edge-to-edge 一致）。
+
+> 状态栏高度经 `AppStorage` 传递（替代 `globalThis`，规避 ArkTS `arkts-no-any-unknown` 约束）。
 
 ## 开发期联调（连 dev server）
 

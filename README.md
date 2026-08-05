@@ -1,6 +1,6 @@
 # VLStream-APP
 
-> VLStream multi-platform application suite — cross-platform clients for Video & Location Stream scenarios, currently centered on the H5 mobile web client (Vue 3).
+> VLStream multi-platform application suite — a single Vue 3 H5 codebase packaged as native clients for Android, iOS, and HarmonyOS via Capacitor.
 
 English | [简体中文](./README.zh-CN.md)
 
@@ -8,6 +8,7 @@ English | [简体中文](./README.zh-CN.md)
 [![Vue](https://img.shields.io/badge/Vue-3.5-42b883.svg)](https://vuejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-4-646cff.svg)](https://vitejs.dev/)
 [![Vant](https://img.shields.io/badge/Vant-4-ff6034.svg)](https://vant-ui.github.io/)
+[![Capacitor](https://img.shields.io/badge/Capacitor-8-119eff.svg)](https://capacitorjs.com/)
 
 ---
 
@@ -15,6 +16,7 @@ English | [简体中文](./README.zh-CN.md)
 
 - [Overview](#overview)
 - [Repository Structure](#repository-structure)
+- [The Three Native Shells](#the-three-native-shells)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
@@ -28,27 +30,49 @@ English | [简体中文](./README.zh-CN.md)
 
 ## Overview
 
-VLStream-APP is a **multi-platform client repository** organized by target platform. It adopts a "multi-project frontend collection" design: a single codebase can host multiple sub-projects, and the currently active project (for development / build) is selected via environment variables.
+VLStream-APP is a **multi-platform client repository**. The core is a Vue 3 H5 mobile client ([`vue3-h5`](./vue3-h5)) hosting the sub-project **VLStreamCloud (VLStream Cloud Platform)**. This single H5 codebase is packaged into native apps for three platforms — **Android, iOS, and HarmonyOS** — all built on [Capacitor](https://capacitorjs.com/) 8 and sharing one bridge contract (`window.androidFunUtils` + `window.__VL_STATIC__`), so the H5 business code has **zero platform branches**.
 
-At present, the native platform directories are placeholders, while the **implemented and ready-to-use H5 mobile client lives in [`vue3-h5`](./vue3-h5)**. It hosts the sub-project **VLStreamCloud (VLStream Cloud Platform)** — a mobile application combining map trajectories, video playback, event management, contacts, and more.
+The remaining platform directories (`Windows/`, `Mac OS/`, `Linux/`, `Kylin OS/`) are `.gitkeep` placeholders for future native clients.
 
 ## Repository Structure
 
 ```
 VLStream-APP/
-├── Android/        # Android client (planned)
-├── Harmony OS/     # HarmonyOS client (planned)
-├── Kylin OS/       # Kylin OS client (planned)
-├── Linux/          # Linux client (planned)
-├── Mac OS/         # macOS client (planned)
+├── vue3-h5/        # ✅ H5 mobile client (Vue 3 + Vite) — shared core & build entry
+├── Android/        # ✅ Android shell (Capacitor 8)          → Android/android
+├── iOS/            # ✅ iOS shell (Capacitor 8)              → iOS/ios
+├── HarmonyOS/      # ✅ HarmonyOS shell (openHarmony-capacitor) → HarmonyOS
 ├── Windows/        # Windows client (planned)
-├── iOS/            # iOS client (planned)
-├── vue3-h5/        # ✅ H5 mobile client (Vue 3 + Vite) — core project
+├── Mac OS/         # macOS client (planned)
+├── Linux/          # Linux client (planned)
+├── Kylin OS/       # Kylin OS client (planned)
+├── docs/vls/       # Brand logo & icon source assets
 ├── LICENSE
 └── README.md
 ```
 
-> Note: With the exception of `vue3-h5`, the platform directories above are currently `.gitkeep` placeholders and will be populated in future iterations.
+## The Three Native Shells
+
+All three shells load the same `vue3-h5/dist` offline package and expose an identical set of native capabilities through one self-developed `NativeBridge` plugin (gateway / appInfo / tokenOverdue) plus official Capacitor plugins (camera / app-exit / geolocation). The H5 side (`vue3-h5/public/androidFunUtils.js`) keeps a stable signature across platforms.
+
+| Platform | Base | Shell dir | Build toolchain | Docs |
+| --- | --- | --- | --- | --- |
+| Android | Capacitor 8 (`@capacitor/android`) | [`Android/android`](./Android/android) | Android Studio / Gradle (JDK 21, AGP 8.13) | [`Android/README.md`](./Android/README.md) |
+| iOS | Capacitor 8 (`@capacitor/ios`) | [`iOS/ios`](./iOS/ios) | Xcode 16+ / SPM (macOS only) | [`iOS/README.md`](./iOS/README.md) |
+| HarmonyOS | openHarmony-capacitor 8 | [`HarmonyOS`](./HarmonyOS) | DevEco Studio 6.1+ / hvigor | [`HarmonyOS/README.md`](./HarmonyOS/README.md) |
+
+> The shell path for Android/iOS is configured via `vue3-h5/capacitor.config.json` (`android.path` / `ios.path`); HarmonyOS uses `entry/src/main/resources/rawfile/www` and a manual `dist` sync (no `cap copy`).
+
+### Capability mapping (H5 → native)
+
+| H5 (`window.androidFunUtils`) | Implementation (identical across all 3 platforms) |
+| --- | --- |
+| `getGateway()` (sync) | `NativeBridge` injects `window.__VL_STATIC__.gateway` at document-start |
+| `getAppInfo()` / `tokenOverdue()` | Self-developed `NativeBridge` plugin |
+| `appExit()` | Official `@capacitor/app` `exitApp()` |
+| `takePhoto(params)` | Official `@capacitor/camera` |
+| `FileTransfer` upload | H5 XHR + FormData polyfill (decoupled from native) |
+| `is_native_shell` flag | `NativeBridge` injects `window.global.is_native_shell = true` |
 
 ## Features
 
@@ -76,6 +100,7 @@ VLStream-APP/
 | Forms | vform3-mobile-builds |
 | i18n | vue-i18n 11 |
 | Utilities | lodash-es, dayjs, moment, qs, mitt, jsencrypt, gcoord |
+| **Native Shell** | **Capacitor 8 (Android / iOS) + openHarmony-capacitor 8 (HarmonyOS)** |
 | Code Quality | ESLint + Husky + commitlint + lint-staged |
 | Auto Import | unplugin-auto-import, unplugin-vue-components |
 
@@ -127,18 +152,58 @@ For the full directory layout and component library docs, see [`vue3-h5/README.m
 
 ## Build & Deployment
 
-### Build a Single Project
+### 1. Build the shared H5 bundle
 
-Pass the project name to `build.sh` for a production build (it writes `NODE_BUILDTARGET` into `.env.production` and then runs `vite build`):
+Every native shell consumes the same `vue3-h5/dist`:
 
 ```bash
 cd vue3-h5
-sh ./build.sh VLStreamCloud
-# or use the preset script
-pnpm run build:VLStreamCloud
+pnpm install
+pnpm run build:VLStreamCloud      # runs build.sh → vite build → vue3-h5/dist
 ```
 
-Build output goes to `vue3-h5/dist`. The repository also provides `moveTodepoly.sh` to move artifacts into the deployment directory for Git-based auto-deployment.
+### 2. Build each native client
+
+<details>
+<summary><b>Android</b> (JDK 21, Android SDK 36)</summary>
+
+```bash
+cd vue3-h5 && npx cap sync android     # copy dist + register official plugins
+cd ../Android/android
+./gradlew :app:assembleDebug           # → app/build/outputs/apk/debug/app-debug.apk
+```
+Requires JDK 21 (the project uses a foojay toolchain resolver to auto-download it). See [`Android/README.md`](./Android/README.md).
+</details>
+
+<details>
+<summary><b>iOS</b> (Xcode 16+, macOS only)</summary>
+
+```bash
+cd vue3-h5 && npx cap sync ios         # copies dist to iOS/ios/App/App/public
+# then open iOS/ios/App/App.xcodeproj in Xcode, set Signing, Run
+```
+After `cap sync` you must re-add `"NativeBridgePlugin"` to `packageClassList` in `iOS/ios/App/App/capacitor.config.json` (the CLI drops self-developed plugins). See [`iOS/README.md`](./iOS/README.md).
+</details>
+
+<details>
+<summary><b>HarmonyOS</b> (DevEco Studio 6.1+, hvigor)</summary>
+
+```bash
+# manual dist sync (openHarmony-capacitor has no cap copy):
+rm -rf HarmonyOS/entry/src/main/resources/rawfile/www
+mkdir -p HarmonyOS/entry/src/main/resources/rawfile/www
+cp -r vue3-h5/dist/. HarmonyOS/entry/src/main/resources/rawfile/www/
+
+# command-line build (set DEVECO_SDK_HOME first):
+cd HarmonyOS
+hvigorw assembleHap -p product=default --mode module -p module=entry@default
+# → entry/build/default/outputs/default/entry-default-unsigned.hap
+hdc install entry/build/default/outputs/default/entry-default-unsigned.hap
+```
+Or open the `HarmonyOS/` folder in DevEco Studio and Run. See [`HarmonyOS/README.md`](./HarmonyOS/README.md).
+</details>
+
+> `vue3-h5/dist` also feeds `moveTodepoly.sh` for Git-based web auto-deployment.
 
 ### Add a New Project
 
@@ -180,6 +245,9 @@ For details, see [`vue3-h5/.eslintrc.cjs`](./vue3-h5/.eslintrc.cjs) and [`vue3-h
 ## Related Documentation
 
 - [vue3-h5 detailed guide (directory layout / component library / workflow)](./vue3-h5/README.md)
+- [Android shell (Capacitor)](./Android/README.md)
+- [iOS shell (Capacitor)](./iOS/README.md)
+- [HarmonyOS shell (openHarmony-capacitor)](./HarmonyOS/README.md)
 - [Code style reference](./vue3-h5/REFRENCE.md)
 - [Commit convention config](./vue3-h5/commitlint.config.js)
 - [Vite build config](./vue3-h5/vite.config.ts)
