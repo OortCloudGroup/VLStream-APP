@@ -11,8 +11,8 @@ let config = {
   headers: {},
   frontURLStr: '/front'
 }
-config.URL = 'http://183.62.103.20:21410/'
-// config.URL = 'https://workup-dev.myoumuamua.com:6433/'
+config.URL = 'https://workup-dev.myoumuamua.com:6433/'
+// config.URL = 'http://183.62.103.20:21410/'
 config.token = ''
 config.gateWay = 'bus/'
 
