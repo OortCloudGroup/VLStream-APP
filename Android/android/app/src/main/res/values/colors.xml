@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 主色调（与 H5 品牌蓝 #2F69F8 对齐）-->
+    <color name="colorPrimary">#2F69F8</color>
+    <!-- 状态栏背景（沉浸式下显示在界面顶部；这里用白色，与 H5 白底界面一致）-->
+    <color name="colorPrimaryDark">#FFFFFF</color>
+    <color name="colorAccent">#2F69F8</color>
+    <!-- 启动 splash / 窗口背景：纯白，避免过渡界面出现深色块 -->
+    <color name="background">#FFFFFF</color>
+</resources>
