@@ -24,3 +24,7 @@
 
 # 前端离线包（由 vue3-h5 dist 同步，构建产物，不进 git）
 entry/src/main/resources/rawfile/www/
+
+# DevEco 本地 IDE 配置
+.clang-tidy
+.clangd
