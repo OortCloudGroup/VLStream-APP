@@ -11,7 +11,7 @@
 // import config from '@/config'
 // function commonFunc<T, K>(interfaceName: string, data: T, method = 'post') {
 //   return request<K>({
-//     url: config.URL + config.gateWay + 'vls-server/' + interfaceName,
+//     url: config.URL + config.gateWay + 'apaas-vls-server/' + interfaceName,
 //     method: method,
 //     data: data
 //   })

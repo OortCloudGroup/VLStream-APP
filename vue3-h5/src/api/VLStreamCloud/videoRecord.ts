@@ -3,7 +3,7 @@ import config from '@/config'
 
 function commonFunc<T = any, K = any>(interfaceName: string, data: T, method = 'post') {
   return request<K>({
-    url: config.URL + config.gateWay + 'vls-server/' + interfaceName,
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + interfaceName,
     method: method,
     data: data
   })
@@ -75,7 +75,7 @@ export function getDeviceRecords(deviceId, params) {
 // 下载录制文件
 export function downloadRecordFile(id) {
   return request({
-    url: config.URL + config.gateWay + 'vls-server/' + `/vlsVideoRecord/${id}/download`,
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + `/vlsVideoRecord/${id}/download`,
     method: 'get',
     data: {},
     responseType: 'blob'

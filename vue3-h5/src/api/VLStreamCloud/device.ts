@@ -11,7 +11,7 @@
 // import config from '@/config'
 // function commonFunc<T, K>(interfaceName: string, data: T, method = 'post') {
 //   return request<K>({
-//     url: config.URL + config.gateWay + 'vls-server/' + interfaceName,
+//     url: config.URL + config.gateWay + 'apaas-vls-server/' + interfaceName,
 //     method: method,
 //     data: data
 //   })
@@ -31,7 +31,7 @@ function commonFunc<T, K>(interfaceName: string, data: T, method = 'post', isPar
     params = { params: data }
   }
   return request < K >({
-    url: config.URL + config.gateWay + 'vls-server' + interfaceName,
+    url: config.URL + config.gateWay + 'apaas-vls-server' + interfaceName,
     method: method,
     ...params
   })
@@ -320,7 +320,7 @@ export function getDeviceStreamInfo(id) {
  */
 export function exportDevices(params) {
   return request({
-    url: config.URL + config.gateWay + 'vls-server/' + '/vlsDeviceInfo/export',
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + '/vlsDeviceInfo/export',
     method: 'get',
     data: params,
     responseType: 'blob'
@@ -333,7 +333,7 @@ export function exportDevices(params) {
  */
 export function importDevices(formData) {
   return request({
-    url: config.URL + config.gateWay + 'vls-server/' + '/vlsDeviceInfo/import',
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + '/vlsDeviceInfo/import',
     method: 'post',
     data: formData,
     headers: {

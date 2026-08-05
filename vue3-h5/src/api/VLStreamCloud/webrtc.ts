@@ -4,13 +4,17 @@ import config from '@/config'
 // 公共请求函数：统一URL拼接、入参处理、请求方式，泛型支持类型约束
 function commonFunc<T = any, K = any>(interfaceName: string, data: T, method = 'post') {
   return request<K>({
-    url: config.URL + config.gateWay + 'vls-server/' + interfaceName,
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + interfaceName,
     method: method,
     data: data
   })
 }
 
 // WebRTC 服务配置
+// 流媒体服务器（21410 端口）仅支持 http，不支持 https。
+// Android 离线壳页面挂在 https 源（appassets.androidplatform.net）下，
+// 加载 http 资源/ws 信令会被混合内容拦截，故原生 WebView 侧已开启
+// MIXED_CONTENT_ALWAYS_ALLOW 放行，这里保持 http 不变。
 export const WEBRTC_SERVER_BASE_URL = 'http://oort.oortcloudsmart.com:21410/bus/webrtc-streamer-server'
 
 /**

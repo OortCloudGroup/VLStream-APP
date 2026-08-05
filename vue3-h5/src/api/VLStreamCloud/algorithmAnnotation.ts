@@ -3,7 +3,7 @@ import config from '@/config'
 
 function commonFunc<T = any, K = any>(interfaceName: string, data: T, method = 'post') {
   return request<K>({
-    url: config.URL + config.gateWay + 'vls-server/' + interfaceName,
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + interfaceName,
     method: method,
     data: data
   })
@@ -62,7 +62,7 @@ export function updateAnnotationProgress(id, annotatedCount) {
 // 导出标注数据（特殊配置单独处理，保留responseType）
 export function exportAnnotationData(id) {
   return request({
-    url: config.URL + config.gateWay + 'vls-server/' + `/vlsAlgorithmAnnotation/${id}/export`,
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + `/vlsAlgorithmAnnotation/${id}/export`,
     method: 'post',
     data: {},
     responseType: 'blob'
@@ -74,7 +74,7 @@ export function importAnnotationData(id, file) {
   const formData = new FormData()
   formData.append('file', file)
   return request({
-    url: config.URL + config.gateWay + 'vls-server/' + `/vlsAlgorithmAnnotation/${id}/import-zip`,
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + `/vlsAlgorithmAnnotation/${id}/import-zip`,
     method: 'post',
     data: formData,
     headers: {
@@ -123,7 +123,7 @@ export function saveDataset(id, annotationData) {
   const formData = new FormData()
   formData.append('annotationData', annotationData)
   return request({
-    url: config.URL + config.gateWay + 'vls-server/' + `/vlsAlgorithmAnnotation/${id}/save-dataset`,
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + `/vlsAlgorithmAnnotation/${id}/save-dataset`,
     method: 'post',
     data: formData,
     headers: {

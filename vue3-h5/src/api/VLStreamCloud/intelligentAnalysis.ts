@@ -11,7 +11,7 @@
 // import config from '@/config'
 // function commonFunc<T, K>(interfaceName: string, data: T, method = 'post') {
 //   return request<K>({
-//     url: config.URL + config.gateWay + 'vls-server/' + interfaceName,
+//     url: config.URL + config.gateWay + 'apaas-vls-server/' + interfaceName,
 //     method: method,
 //     data: data
 //   })
@@ -31,7 +31,7 @@ function commonFunc<T, K>(interfaceName: string, data: T, method = 'post', isPar
     params = { params: data }
   }
   return request < K >({
-    url: config.URL + config.gateWay + 'vls-server' + interfaceName,
+    url: config.URL + config.gateWay + 'apaas-vls-server' + interfaceName,
     method: method,
     ...params
   })
@@ -51,7 +51,7 @@ export function getPlayback(data) {
  */
 export function getPlaybackStream(recordId, params = {}) {
   return request({
-    url: config.URL + config.gateWay + 'vls-server/vlsVideoRecord/stream/' + recordId,
+    url: config.URL + config.gateWay + 'apaas-vls-server/vlsVideoRecord/stream/' + recordId,
     method: 'GET',
     params: params,
     responseType: 'blob'

@@ -5,7 +5,7 @@ import { userCenterVerifyToken } from './userCenter'
 // 公共请求函数：统一URL拼接、入参处理、请求方式，泛型支持类型约束
 function commonFunc<T = any, K = any>(interfaceName: string, data: T, method = 'post') {
   return request<K>({
-    url: config.URL + config.gateWay + 'vls-server/' + interfaceName,
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + interfaceName,
     method: method,
     data: data
   })

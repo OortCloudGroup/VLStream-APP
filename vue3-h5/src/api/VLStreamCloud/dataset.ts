@@ -3,7 +3,7 @@ import config from '@/config'
 
 function commonFunc<T = any, K = any>(interfaceName: string, data: T, method = 'post') {
   return request<K>({
-    url: config.URL + config.gateWay + 'vls-server/' + interfaceName,
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + interfaceName,
     method: method,
     data: data
   })
@@ -19,7 +19,7 @@ function commonFunc<T = any, K = any>(interfaceName: string, data: T, method = '
  */
 export function connectToServer(params) {
   return request({
-    url: config.URL + config.gateWay + 'vls-server/' + '/api/dataset/connect',
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + '/api/dataset/connect',
     method: 'post',
     data: params,
     headers: {
@@ -58,7 +58,7 @@ export function getFileContent(params) {
  */
 export function downloadFile(params) {
   return request({
-    url: config.URL + config.gateWay + 'vls-server/' + '/api/dataset/download',
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + '/api/dataset/download',
     method: 'get',
     data: params,
     responseType: 'blob'
@@ -79,7 +79,7 @@ export function uploadFileToServer(params) {
   formData.append('file', params.file)
 
   return request({
-    url: config.URL + config.gateWay + 'vls-server/' + '/api/dataset/upload',
+    url: config.URL + config.gateWay + 'apaas-vls-server/' + '/api/dataset/upload',
     method: 'post',
     data: formData,
     headers: {
