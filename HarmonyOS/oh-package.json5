@@ -1,4 +1,5 @@
 {
+  "modelVersion": "5.0.1",
   "name": "vlstream-harmony",
   "version": "1.0.0",
   "description": "VLStreamCloud 鸿蒙壳（基于 openHarmony-capacitor）",
@@ -6,6 +7,6 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "openHarmony-capacitor": "file:./capacitor"
+    "harmony-capacitor": "file:./capacitor"
   }
 }

@@ -3,14 +3,21 @@
 /.cxx/
 /.test/
 /.hvigor/
-/oh_modules/
 /.idea/
 /local.properties
+
+# 各模块构建产物与依赖
+**/build/
+**/.cxx/
+**/oh_modules/
 
 # DevEco
 /.appanalyzer/
 /.hvigor/
 /captures/
+
+# 崩溃转储
+*.dmp
 
 # OMC 运行时状态
 /.omc/
