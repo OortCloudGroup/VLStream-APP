@@ -3,6 +3,8 @@ package com.oort.vlstream.app;
 import android.os.Bundle;
 import android.webkit.WebView;
 
+import androidx.core.view.WindowCompat;
+
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -11,6 +13,9 @@ public class MainActivity extends BridgeActivity {
         // 自研业务 plugin 必须在 super.onCreate 之前注册
         registerPlugin(NativeBridgePlugin.class);
         super.onCreate(savedInstanceState);
+        // 沉浸式 edge-to-edge：让 WebView 内容延伸到状态栏下方，
+        // 状态栏背景由 H5 顶部界面透出（配合 window.__safeAreaTop 留白）。
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
     }
 
     /**

@@ -27,9 +27,11 @@ import java.util.Collections;
  * <p>
  * 此外，{@link #load()} 通过 {@code WebViewCompat.addDocumentStartJavaScript}
  * 在「document start」时机注入同步静态变量 {@code window.__VL_STATIC__}
- * （gateway / appInfo）与运行环境标志 {@code window.global.is_native_shell=true}，
+ * （gateway / appInfo）、运行环境标志 {@code window.global.is_native_shell=true}，
+ * 以及沉浸式状态栏安全区高度 {@code window.__safeAreaTop}（CSS px），
  * 保证它们在任何业务脚本（index.html 的 &lt;script&gt;）之前就绪——从而
- * H5 侧 androidFunUtils.js 能用「同步调用」拿到网关（App.vue 不必改成 async）。
+ * H5 侧 androidFunUtils.js 能用「同步调用」拿到网关（App.vue 不必改成 async），
+ * LoginDev / workbench 能精确留出状态栏空间（与旧 AgentWeb 壳一致）。
  */
 @CapacitorPlugin(name = "NativeBridge")
 public class NativeBridgePlugin extends Plugin {
@@ -53,6 +55,7 @@ public class NativeBridgePlugin extends Plugin {
                 + "window.global.is_phone=true;"
                 + "window.global.is_harmony=false;"
                 + "window." + JS_STATIC_VAR + "=" + buildStaticJson() + ";"
+                + "window.__safeAreaTop=" + getStatusBarHeightCss() + ";"
                 + "}catch(e){console.error('[NativeBridgePlugin] inject failed',e);}})();";
     }
 
@@ -76,6 +79,24 @@ public class NativeBridgePlugin extends Plugin {
             // 降级到 eval
         }
         getBridge().eval(script, null);
+    }
+
+    /**
+     * 取状态栏高度并换算为 CSS px（H5 视口坐标系）。
+     * WebView 的 layout viewport 与 CSS px 一致，这里按 density 换算。
+     * 与旧 AgentWeb 壳 BaseAgentWebActivity#getStatusBarHeightCss 对齐。
+     */
+    private int getStatusBarHeightCss() {
+        try {
+            int resId = getContext().getResources().getIdentifier("status_bar_height", "dimen", "android");
+            if (resId > 0) {
+                float px = getContext().getResources().getDimension(resId); // 物理像素
+                float density = getContext().getResources().getDisplayMetrics().density; // dp→px
+                return Math.round(px / density);
+            }
+        } catch (Throwable ignore) {
+        }
+        return 0;
     }
 
     private String buildStaticJson() {
