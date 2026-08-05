@@ -1,0 +1,25 @@
+{
+  "appId": "com.oort.vlstream.app",
+  "appName": "VLStreamCloud",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "capacitor"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "path": "../Android/android"
+  },
+  "ios": {
+    "path": "../iOS/ios",
+    "scrollEnabled": false
+  },
+  "harmony": {
+    "allowMixedContent": true
+  },
+  "packageClassList": [
+    "App",
+    "Camera",
+    "Geolocation"
+  ]
+}

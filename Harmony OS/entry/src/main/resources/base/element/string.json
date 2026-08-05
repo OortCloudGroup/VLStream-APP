@@ -1,0 +1,10 @@
+{
+  "string": [
+    { "name": "module_desc", "value": "VLStreamCloud 鸿蒙主模块" },
+    { "name": "EntryAbility_desc", "value": "VLStreamCloud" },
+    { "name": "EntryAbility_label", "value": "VLStream" },
+    { "name": "reason_camera", "value": "VLStream 需要使用相机以拍摄上传图片/视频" },
+    { "name": "reason_album", "value": "VLStream 需要访问相册以选择上传图片/视频" },
+    { "name": "reason_location", "value": "VLStream 需要获取您的位置以提供地图与定位服务" }
+  ]
+}
