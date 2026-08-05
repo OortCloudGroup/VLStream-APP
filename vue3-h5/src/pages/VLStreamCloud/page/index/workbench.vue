@@ -7,7 +7,7 @@
       <div class="workbench-container">
         <div class="top-bg" :style="{ backgroundImage: `url(${bgImg})` }" />
         <!-- 顶部标题区域 -->
-        <div class="header-section">
+        <div class="header-section" :style="{ paddingTop: headerPaddingTop }">
           <h1 class="page-title">
             工作台
           </h1>
@@ -183,6 +183,19 @@ import sphf from '@/assets/img/VLStreamCloud/sphf.png'
 
 const router = useRouter()
 const store = useUserStore()
+
+// 沉浸式状态栏适配：原生壳注入 window.__safeAreaTop（CSS px），
+// 非原生环境（浏览器/PC）留少量默认留白。
+const headerPaddingTop = ref('12px')
+const computeHeaderPadding = () => {
+  try {
+    const isShell = window.global && window.global.is_native_shell
+    const safeTop = isShell ? (window.__safeAreaTop || 0) : 0
+    headerPaddingTop.value = (safeTop + 12) + 'px'
+  } catch (e) {
+    headerPaddingTop.value = '12px'
+  }
+}
 
 // 用户名
 const userName = ref(store.userInfo.userName || '用户')
@@ -408,6 +421,7 @@ onBeforeUnmount(() => {
 })
 
 onMounted(() => {
+  computeHeaderPadding()
   startClock()
   fetchWeather()
   fetchPopularDevices()
@@ -504,7 +518,7 @@ const onRefresh = async() => {
   top: -15px;
   left: -20px;
   right: -20px;
-  height: 200px;
+  height: 168px;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -522,19 +536,20 @@ const onRefresh = async() => {
 .page-title {
   font-weight: 700;
   color: #ffffff;
-  font-size: 18px;
-  padding: 38px 0 21px 0;
+  font-size: 17px;
+  margin: 0;
+  padding: 0 0 10px 0;
 }
 
 .weather-card {
-  height: 190px;
   background: #ffffff;
   border-radius: 12px;
   padding: 12px;
+  box-shadow: 0 4px 16px rgba(35, 60, 120, 0.06);
   .weather-title{
     display: flex;
     gap: 12px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     img{
       width: 27px;
       height: 26.38px;
@@ -574,13 +589,13 @@ const onRefresh = async() => {
 
 .weather-info {
   flex: 1;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 
   .greeting {
-    line-height: 22px;
+    line-height: 20px;
     font-weight: 500;
     color: #323233;
-    font-size: 16px;
+    font-size: 15px;
   }
 }
 
@@ -593,10 +608,10 @@ const onRefresh = async() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
   justify-content: center;
-  height: 88px;
+  height: 72px;
   background: #fddedb;
   border-radius: 4px;
 
@@ -674,7 +689,7 @@ const onRefresh = async() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
 .more-link {

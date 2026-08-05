@@ -201,8 +201,8 @@ export default {
           this.$router.back()
         }
       } else {
-        if (window.global.is_cordova) {
-          if (!!window.cordova && !!window.cordova.exec) {
+        if (window.global && (window.global.is_cordova || window.global.is_native_shell)) {
+          if (window.global.is_native_shell || (!!window.cordova && !!window.cordova.exec)) {
             this.$emit('appExit')
             window.androidFunUtils.appExit()
           }

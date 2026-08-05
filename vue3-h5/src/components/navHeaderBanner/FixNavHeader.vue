@@ -18,7 +18,9 @@ export default {
     },
     exitApp() {
       if (window.global) {
-        if (window.global.is_cordova) {
+        if (window.global.is_native_shell) {
+          window.androidFunUtils.appExit()
+        } else if (window.global.is_cordova) {
           if (!!window.cordova && !!window.cordova.exec) {
             window.androidFunUtils.appExit()
           }

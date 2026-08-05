@@ -1,0 +1,12 @@
+{
+  "appId": "com.oort.vlstream.app",
+  "appName": "VLStreamCloud",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "path": "../Android/android"
+  }
+}

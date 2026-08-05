@@ -45,7 +45,17 @@ const init = () => {
   Config.headers.requestType = Config.requestType
 
   Config.appName = configObj.appName
-  if (!!window.cordova && !!window.cordova.exec) {
+  if (window.global && window.global.is_native_shell) {
+    // 新原生壳（AgentWeb）：网关由原生注入，token 由 H5 LoginDev 自取
+    const gw = window.androidFunUtils && window.androidFunUtils.getGateway
+      ? window.androidFunUtils.getGateway()
+      : ''
+    if (gw) {
+      Config.URL = gw.endsWith('/') ? gw : gw + '/'
+    }
+    // 弹出 H5 登录面板
+    showLoginDev.value = true
+  } else if (!!window.cordova && !!window.cordova.exec) {
     let toastInst = showLoadingToast({
       message: '加载中...',
       forbidClick: true,
@@ -75,7 +85,7 @@ const init = () => {
       }
     })
   } else {
-    if (window.location.hostname !== 'localhost') {
+    if (window.location.hostname !== 'localhost' && window.location.protocol.startsWith('http')) {
       Config.URL = window.location.origin + '/'
     }
     showLoginDev.value = true
@@ -91,7 +101,10 @@ const loginSuccess = async() => {
 }
 
 onMounted(() => {
-  if (window.global.is_cordova) {
+  if (window.global && window.global.is_native_shell) {
+    // 新原生壳：直接初始化（无需 deviceready）
+    init()
+  } else if (window.global.is_cordova) {
     // this.isInitFinsh = true
     document.addEventListener('deviceready', init, false)
   } else {

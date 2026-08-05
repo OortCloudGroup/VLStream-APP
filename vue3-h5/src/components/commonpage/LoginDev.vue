@@ -1,49 +1,114 @@
-/**
-Created by 兰舰 on 2020/1/16  9:35
-pc端 调试的登陆界面
-*/
+<!--
+  LoginDev 登录面板（现代化重设计）。
+  逻辑保持不变（getLogin → getUserTenants → loginSSO），仅重构视觉与交互。
+  @Author 兰舰 (UI redesign)
+-->
 <template>
-  <div class="page_container" style="background-color: #f7f8fa;">
-    <NavHeaderBanner title="登陆账号（pc 调试专用）" />
-    <div class="login_dev_body">
-      <van-cell-group>
-        <van-field v-model="username" style="margin-top: 8px" placeholder="请输入用户名" />
-        <van-field v-model="password" style="margin-top: 8px" type="password" placeholder="请输入密码" />
-      </van-cell-group>
-      <div v-if="captchaID" class="login_content_field">
-        <van-cell-group style="display: flex; flex-direction: row">
-          <van-field v-model="code" placeholder="请输入图形验证码" />
-          <img style="width: 40%;" :src="codePngUrl+ '/'+ captchaID + '.png?' + timeStamp" @click="timeStamp=new Date().getTime()" />
-        </van-cell-group>
+  <div class="login_page">
+    <!-- 品牌区 -->
+    <div class="brand_area" :style="{ paddingTop: brandPaddingTop }">
+      <img class="brand_logo" src="@/assets/img/login_logo.png" alt="VLStream Cloud">
+      <div class="brand_subtitle">
+        视频流云平台
       </div>
-      <div class="autoLogo_banner">
-        <span style="font-size: 12px;color: #333333">自动登陆</span>
-        <van-switch v-model="autoLogin" @change="autoLoginChange" />
+    </div>
+
+    <!-- 表单卡片 -->
+    <div class="form_card">
+      <div class="form_card_title">
+        账号登录
       </div>
-      <van-button type="primary" @click="loginBtn">
-        登陆
+
+      <div class="field_group">
+        <van-field
+          v-model="username"
+          class="login_field"
+          left-icon="manager-o"
+          placeholder="请输入用户名"
+          clearable
+        />
+        <van-field
+          v-model="password"
+          class="login_field"
+          left-icon="lock"
+          :type="showPwd ? 'text' : 'password'"
+          placeholder="请输入密码"
+          :right-icon="showPwd ? 'eye-o' : 'closed-eye'"
+          @click-right-icon="showPwd = !showPwd"
+        />
+      </div>
+
+      <!-- 图形验证码（后端要求时出现） -->
+      <div v-if="captchaID" class="captcha_row">
+        <van-field
+          v-model="code"
+          class="login_field captcha_field"
+          left-icon="shield-o"
+          placeholder="请输入图形验证码"
+        />
+        <img
+          class="captcha_img"
+          :src="codePngUrl + '/' + captchaID + '.png?' + timeStamp"
+          alt="验证码"
+          @click="refreshCaptcha"
+        >
+      </div>
+
+      <div class="aux_row">
+        <div class="auto_login" @click="autoLogin = !autoLogin">
+          <span class="auto_login_box" :class="{ checked: autoLogin }">
+            <van-icon v-if="autoLogin" name="success" />
+          </span>
+          <span class="auto_login_text">下次自动登录</span>
+        </div>
+      </div>
+
+      <van-button
+        class="login_btn"
+        :loading="loading"
+        loading-text="登录中..."
+        block
+        @click="loginBtn"
+      >
+        登 录
       </van-button>
     </div>
 
+    <div class="footer_tip">
+      登录即表示同意平台服务条款
+    </div>
+
     <!-- 租户选择弹窗 -->
-    <oort-popup v-model="tenantVis" position="center" style="width: 85%; border-radius: 12px;">
-      <div class="tenant_popup_container">
-        <div class="tenant_popup_title">
-          <span>请选择登录租户</span>
+    <oort-popup v-model="tenantVis" position="center" :close-on-click-overlay="false" class="tenant_popup">
+      <div class="tenant_container">
+        <div class="tenant_header">
+          <div class="tenant_title">
+            请选择登录租户
+          </div>
+          <div class="tenant_desc">
+            该账号关联了多个租户
+          </div>
         </div>
         <div class="tenant_list">
           <div
             v-for="item in tenantList"
             :key="item.tenant_id"
             class="tenant_item"
+            :class="{ active: selectedTenantId === item.tenant_id }"
             @click="tenantClickLogin(item)"
           >
-            <div class="tenant_name">
-              {{ item.tenant_name }}
+            <div class="tenant_avatar">
+              {{ (item.tenant_name || item.tenant_code || 'T').charAt(0) }}
             </div>
             <div class="tenant_info">
-              {{ item.tenant_code }}
+              <div class="tenant_name">
+                {{ item.tenant_name }}
+              </div>
+              <div class="tenant_code">
+                {{ item.tenant_code }}
+              </div>
             </div>
+            <van-icon v-if="selectedTenantId === item.tenant_id" name="success" class="tenant_check" />
           </div>
         </div>
       </div>
@@ -55,7 +120,6 @@ pc端 调试的登陆界面
 
 import { ref, onMounted } from 'vue'
 
-import NavHeaderBanner from '@/components/navHeaderBanner'
 import OortPopup from '@/components/popup/oort_popup'
 
 import { getUserTenants } from '@/api/login/indexapaas.ts'
@@ -64,6 +128,21 @@ import { showToast } from 'vant'
 const tenantList = ref([])
 const tenantVis = ref(false)
 const tempToken = ref('')
+const selectedTenantId = ref('')
+
+// 沉浸式状态栏适配：根据安全区动态留出顶部空间
+const brandPaddingTop = ref('60px')
+const computeBrandPadding = () => {
+  try {
+    const sh = window.global && window.global.is_native_shell
+      ? (window.__safeAreaTop || 0)
+      : 0
+    brandPaddingTop.value = (24 + sh) + 'px'
+  } catch (e) {
+    brandPaddingTop.value = '60px'
+  }
+}
+
 const getTenantInfo = () => {
   const params = {
     accessToken: tempToken.value
@@ -71,11 +150,9 @@ const getTenantInfo = () => {
   getUserTenants(params).then((res) => {
     if (res.code === 200) {
       tenantList.value = res.data.list
-      // 只有一个租户直接登录
       if (tenantList.value.length === 1) {
         tenantClickLogin(tenantList.value[0])
       } else if (tenantList.value.length > 1) {
-        // 多个租户，显示选择弹窗
         tenantVis.value = true
       } else {
         showToast('暂无租户信息')
@@ -86,13 +163,13 @@ const getTenantInfo = () => {
 
 const emits = defineEmits(['loginSuccess'])
 const tenantClickLogin = (item) => {
+  selectedTenantId.value = item.tenant_id
   const params = {
     accessToken: tempToken.value,
     tenant_id: item.tenant_id
   }
   store.login(params).then((res) => {
     if (res.code === 200) {
-      // 清空错误
       showToast('登录成功')
       emits('loginSuccess')
     }
@@ -100,6 +177,8 @@ const tenantClickLogin = (item) => {
 }
 
 const autoLogin = ref(false)
+const showPwd = ref(false)
+const loading = ref(false)
 
 import { useUserStore } from '@/store/modules/useraPaas'
 import Config from '@/config'
@@ -111,8 +190,19 @@ const code = ref('')
 const codePngUrl = ref(Config.URL + Config.gateWay + 'apaas-sso/captcha/v1/')
 
 const timeStamp = ref(new Date().getTime())
+const refreshCaptcha = () => {
+  timeStamp.value = new Date().getTime()
+}
 
 const loginBtn = async() => {
+  if (!username.value) {
+    showToast('请输入用户名')
+    return
+  }
+  if (!password.value) {
+    showToast('请输入密码')
+    return
+  }
   if (autoLogin.value) {
     const tempObj = {
       username: username.value,
@@ -120,34 +210,37 @@ const loginBtn = async() => {
     }
     window.sessionStorage.setItem('autoLogin', JSON.stringify(tempObj))
   }
+  loading.value = true
   store.getLogin({
     loginId: username.value,
     password: password.value,
     code: code.value,
-    // tenant_id: loginForm.tenant_id,
     captchaID: captchaID.value
   }).then((res) => {
     if (res.code === 200) {
       tempToken.value = res.data.token
       getTenantInfo()
     } else {
-      timeStamp.value = new Date().getTime()
-      captchaID.value = res.data.CaptchaID
+      refreshCaptcha()
+      captchaID.value = res.data && res.data.CaptchaID ? res.data.CaptchaID : ''
     }
   }).catch(() => {
   }).finally(() => {
+    loading.value = false
   })
 }
 
 onMounted(() => {
+  computeBrandPadding()
   if (window.sessionStorage.getItem('autoLogin')) {
     try {
       const tempObj = JSON.parse(window.sessionStorage.getItem('autoLogin'))
       username.value = tempObj.username
       password.value = tempObj.password
+      autoLogin.value = true
       loginBtn()
     } catch (e) {
-      // console.log(e)
+      // ignore
     }
   }
 })
@@ -155,89 +248,287 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-  .closeBtn {
-    position: absolute;
-    top: -10px;
-    left: -10px;
-    width: 25px;
-    height: 25px;
-  }
-  .slide_area {
-    z-index: 99;
-    position: absolute;
-    top: 68px;
-    left: 10px;
-    background-color: #F0F0F0;
-    box-shadow: 1px 1px 5px 2px #33333370;
-    padding: 20px;
-  }
-  .autoLogo_banner {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    height: 48px;
-    span {
-      margin-left: 16px;
-      margin-right: 16px;
-    }
-  }
-  .login_dev_body {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
+$brand: #2f69f8;
+$brand_dark: #1a53ff;
+$brand_light: #5b8cff;
+$text_main: #1a1a1a;
+$text_sub: #8a8f99;
+
+.login_page {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(160deg, #eef3ff 0%, #f7f9ff 38%, #ffffff 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 顶部装饰光斑 */
+.login_page::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(47, 105, 248, 0.22) 0%, rgba(47, 105, 248, 0) 70%);
+  pointer-events: none;
+}
+
+/* 品牌区 */
+.brand_area {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 60px;
+  padding-bottom: 28px;
+  position: relative;
+  z-index: 1;
+}
+
+.brand_logo {
+  width: 140px;
+  height: auto;
+  margin-bottom: 12px;
+  object-fit: contain;
+}
+
+.brand_subtitle {
+  margin-top: 6px;
+  font-size: 14px;
+  color: $text_sub;
+}
+
+/* 表单卡片 */
+.form_card {
+  width: calc(100% - 48px);
+  max-width: 420px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px 20px 24px;
+  box-shadow: 0 10px 40px rgba(35, 60, 120, 0.08);
+  position: relative;
+  z-index: 1;
+}
+
+.form_card_title {
+  font-size: 20px;
+  font-weight: 700;
+  color: $text_main;
+  margin-bottom: 22px;
+}
+
+.field_group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+:deep(.login_field) {
+  background: #f4f6fa;
+  border-radius: 12px;
+  padding: 10px 14px;
+  align-items: center;
+
+  .van-field__left-icon {
+    color: $brand;
+    font-size: 20px;
+    margin-right: 10px;
   }
 
-  /* 租户选择弹窗样式 */
-  .tenant_popup_container {
-    padding: 24px 16px;
-    background: #fff;
-    border-radius: 12px;
+  .van-field__right-icon {
+    color: $text_sub;
+    font-size: 20px;
+    padding-left: 8px;
   }
 
-  .tenant_popup_title {
-    text-align: center;
-    margin-bottom: 24px;
-    font-size: 18px;
-    font-weight: 600;
-    color: #333333;
+  input {
+    color: $text_main;
+    font-size: 15px;
   }
 
-  .tenant_list {
-    max-height: 400px;
-    overflow-y: auto;
+  input::placeholder {
+    color: #b3b8c2;
+  }
+}
+
+.captcha_row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.captcha_field {
+  flex: 1;
+}
+
+.captcha_img {
+  width: 110px;
+  height: 44px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: #f4f6fa;
+}
+
+.aux_row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  margin-bottom: 22px;
+}
+
+.auto_login {
+  display: flex;
+  align-items: center;
+}
+
+.auto_login_box {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid #cfd4de;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  transition: all 0.2s ease;
+
+  &.checked {
+    background: $brand;
+    border-color: $brand;
+  }
+}
+
+.auto_login_text {
+  margin-left: 8px;
+  font-size: 13px;
+  color: $text_sub;
+}
+
+.login_btn {
+  height: 48px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  color: #fff;
+  background: linear-gradient(135deg, $brand_light 0%, $brand 100%);
+  box-shadow: 0 8px 20px rgba(47, 105, 248, 0.3);
+}
+
+.login_btn:active {
+  opacity: 0.9;
+}
+
+.footer_tip {
+  margin-top: 28px;
+  font-size: 12px;
+  color: #b3b8c2;
+  position: relative;
+  z-index: 1;
+}
+
+/* 租户选择弹窗 */
+:deep(.tenant_popup) {
+  width: 86%;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.tenant_container {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px 18px 18px;
+}
+
+.tenant_header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.tenant_title {
+  font-size: 18px;
+  font-weight: 700;
+  color: $text_main;
+}
+
+.tenant_desc {
+  margin-top: 6px;
+  font-size: 13px;
+  color: $text_sub;
+}
+
+.tenant_list {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.tenant_item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: #f4f6fa;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  transition: all 0.2s ease;
+
+  &:active {
+    background: #eaeefb;
   }
 
-  .tenant_item {
-    display: flex;
-    flex-direction: column;
-    padding: 16px 12px;
-    margin-bottom: 12px;
-    background: #f5f6f7;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-left: 4px solid transparent;
-
-    &:active {
-      background: #e8e9eb;
-      border-left-color: #1989fa;
-    }
-
-    &:hover {
-      background: #e8e9eb;
-      border-left-color: #1989fa;
-    }
+  &.active {
+    background: #eef3ff;
+    border-color: $brand;
   }
+}
 
-  .tenant_name {
-    font-size: 16px;
-    font-weight: 500;
-    color: #333333;
-    margin-bottom: 6px;
-  }
+.tenant_avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, $brand_light 0%, $brand 100%);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-  .tenant_info {
-    font-size: 12px;
-    color: #999999;
-  }
+.tenant_info {
+  margin-left: 12px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.tenant_name {
+  font-size: 15px;
+  font-weight: 600;
+  color: $text_main;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tenant_code {
+  margin-top: 3px;
+  font-size: 12px;
+  color: $text_sub;
+}
+
+.tenant_check {
+  color: $brand;
+  font-size: 18px;
+}
 </style>

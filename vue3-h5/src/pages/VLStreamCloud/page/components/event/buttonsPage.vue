@@ -139,6 +139,11 @@ const getUserListFn = async() => {
 // 发起群聊
 const groupChat = () => {
   let val = props.work_order_data
+  // 新原生壳（AgentWeb）首期未集成 IM SDK，群聊能力降级
+  if (window.global && window.global.is_native_shell) {
+    import('vant').then(({ showToast }) => showToast('当前版本暂不支持发起群聊'))
+    return
+  }
   window.cordova.exec(
     () => {
       console.log(222)

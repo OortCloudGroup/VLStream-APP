@@ -74,7 +74,7 @@ const emit = defineEmits(['update:show', 'getImgUrl'])
 
 // 响应式数据
 const imgUrl = ref('')
-const isInCordovaEnv = ref(window.global.is_cordova) // 是否在cordova 的环境中， 若不是隐藏拍照， 使用vant 自带的方法即可以调用原生ios 或者 android
+const isInCordovaEnv = ref(window.global && (window.global.is_cordova || window.global.is_native_shell)) // 是否在cordova/原生壳 环境中， 若不是隐藏拍照， 使用vant 自带的方法即可以调用原生ios 或者 android
 const fileList = ref([])
 const popupShow = ref(false)
 const mediaType = ref(4) // 默认是是4 可传所有

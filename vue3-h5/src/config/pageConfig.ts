@@ -10,7 +10,7 @@
 // 页面配置 extendJSlib 为预留
 const pageConfig = {
   VLStreamCloud: {
-    extendJSLib1: './androidFunUtils.min.js',
+    extendJSLib1: './androidFunUtils.js',
     extendJSLib2: './vconsole.min.js',
     extendJSLib3: '',
     extendJSLib4: '',

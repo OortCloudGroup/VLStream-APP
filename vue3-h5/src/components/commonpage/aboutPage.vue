@@ -47,13 +47,28 @@ export default {
   },
   methods: {
     getAPP() {
-      window.androidFunUtils.getAppInfo().then((res) => {
+      // 新原生壳下走 getAppInfoFromHttp；否则走原生 getAppInfo
+      const isNativeShell = window.global && window.global.is_native_shell
+      const fetcher = isNativeShell
+        ? Promise.resolve(this.getAppInfoFromHttp())
+        : window.androidFunUtils.getAppInfo()
+      Promise.resolve(fetcher).then((res) => {
         if (res) {
-          this.appDetail = JSON.parse(res)
-          config.appInfo = JSON.parse(res)
+          const parsed = typeof res === 'string' ? JSON.parse(res) : res
+          this.appDetail = parsed
+          config.appInfo = parsed
           console.log(res)
         }
       })
+    },
+    getAppInfoFromHttp() {
+      // 兜底：原生壳没有动态 appInfo 时，提供基本展示信息
+      return {
+        applabel: config.appName || 'VLStreamCloud',
+        version: '1.0.0',
+        develop_unit: '奥尔特云（深圳）智慧科技有限公司',
+        icon_url: ''
+      }
     },
     showVConsole() {
       if (this.clickCount === 5) {
