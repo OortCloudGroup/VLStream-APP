@@ -3,10 +3,15 @@
   "appName": "VLStreamCloud",
   "webDir": "dist",
   "server": {
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "iosScheme": "capacitor"
   },
   "android": {
     "allowMixedContent": true,
     "path": "../Android/android"
+  },
+  "ios": {
+    "path": "../iOS/ios",
+    "scrollEnabled": false
   }
 }
