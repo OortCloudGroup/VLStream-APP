@@ -13,14 +13,14 @@ import config from '@/config'
 
 function commonFunc<T, K>(interfaceName: string, data: T, method: string) {
   return request<K>({
-    url: config.URL + config.gateWay + 'oortcloud-warehouse' + interfaceName,
+    url: config.platformURL + config.gateWay + 'oortcloud-warehouse' + interfaceName,
     method: method,
     data: data
   })
 }
 function commonFuncWarehouse<T, K>(interfaceName: string, data: T, method: string) {
   return request<K>({
-    url: config.URL + config.gateWay + 'oortcloud-warehouse' + interfaceName,
+    url: config.platformURL + config.gateWay + 'oortcloud-warehouse' + interfaceName,
     method: method,
     data: data
   })

@@ -61,7 +61,7 @@ export default {
     },
     uploadURL: {
       type: String,
-      default: config.URL + config.gateWay + 'apaas-fastdfsservice/fastdfs/v1/uploadFile'
+      default: config.platformURL + config.gateWay + 'apaas-fastdfsservice/fastdfs/v1/uploadFile'
     }
   },
   data() {
@@ -129,7 +129,7 @@ export default {
           let tempArr = JSON.parse(res)
           let tempPromiseArr = []
           tempArr.forEach(item => {
-            tempPromiseArr.push(this.uploadImage(item.split('?')[0]))
+            tempPromiseArr.push(this.uploadImage(item.filePath.split('?')[0]))
           })
           const toastIns = showLoadingToast({
             message: '文件上传中,请耐心等待...',

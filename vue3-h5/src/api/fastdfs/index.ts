@@ -12,7 +12,7 @@ import config from '@/config'
 
 function commonFunc<T, K>(interfaceName: string, data: T, method: string) {
   return request<K>({
-    url: config.URL + config.gateWay + 'apaas-fastdfsservice/' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-fastdfsservice/' + interfaceName,
     method: method,
     data: data
   })
@@ -26,7 +26,7 @@ export function uploadBase64(data) {
 import { getToken } from '@/utils/cache'
 function commonFuncFile<T, K>(interfaceName: string, data: T, method: string) {
   return request<K>({
-    url: config.URL + config.gateWay + 'apaas-fastdfsservice/' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-fastdfsservice/' + interfaceName,
     method: method,
     data: data,
     headers: { 'Content-Type': 'multipart/form-data', ...config.headers, accessToken: getToken() }

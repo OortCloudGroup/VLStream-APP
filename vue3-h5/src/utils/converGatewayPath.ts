@@ -25,7 +25,7 @@ export function covertCurrentLocationURL(val) {
   for (const pattern of patterns) {
     const parts = val.split(pattern)
     if (parts.length === 2) {
-      return Config.URL + Config.gateWay + pattern.slice(1) + parts[1]
+      return Config.platformURL + Config.gateWay + pattern.slice(1) + parts[1]
     }
   }
   return val

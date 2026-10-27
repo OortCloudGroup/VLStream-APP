@@ -44,9 +44,9 @@ watch(() => props.src, (val) => {
     let arr = val.split('/wj1/')
     if (arr.length === 2) {
       // this.firstTemp++
-      imageSrc.value = Config.URL + Config.gateWay + 'wj1/' + arr[1]
+      imageSrc.value = Config.platformURL + Config.gateWay + 'wj1/' + arr[1]
     } else if (val.split('/oortwj1/').length === 2) {
-      imageSrc.value = Config.URL + Config.gateWay + 'oortwj1/' + val.split('/oortwj1/')[1]
+      imageSrc.value = Config.platformURL + Config.gateWay + 'oortwj1/' + val.split('/oortwj1/')[1]
     }
   } else {
     imageSrc.value = val

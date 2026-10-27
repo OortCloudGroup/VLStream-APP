@@ -15,7 +15,7 @@ function commonFunc<T, K>(interfaceName: string, data: T, method: string, isPara
     params = { params: data }
   }
   return request<K>({
-    url: config.URL + config.gateWay + 'apaas-smart-approval' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-smart-approval' + interfaceName,
     method: method,
     ...params
   })
@@ -23,7 +23,7 @@ function commonFunc<T, K>(interfaceName: string, data: T, method: string, isPara
 
 function commonFunc2<T, K>(interfaceName: string, data: T, method: string) {
   return request<K>({
-    url: config.URL + config.gateWay + 'apaas-smart-approval' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-smart-approval' + interfaceName,
     method: method,
     data: data,
     responseType: 'blob'

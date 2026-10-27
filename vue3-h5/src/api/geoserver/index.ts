@@ -16,7 +16,7 @@ function commonFunc<T, K>(interfaceName: string, data: T, method: string, isPara
     params = { params: data }
   }
   return request<K>({
-    url: config.URL + config.gateWay + 'apaas-map-server' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-map-server' + interfaceName,
     method: method,
     ...params
   })
@@ -44,7 +44,7 @@ export function mlsFeaturesCategoryList(data: any) {
 
 // 获取逆地址解析
 export function geocoderAddress(data: any) {
-  return commonFunc('/mapServer/mlsBaseMap/geocoder', data, 'get')
+  return commonFunc<any, { code: number, msg?: string, data: string }>('/mapServer/mlsBaseMap/geocoder', data, 'get')
 }
 
 // 获取搜索的周边

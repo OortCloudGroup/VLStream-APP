@@ -10,7 +10,7 @@
 import { request } from '@/utils/service'
 import config from '@/config'
 // import config from '@/config'
-import { getToken } from '@/utils/cache/cookies'
+import { getToken } from '@/utils/cache'
 function commonFunc<T, K>(interfaceName: string, data: T, method: string, isParams = false) {
   let params = method === 'get' || method === 'delete' || method === 'GET' || method === 'DELETE' ? { params: data } : { data: data }
   if (isParams) {
@@ -18,7 +18,7 @@ function commonFunc<T, K>(interfaceName: string, data: T, method: string, isPara
   }
   config.headers.authorization = getToken()
   return request<K>({
-    url: config.URL + config.gateWay + 'apaas-workflowforms' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-workflowforms' + interfaceName,
     // url: '/workflow/' + interfaceName,
     method: method,
     ...params
@@ -30,7 +30,7 @@ function commonFunc<T, K>(interfaceName: string, data: T, method: string, isPara
 
 function commonFuncB<T, K>(interfaceName: string, data: T, method: string) {
   return request<K>({
-    url: config.URL + config.gateWay + 'apaas-workflowforms' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-workflowforms' + interfaceName,
     method: method,
     data: data,
     // responseType: 'blob'
@@ -40,7 +40,7 @@ function commonFuncB<T, K>(interfaceName: string, data: T, method: string) {
 
 function commonFunc2<T, K>(interfaceName: string, data: T, method: string) {
   return request<K>({
-    url: config.URL + config.gateWay + 'apaas-workflowforms' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-workflowforms' + interfaceName,
     method: method,
     data: data,
     responseType: 'blob'

@@ -12,7 +12,7 @@ import config from '@/config'
 
 function commonFunc<T, K>(interfaceName: string, data: T, method = 'post') {
   return request<K>({
-    url: config.URL + config.gateWay + 'apaas-sso/' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-sso/' + interfaceName,
     method: method,
     data: data
   })

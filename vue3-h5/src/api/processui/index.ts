@@ -18,7 +18,7 @@ function commonFunc<T, K>(interfaceName: string, data: T, method: string, isPara
   }
   // config.headers.authorization = getToken()
   return request<K>({
-    url: config.URL + config.gateWay + 'apaas-workflowforms' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-workflowforms' + interfaceName,
     // url: '/workflow/' + interfaceName,
     method: method,
     ...params
@@ -30,7 +30,7 @@ function commonFunc<T, K>(interfaceName: string, data: T, method: string, isPara
 
 function commonFuncB<T, K>(interfaceName: string, data: T, method: string) {
   return request<K>({
-    url: config.URL + config.gateWay + 'apaas-workflowforms' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-workflowforms' + interfaceName,
     method: method,
     data: data,
     responseType: 'blob'

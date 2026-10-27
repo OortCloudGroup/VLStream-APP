@@ -12,6 +12,22 @@
 // 使用接口
 import { geocoderAddress } from '@/api/geoserver'
 
+interface TiandituGeocodeResult {
+  status: string
+  msg?: string
+  result?: {
+    formatted_address: string
+    addressComponent: {
+      province: string
+      city: string
+      county: string
+      street: string
+      town: string
+      road: string
+    }
+  }
+}
+
 /**
  * 使用天地图API将经纬度转换为地址
  * @param lng 经度
@@ -25,10 +41,10 @@ export const getAddressFromTianditu = async(lng: number, lat: number): Promise<o
   //   const data = await response.json()
 
   try {
-    let res = await geocoderAddress({ lon: lng, lat: lat })
-    let data = null
+    const res = await geocoderAddress({ lon: lng, lat: lat })
+    let data: TiandituGeocodeResult | null = null
     if (res.code === 200) {
-      data = JSON.parse(res.data)
+      data = JSON.parse(res.data) as TiandituGeocodeResult
     }
     if (data && data.status === '0' && data.result) {
       // 返回格式化后的地址

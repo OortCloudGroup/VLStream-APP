@@ -12,7 +12,7 @@ import config from '@/config'
 
 function commonFunc<T, K>(interfaceName: string, data: T, method = 'post') {
   return request<K>({
-    url: config.URL + config.gateWay + 'apaas-admin-platform/' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-admin-platform/' + interfaceName,
     method: method,
     data: data
   })

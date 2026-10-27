@@ -99,7 +99,7 @@ export default {
     const { i18nt } = useI18n()
 
     const data = reactive({
-      defaultUploadURL: config.URL + config.gateWay + 'apaas-fastdfsservice/fastdfs/v1/uploadFile',
+      defaultUploadURL: config.platformURL + config.gateWay + 'apaas-fastdfsservice/fastdfs/v1/uploadFile',
       showUploaderFile: false,
       accept: '*/*',
       ImagePreview: {},

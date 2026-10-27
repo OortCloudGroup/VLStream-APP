@@ -3,7 +3,7 @@ import config from '@/config'
 
 function commonFunc<T, K>(interfaceName: string, data: T, method: string) {
   return request<K>({
-    url: config.URL + config.gateWay + 'apaas-location-service' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-location-service' + interfaceName,
     method: method,
     data: data
   })

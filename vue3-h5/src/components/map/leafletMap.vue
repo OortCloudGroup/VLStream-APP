@@ -127,8 +127,8 @@ const updateBaseLayers = () => {
   // 添加新的底图图层
   if (props.baseMapOptions && props.baseMapOptions.length > 0) {
     props.baseMapOptions.forEach(item => {
-      // 处理item.url 替换为 如果是http 开头 则不替换， 如果不是这加上 config.URL +
-      item.url = item.url.startsWith('http') ? item.url : Config.URL + item.url
+      // 处理item.url 替换为 如果是http 开头 则不替换， 否则补平台域名（底图/WMS 由 aPaaS 平台服务提供）
+      item.url = item.url.startsWith('http') ? item.url : Config.platformURL + item.url
       let layer = null
       if (item.type === 'WMS') {
         layer = L.tileLayer.wms(item.url, {

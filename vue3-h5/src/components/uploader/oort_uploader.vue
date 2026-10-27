@@ -68,7 +68,7 @@ const props = defineProps({
   }
 })
 
-const uploadURL = ref(config.URL + config.gateWay + 'apaas-fastdfsservice/fastdfs/v1/uploadFile')
+const uploadURL = ref(config.platformURL + config.gateWay + 'apaas-fastdfsservice/fastdfs/v1/uploadFile')
 
 const emit = defineEmits(['update:show', 'getImgUrl'])
 
@@ -164,7 +164,7 @@ const takePhoto = async(srcType) => {
       let tempArr = JSON.parse(res)
       let tempPromiseArr = []
       tempArr.forEach(item => {
-        tempPromiseArr.push(uploadImage(item))
+        tempPromiseArr.push(uploadImage(item.filePath))
       })
       const toastIns = showLoadingToast({
         message: '文件上传中，请耐心等待...',
