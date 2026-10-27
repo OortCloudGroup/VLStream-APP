@@ -1,13 +1,14 @@
 <!--
   LoginDev 登录面板（现代化重设计）。
-  逻辑保持不变（getLogin → getUserTenants → loginSSO），仅重构视觉与交互。
+  多租户：getLogin（apaas-sso）→ getUserTenants → loginSSO；
+  单租户（Config.authMode === 'local'）：getLogin 一步完成（vls-server/blade-auth/token），无验证码与租户选择。
   @Author 兰舰 (UI redesign)
 -->
 <template>
-  <div class="login_page">
+  <div class="login_page" :style="{ paddingTop: safeAreaTop, paddingBottom: '16px' }">
     <!-- 品牌区 -->
-    <div class="brand_area" :style="{ paddingTop: brandPaddingTop }">
-      <img class="brand_logo" src="@/assets/img/login_logo.png" alt="VLStream Cloud">
+    <div class="brand_area">
+      <img class="brand_logo" src="@/assets/img/login_logo.png" alt="VLStream Cloud" />
       <div class="brand_subtitle">
         视频流云平台
       </div>
@@ -51,7 +52,7 @@
           :src="codePngUrl + '/' + captchaID + '.png?' + timeStamp"
           alt="验证码"
           @click="refreshCaptcha"
-        >
+        />
       </div>
 
       <div class="aux_row">
@@ -130,17 +131,13 @@ const tenantVis = ref(false)
 const tempToken = ref('')
 const selectedTenantId = ref('')
 
-// 沉浸式状态栏适配：根据安全区动态留出顶部空间
-const brandPaddingTop = ref('60px')
-const computeBrandPadding = () => {
-  try {
-    const sh = window.global && window.global.is_native_shell
-      ? (window.__safeAreaTop || 0)
-      : 0
-    brandPaddingTop.value = (24 + sh) + 'px'
-  } catch (e) {
-    brandPaddingTop.value = '60px'
-  }
+// 沉浸式状态栏适配：整页内容垂直居中，安全区只作为容器上边距，避免内容顶进状态栏
+const safeAreaTop = ref('0px')
+const computeSafeAreaTop = () => {
+  const sh = window.global && window.global.is_native_shell
+    ? (window.__safeAreaTop || 0)
+    : 0
+  safeAreaTop.value = sh + 'px'
 }
 
 const getTenantInfo = () => {
@@ -183,11 +180,13 @@ const loading = ref(false)
 import { useUserStore } from '@/store/modules/useraPaas'
 import Config from '@/config'
 const store = useUserStore()
+// 单租户（local）用 vls-server 的 BladeX 登录，没有验证码、没有租户选择
+const isLocalAuth = Config.authMode === 'local'
 const username = ref('')
 const password = ref('')
 const captchaID = ref('')
 const code = ref('')
-const codePngUrl = ref(Config.URL + Config.gateWay + 'apaas-sso/captcha/v1/')
+const codePngUrl = ref(Config.platformURL + Config.gateWay + Config.authService + '/captcha/v1/')
 
 const timeStamp = ref(new Date().getTime())
 const refreshCaptcha = () => {
@@ -218,20 +217,29 @@ const loginBtn = async() => {
     captchaID: captchaID.value
   }).then((res) => {
     if (res.code === 200) {
+      if (isLocalAuth) {
+        // 单租户一步登录：本地令牌即业务令牌，没有租户选择这一步
+        showToast('登录成功')
+        emits('loginSuccess')
+        return
+      }
       tempToken.value = res.data.token
       getTenantInfo()
     } else {
+      // 本地认证走裸 axios，没有 service.ts 的统一错误提示，这里补上
+      if (isLocalAuth && res.msg) showToast(res.msg)
       refreshCaptcha()
       captchaID.value = res.data && res.data.CaptchaID ? res.data.CaptchaID : ''
     }
-  }).catch(() => {
+  }).catch((error) => {
+    if (isLocalAuth) showToast(error?.response?.data?.msg || error?.message || '登录失败')
   }).finally(() => {
     loading.value = false
   })
 }
 
 onMounted(() => {
-  computeBrandPadding()
+  computeSafeAreaTop()
   if (window.sessionStorage.getItem('autoLogin')) {
     try {
       const tempObj = JSON.parse(window.sessionStorage.getItem('autoLogin'))
@@ -256,13 +264,15 @@ $text_sub: #8a8f99;
 
 .login_page {
   min-height: 100vh;
+  max-height: 100%;
   width: 100%;
   background: linear-gradient(160deg, #eef3ff 0%, #f7f9ff 38%, #ffffff 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* 顶部装饰光斑 */
@@ -285,7 +295,8 @@ $text_sub: #8a8f99;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 60px;
+  margin-top: auto;
+  padding-top: 8px;
   padding-bottom: 28px;
   position: relative;
   z-index: 1;
@@ -431,6 +442,7 @@ $text_sub: #8a8f99;
 
 .footer_tip {
   margin-top: 28px;
+  margin-bottom: auto;
   font-size: 12px;
   color: #b3b8c2;
   position: relative;

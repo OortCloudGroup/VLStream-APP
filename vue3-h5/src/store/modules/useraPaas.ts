@@ -11,6 +11,7 @@ import { ref } from 'vue'
 import store from '@/store/index'
 import { defineStore } from 'pinia'
 import { getToken, removeToken, setToken } from '@/utils/cache'
+import { removeVlstreamToken } from '@/utils/vlstreamAuth'
 import {
   loginSSO,
   verifyToken,
@@ -18,6 +19,7 @@ import {
   resetPassword,
   getLoginCode
 } from '@/api/login/indexapaas'
+import { localLogin } from '@/api/login/localAuth'
 import {
   IVerifyTokenData,
   UserInfo
@@ -41,13 +43,33 @@ export const useUserStore = defineStore('user', () => {
 
   /* 临时登录*/
   const getLogin = (loginData) => {
+    if (config.authMode === 'local') {
+      // 单租户：账号密码一步换本地令牌，没有验证码也没有租户选择，会话在此就地建立
+      return localLogin({ account: loginData.loginId, password: loginData.password }).then((res) => {
+        if (res.code === 200) {
+          removeVlstreamToken()
+          setToken(res.data.accessToken)
+          token.value = res.data.accessToken
+          userInfo.value = { ...(res.data.userInfo || res.data), accessToken: res.data.accessToken }
+          setTenantId(res.data.tenantId || config.tenantId)
+        }
+        return res
+      })
+    }
     return new Promise((resolve, reject) => {
       // 使用 公钥加密
       const publicKey =
         'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAzd2eYqgC6A3CvQN982C7s3xo2zjL97b0lHkfcAFEy50YHg+g5QD6RbvZt0NTQVOoC5Vv867lp0UBrwAslNCjt92QyxKkGLU+10UClkCJsiHpxy/J7AOOpS0wMGao80uWN94EZEsP/FKFfGNz3lJcZRtg4TGCMgXQGlKxBcYJDor/zK/06asTBGp4IxvTDAKTuMP+u88y5nQTUpKPnPstwmiLfqZLOSE3y4kIA7VC98GxPY8SqLZ7b9HzLSNoZNXKvA9US7A2F8/A97b8tExXsGPOodMQzrLFVr840ZV2WgpxJHqobqYReGhGMN4JdjfGlUvHyhYaCyOcSWalWuLh18cDQkum8yUrw5Tki8r8VPDTEZhsOXcq46cMr4437HGYeDA2ib7TOArFq1d0DD9Z0DAsjNfhgqqIP9A9kXrs6JIRrkz82skco2WQ5NUdpLT3yaAiXTxmFaajQGVIhFG24VL8CTloRo3FZmy9vMlUseCKmhfCBFbhUG9r7HOuhkO+jY4yfItE8BIrClbkQBAzMBMTuRM84VQQ4MnYlbdT3uSt5Qw5WmGIxsAKk93o8Hyhrg/OX8FCwntw2h5AjGDGn/H5H0TDAp8vX0NJgh4xhOpNT8pshuX7W1vcqr42sqOjM/mbRPV3s+tT4ynY0xQLuqp0P7GW3fu0fT0/OeHPwcsCAwEAAQ=='
       const encrypt = new JSEncrypt()
       encrypt.setPublicKey(publicKey)
-      const json = {
+      const json: {
+        loginId: string
+        password: string
+        timestamp: number
+        client: string
+        code?: string
+        captchaID?: string
+      } = {
         loginId: loginData.loginId,
         password: loginData.password,
         timestamp: Math.floor(new Date().getTime() / 1000),
@@ -57,7 +79,6 @@ export const useUserStore = defineStore('user', () => {
         json.code = loginData.code
         json.captchaID = loginData.captchaID
       }
-      console.log('json', json)
       const tjson = encrypt.encrypt(JSON.stringify(json)) as string
       getLoginCode({ userInfo: tjson })
         .then((res) => {
@@ -74,6 +95,7 @@ export const useUserStore = defineStore('user', () => {
     return new Promise((resolve, reject) => {
       loginSSO(loginData)
         .then((res) => {
+          removeVlstreamToken()
           setToken(res.data.accessToken)
           setTenantId(res.data.tenantId)
           token.value = res.data.accessToken
@@ -112,6 +134,8 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const setTenantId = (data: string) => {
+    // 换租户等于换 VLStream 本地会话，缓存的 JWT 必须作废重新换取
+    if (tenantId.value !== data) removeVlstreamToken()
     tenantId.value = data
     window.sessionStorage.setItem('tenantId', data)
     setHeaders()
@@ -154,6 +178,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const removeStoreToken = () => {
+    removeVlstreamToken()
     removeToken()
     token.value = ''
     userInfo.value = undefined
