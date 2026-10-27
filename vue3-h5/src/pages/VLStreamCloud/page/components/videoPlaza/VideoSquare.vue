@@ -43,7 +43,7 @@
           :key="slot.id"
           class="preview-cell"
         >
-          <!-- 有设备：播放 WebRTC 视频 -->
+          <!-- 有设备：播放 WVP 预览流 -->
           <div v-if="slot.device" class="preview-video-wrapper">
             <video
               :id="`vs-webrtc-${slot.device.id}`"
@@ -56,6 +56,9 @@
             <!-- 自定义全屏 -->
             <div class="cell-fullscreen-btn" @click.stop="enterCellFullscreen(slot.device.id)">
               <van-icon name="expand-o" />
+            </div>
+            <div v-if="previewStates[slot.device.id]" class="cell-status">
+              {{ previewStates[slot.device.id] }}
             </div>
           </div>
           <!-- 无设备：占位 -->
@@ -90,7 +93,7 @@
           <div class="name">
             {{ item.deviceName }}
           </div>
-          <span class="privacy-tag">
+          <span v-if="item.privacy" class="privacy-tag">
             {{ item.privacy }}
           </span>
         </div>
@@ -146,9 +149,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { useUserStore } from '@/store/modules/useraPaas'
-import { getDeviceList } from '@/api/VLStreamCloud/device'
-import { WEBRTC_SERVER_BASE_URL } from '@/api/VLStreamCloud/webrtc'
+import { getWvpVlsDeviceList, getWvpVlsDeviceDetail, getWvpVlsDeviceStreams, createWvpVlsDevicePreview } from '@/api/VLStreamCloud/wvp'
+import { CameraRtcPlayer, parseCameraRtcTarget } from '@/utils/cameraRtc'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import VideoViewDetail from './VideoViewDetail.vue'
 import p1 from '@/assets/img/VLStreamCloud/spgc/p1.png'
@@ -385,121 +387,96 @@ const previewSlots = computed(() => {
 
 const previewCols = computed(() => layoutColsMap[activeLayout.value] || 2)
 
-const store = useUserStore()
-
 const devices = ref<any[]>([])
 
-// ========= WebRTC 播放相关（移动端多分屏） =========
-const WEBRTC_STREAMER_BASE = WEBRTC_SERVER_BASE_URL
-const WEBRTC_SCRIPT_URLS = [
-  `${WEBRTC_STREAMER_BASE}/libs/adapter.min.js`,
-  `${WEBRTC_STREAMER_BASE}/webrtcstreamer.js`
-]
+// ========= WVP 预览播放（移动端多分屏） =========
+// 每个分屏一路 CameraRTC 会话：详情校验在线 → 取流列表 → 创建预览 → 信令播放
+const previewPlayers: Record<string, CameraRtcPlayer> = {}
+const previewStates = ref<Record<string, string>>({})
 
-// 记录每个设备的 WebRtcStreamer 实例，方便销毁
-const webrtcPlayers: Record<string, any> = {}
-let webrtcScriptLoader: Promise<unknown> | null = null
-
-const loadScriptTag = (src: string) => {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) {
-      resolve(true)
-      return
-    }
-    const script = document.createElement('script')
-    script.src = src
-    script.async = true
-    script.onload = () => resolve(true)
-    script.onerror = () => reject(new Error(`Failed to load ${src}`))
-    document.head.appendChild(script)
-  })
-}
-
-const ensureWebRtcStreamerScripts = async() => {
-  if (webrtcScriptLoader) return webrtcScriptLoader
-  webrtcScriptLoader = Promise.all(WEBRTC_SCRIPT_URLS.map(loadScriptTag)).catch(err => {
-    webrtcScriptLoader = null
-    throw err
-  })
-  return webrtcScriptLoader
-}
-
-const stopWebrtcForDevice = async(deviceId: string) => {
-  const player = webrtcPlayers[deviceId]
+const stopPreviewForDevice = (rowId: string) => {
+  const player = previewPlayers[rowId]
   if (!player) return
   try {
-    if (typeof player.disconnect === 'function') {
-      await player.disconnect()
-    } else if (typeof player.stop === 'function') {
-      await player.stop()
-    }
+    player.stop()
   } catch (e) {
-    // 忽略单个播放器停止时的异常
+    // 忽略单个播放器销毁时的异常
   }
-  delete webrtcPlayers[deviceId]
+  delete previewPlayers[rowId]
+  delete previewStates.value[rowId]
 }
 
-const stopAllWebrtc = async() => {
-  const ids = Object.keys(webrtcPlayers)
-  await Promise.all(ids.map(id => stopWebrtcForDevice(id)))
+const stopAllPreviews = () => {
+  Object.keys(previewPlayers).forEach(rowId => stopPreviewForDevice(rowId))
 }
 
-const startWebrtcForDevice = async(device: any) => {
-  const streamUrl =
-    device?.streamUrl || device?.originalRtspUrl || device?.rtspUrl || device?.url
-  if (!streamUrl) return
-
-  const videoId = `vs-webrtc-${device.id}`
-  const videoEl = document.getElementById(videoId) as HTMLVideoElement | null
+const startPreviewForDevice = async(device: any) => {
+  const videoEl = document.getElementById(`vs-webrtc-${device.id}`) as HTMLVideoElement | null
   if (!videoEl) return
 
-  await ensureWebRtcStreamerScripts()
+  stopPreviewForDevice(device.id)
 
-  // 全局 WebRtcStreamer 挂在 window 上
-  const anyWindow = window as any
-  if (!anyWindow.WebRtcStreamer) {
-    return
+  const setState = (message: string) => {
+    previewStates.value = { ...previewStates.value, [device.id]: message }
   }
 
-  // 先停止旧的
-  await stopWebrtcForDevice(device.id)
-
-  const player = new anyWindow.WebRtcStreamer(videoId, WEBRTC_STREAMER_BASE)
-  webrtcPlayers[device.id] = player
-
   try {
-    if (typeof player.connect === 'function') {
-      player.connect(streamUrl, '', 'rtptransport=tcp&timeout=60')
-    } else if (typeof player.play === 'function') {
-      player.play(streamUrl)
+    const detail: any = await getWvpVlsDeviceDetail(device.id)
+    if (detail?.data?.device?.online !== true) {
+      setState('设备离线，不允许播放')
+      return
     }
-  } catch (e) {
-    // 单个窗口播放异常时忽略，避免打断其它窗口
+    const streamsRes: any = await getWvpVlsDeviceStreams(device.id)
+    const streams = Array.isArray(streamsRes?.data) ? streamsRes.data : []
+    const stream = streams.find((item: any) => item.defaultStream) || streams[0]
+    if (!stream) {
+      setState('设备没有上报可用视频流')
+      return
+    }
+    const previewRes: any = await createWvpVlsDevicePreview(device.id, stream.id)
+    const preview = previewRes?.data || {}
+    const target = preview.playMode === 'cameraRTC' && preview.url ? parseCameraRtcTarget(preview.url) : null
+    if (!target) {
+      setState('WVP 未返回可用播放地址')
+      return
+    }
+    const player = new CameraRtcPlayer({
+      videoElement: videoEl,
+      deviceId: target.cameraId,
+      socketUrl: target.socketUrl,
+      onStatus: status => {
+        setState(status.state === 'playing' ? '' : status.message)
+      }
+    })
+    previewPlayers[device.id] = player
+    player.start()
+  } catch (e: any) {
+    setState(e?.response?.data?.msg || e?.message || '创建预览失败')
   }
 }
 
-// 当设备列表或布局变化后，刷新当前分屏中的 WebRTC 播放
+// 当设备列表或布局变化后，刷新当前分屏中的预览流
 const refreshAllPreviewStreams = async() => {
   await nextTick()
   const slots = previewSlots.value
   // 先停止所有，再为当前槽位中有设备的重新启动
-  await stopAllWebrtc()
+  stopAllPreviews()
   await Promise.all(
     slots
       .filter(slot => !!slot.device)
-      .map(slot => startWebrtcForDevice(slot.device))
+      .map(slot => startPreviewForDevice(slot.device))
   )
 }
 
 const fetchDevices = async() => {
-  const params = {
-    accessToken: store.userInfo?.accessToken
-  }
-  const res: any = await getDeviceList(params)
-  if (res.code === 200 && res.data && Array.isArray(res.data.records)) {
-    devices.value = res.data.records.map((item: any) => ({
-      privacy: item.isPublic === 1 ? '公开' : '私有',
-      ...item
+  const res: any = await getWvpVlsDeviceList({ pageNum: 1, pageSize: 16 })
+  // wvp 分页是 RuoYi 格式，记录直接在顶层 rows 上
+  if (res.code === 200 && Array.isArray(res.rows)) {
+    devices.value = res.rows.map((item: any) => ({
+      ...item,
+      status: item.online === true ? '1' : '0',
+      deviceType: item.deviceType || item.deviceModel,
+      address: item.address || item.ipAddr
     }))
     await refreshAllPreviewStreams()
   }
@@ -527,7 +504,7 @@ onBeforeUnmount(async() => {
   if (isFullscreen.value) {
     await exitFullscreen()
   }
-  await stopAllWebrtc()
+  stopAllPreviews()
 })
 
 const showDetail = ref(false)
@@ -762,6 +739,20 @@ const openDetail = (item: any) => {
 
 .cell-fullscreen-btn:active {
   background: rgba(0, 0, 0, 0.5);
+}
+
+.cell-status {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  padding: 4px 8px;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
 }
 
 .preview-img {

@@ -10,7 +10,7 @@
       <div class="info-card">
         <div class="title-row">
           <span class="device-name">{{ device.deviceName || '--' }}</span>
-          <span class="privacy-tag">
+          <span v-if="privacyText" class="privacy-tag">
             {{ privacyText }}
           </span>
         </div>
@@ -118,6 +118,8 @@ const heroImg = computed(() => props.device.imagePath || '')
 
 const privacyText = computed(() => {
   const d = props.device || {}
+  // wvp 推送设备没有公私域字段，缺省时不展示标签
+  if (d.isPublic === undefined || d.isPublic === null) return ''
   return d.isPublic === 1 ? '公开' : '私有'
 })
 
