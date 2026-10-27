@@ -13,10 +13,33 @@ import { getToken, removeToken } from './cache'
 import Config from '@/config'
 import useGoWhere from '@/hooks/useGoWhere'
 import { showToast } from 'vant'
+import { ensureVlstreamToken, removeVlstreamToken, EXCHANGE_PATH } from './vlstreamAuth'
+
+const VLS_SERVICE = 'apaas-vls-server'
+const WVP_SERVICE = 'apaas-wvp-server'
 // 节流白名单
 const whiteApi = ['/menu/v1/myAuth', 'sso/v1/getUserList', 'sso/v1/getDeptUser']
 function includeApi(url) {
   return whiteApi.some(item => { return url.includes(item) })
+}
+
+/** 同名头的大小写变体一并删除，避免残留的平台令牌覆盖 VLStream JWT */
+function replaceHeader(headers, name: string, value?: string) {
+  if (!headers) return
+  Object.keys(headers).forEach((key) => {
+    if (key.toLowerCase() === name.toLowerCase()) delete headers[key]
+  })
+  if (value) headers[name] = value
+}
+
+/** 需要 VLStream JWT 的服务 */
+function isVlstreamUrl(url: string) {
+  return url.includes(VLS_SERVICE) || url.includes(WVP_SERVICE)
+}
+
+/** JWT 与平台会话脱期时丢弃缓存，让下一次请求重新换取 */
+function dropVlstreamTokenOn401(url: string, code) {
+  if (code === 401 && isVlstreamUrl(url)) removeVlstreamToken()
 }
 
 /** 创建请求实例 */
@@ -29,7 +52,7 @@ function createService() {
   const service = axios.create()
   // 请求拦截
   service.interceptors.request.use(
-    (config) => {
+    async(config) => {
       const nowTime = new Date().getTime()
       // console.log('节流处理中，稍后再试',repeatArr.get(`${config.method}-${config.url}`) && (nowTime -  repeatArr.get(`${config.method}-${config.url}`)) < 1000,repeatArr.get(`${config.method}-${config.url}`), `${config.url}`,  !includeApi(`${config.url}`))
       //   console.log(repeatArr)
@@ -43,8 +66,19 @@ function createService() {
         console.warn('request to fast', `${config.url}`)
       }
       repeatArr.set(`${config.method}-${config.url}`, nowTime)
-      config.metadata = {
-        startTime: new Date().getTime()
+      const url = `${config.url}`
+      if (url.includes(VLS_SERVICE) && !url.includes(EXCHANGE_PATH)) {
+        const jwt = await ensureVlstreamToken()
+        replaceHeader(config.headers, 'Authorization', `Bearer ${jwt}`)
+        // 单租户的 vls-server 是 BladeX 服务，鉴权头认 blade-auth（与厂商 PC 端一致）
+        if (Config.authMode === 'local') replaceHeader(config.headers, 'blade-auth', `Bearer ${jwt}`)
+      }
+      if (url.includes(WVP_SERVICE)) {
+        const jwt = await ensureVlstreamToken()
+        replaceHeader(config.headers, 'x-vlstream-token', jwt)
+        replaceHeader(config.headers, 'x-wvp-auth-source', 'vlstream')
+        // wvp 只认 x-vlstream-token，携带平台令牌的 Authorization 会干扰其鉴权
+        replaceHeader(config.headers, 'Authorization')
       }
       return config
     },
@@ -62,9 +96,11 @@ function createService() {
       if (response.status === 200) {
         if (response.data.code !== 200) {
           if (response.data?.msg === '无效的accesstoken') {
+            removeVlstreamToken()
             removeToken()
             location.reload()
           } else {
+            dropVlstreamTokenOn401(`${response.config?.url || ''}`, response.data.code)
             if (response.data.msg) showToast(response.data.msg)
           }
         }
@@ -75,6 +111,7 @@ function createService() {
       const httpStatusCode = error.response?.status
       let errMessage = error.message
       const errorBody = error.response?.data
+      dropVlstreamTokenOn401(`${error.config?.url || ''}`, httpStatusCode || errorBody?.code)
       if (errorBody && errorBody.code) {
         errMessage = errorBody.code + errorBody.msg
         errorBody.msg = errorBody.msg || errorBody.message

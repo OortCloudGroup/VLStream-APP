@@ -23,6 +23,7 @@
 
 import { request } from '@/utils/service'
 import config from '@/config'
+import { getToken } from '@/utils/cache'
 
 // 公共请求函数：统一URL拼接、请求方式、入参处理，泛型支持类型约束
 function commonFunc<T, K>(interfaceName: string, data: T, method = 'post', isParams = false) {
@@ -31,7 +32,7 @@ function commonFunc<T, K>(interfaceName: string, data: T, method = 'post', isPar
     params = { params: data }
   }
   return request < K >({
-    url: config.URL + config.gateWay + 'apaas-location-service' + interfaceName,
+    url: config.platformURL + config.gateWay + 'apaas-location-service' + interfaceName,
     method: method,
     ...params
   })
@@ -41,5 +42,6 @@ function commonFunc<T, K>(interfaceName: string, data: T, method = 'post', isPar
  * 标签查询
  */
 export function definitionDataGroupList(data) {
-  return commonFunc('/definition/v2/definitionDataGroupList', data, 'POST')
+  // location-service 从 query/body 取 accessToken，不读请求头
+  return commonFunc('/definition/v2/definitionDataGroupList', { accessToken: getToken(), ...data }, 'POST')
 }
