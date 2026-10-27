@@ -21,6 +21,7 @@ English | [简体中文](./README.zh-CN.md)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
 - [Multi-Project Mechanism](#multi-project-mechanism)
+- [Backend Environment Switch](#backend-environment-switch)
 - [Build & Deployment](#build--deployment)
 - [Code Conventions](#code-conventions)
 - [Related Documentation](#related-documentation)
@@ -149,6 +150,26 @@ vue3-h5/src/
 ```
 
 For the full directory layout and component library docs, see [`vue3-h5/README.md`](./vue3-h5/README.md).
+
+## Backend Environment Switch
+
+One codebase serves two backend environments. Everything about them lives in one preset table, so a switch never touches business code:
+
+| Environment | Name | Business services (`apaas-vls-server` / `apaas-wvp-server`) | Login (`authMode`) | CameraRTC signaling |
+| --- | --- | --- | --- | --- |
+| Multi-tenant production | `multi` | `https://workup.oortcloudsmart.com:2443` | `platform` — `apaas-sso`: RSA `sso/v1/getLoginCode` → tenant pick → `sso/v1/login`, then `sso/v1/exchangeToken` for the VLStream JWT | `wss://vlstream.oortcloudsmart.com:2443/bus/camera-rtc` |
+| Single-tenant | `single` | `https://vlstream.oortcloudsmart.com:2443` | `local` — BladeX `vls-server/blade-auth/token` (form params `account` / `password` / `grant_type=password` / `scope=all` / `type=account`), tenant fixed to `000000`, no captcha and no token exchange | `wss://vlstream.oortcloudsmart.com:2443/bus/camera-rtc` |
+
+- **Presets**: [`vue3-h5/src/config/index.js`](./vue3-h5/src/config/index.js) (`VL_ENV_PRESETS` + `applyVlEnv`) — hosts *and* service/auth differences (`authMode`, `authService`, `tenantId`, `bladeClientAuth`).
+- **Service names differ, not just hosts.** The single-tenant cluster does not route any `apaas-*` vhost (nginx 404); its login/auth lives inside `vls-server` (`blade-auth/token`, `sso/v1/getUserInfo`, `blade-auth/logout`, `sso/v1/mode`). `GET {URL}bus/vls-server/sso/v1/mode` reports `{"tenantType":"single","multiTenant":false}` — the same probe the vendor PC console uses.
+- **Where `authMode` is consumed**: [`api/login/localAuth.ts`](./vue3-h5/src/api/login/localAuth.ts) (local endpoints), [`store/modules/useraPaas.ts`](./vue3-h5/src/store/modules/useraPaas.ts) (`getLogin` branches), [`components/commonpage/LoginDev.vue`](./vue3-h5/src/components/commonpage/LoginDev.vue) (one-step login, no captcha/tenant UI), [`utils/vlstreamAuth.ts`](./vue3-h5/src/utils/vlstreamAuth.ts) (local token *is* the business token → skip `exchangeToken`), [`utils/service.ts`](./vue3-h5/src/utils/service.ts) (adds the `blade-auth` header BladeX expects).
+- **aPaaS platform services** (captcha, tenants, dicts, regions, forms, fastdfs upload, map, app-info) are called on `config.platformURL`. They exist only on the multi-tenant cluster; under `single` that host has no such routes, so those features are unavailable there and [`App.vue`](./vue3-h5/src/pages/VLStreamCloud/App.vue) falls back to the shell-injected `__VL_STATIC__.appInfo` instead of `apaas-admin-platform`.
+- **Switch points**, highest precedence first:
+  1. Native shell: `window.__VL_STATIC__.vlEnv` injected at document start — `VL_ENV` in `Android/android/app/build.gradle`, `AppConfig.vlEnv` in `iOS/ios/App/App/AppConfig.swift`, `APP_VL_ENV` in `HarmonyOS/entry/src/main/ets/plugins/NativeBridgePlugin.ets`. One built H5 bundle can therefore be shipped into either environment.
+  2. Build/dev: `VITE_VL_ENV` in `vue3-h5/.env`, or per command — `VITE_VL_ENV=multi pnpm start`, `VITE_VL_ENV=multi pnpm run build:VLStreamCloud`.
+  3. Fallback default: `multi`.
+- Each shell also has an optional raw gateway override (Android `DEFAULT_GATEWAY`, iOS `AppConfig.gateway`, HarmonyOS `APP_GATEWAY`). Leave it empty to use the preset; set it only for on-site deployments with a custom host. A raw override changes hosts only — `authMode` still comes from the environment name.
+- Unknown environment names are ignored — the current environment stays active instead of blanking the gateway.
 
 ## Build & Deployment
 

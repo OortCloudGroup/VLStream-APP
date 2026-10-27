@@ -20,7 +20,7 @@ HarmonyOS/
 │       ├── ets/
 │       │   ├── entryability/EntryAbility.ets   # UIAbility：WebView 引擎初始化 + 沉浸式状态栏（AppStorage 传值）
 │       │   ├── pages/Index.ets                  # @Entry 页面：挂 MainPage + 注册 NativeBridge plugin
-│       │   └── plugins/NativeBridgePlugin.ets   # 自研 ArkTS 业务 plugin
+│       │   └── plugins/NativeBridgePlugin.ets   # 自研 ArkTS 业务 plugin（含 APP_VL_ENV 环境名 + 可选 APP_GATEWAY 覆盖）
 │       └── resources/
 │           ├── base/{element,media,profile}/    # 字符串/图标/页面路由
 │           └── rawfile/
@@ -66,7 +66,8 @@ H5 侧封装在 `vue3-h5/public/androidFunUtils.js`（挂 `window.androidFunUtil
 
 | H5 能力 | 鸿蒙实现 | Android/iOS 对应 |
 |---|---|---|
-| `getGateway()` 同步 | 自研 `NativeBridgePlugin` `handleOnPageStart` 注入 `window.__VL_STATIC__.gateway` | 同 |
+| `getGateway()` 同步 | 自研 `NativeBridgePlugin` `handleOnPageStart` 注入 `window.__VL_STATIC__.gateway`（仅覆盖时使用） | 同 |
+| 后端环境切换 | `NativeBridgePlugin.ets` 里 `APP_VL_ENV = 'multi' / 'single'` → 注入 `window.__VL_STATIC__.vlEnv`，域名由 H5 预设表决定 | 同（Android `BuildConfig.VL_ENV` / iOS `AppConfig.vlEnv`） |
 | `getAppInfo()` | 自研 `NativeBridgePlugin`（注入 + `registerMethod` 兜底）| 同 |
 | `tokenOverdue()` | 自研 `NativeBridgePlugin`（`runJavaScript` 清 sessionStorage + reload）| 同 |
 | `appExit()` | 官方 `@capacitor-ohos/app` `exitApp()` | 同 |

@@ -19,7 +19,7 @@ iOS/
             ├── AppDelegate.swift              # UIApplication 入口（UIScene）
             ├── SceneDelegate.swift            # rootViewController = CAPBridgeViewController
             ├── NativeBridgePlugin.swift       # 自研业务 Plugin（getGateway/getAppInfo/tokenOverdue + document-start 注入）
-            ├── AppConfig.swift                # 网关/appId/secret 常量（与 Android AppConfig 对齐）
+            ├── AppConfig.swift                # 环境名 vlEnv（multi/single）/ 可选网关覆盖 / appId/secret 常量（与 Android AppConfig 对齐）
             ├── Info.plist                     # 应用名 VLStream + 相机/相册/定位权限 + ATS 放行
             ├── capacitor.config.json          # cap 拷入（含 packageClassList，登记 NativeBridgePlugin）
             ├── Assets.xcassets/AppIcon.appiconset/  # 桌面图标（1024，来自 docs/vls/VLS2）
@@ -34,7 +34,8 @@ H5 侧统一封装在 `vue3-h5/public/androidFunUtils.js`（挂 `window.androidF
 
 | H5 能力 | iOS 实现 | Android 对应 |
 |---|---|---|
-| `getGateway()` 同步 | 自研 `NativeBridgePlugin` document-start 注入 `window.__VL_STATIC__.gateway` | 同 |
+| `getGateway()` 同步 | 自研 `NativeBridgePlugin` document-start 注入 `window.__VL_STATIC__.gateway`（仅覆盖时使用） | 同 |
+| 后端环境切换 | `AppConfig.vlEnv = "multi" / "single"` → 注入 `window.__VL_STATIC__.vlEnv`，域名由 H5 预设表决定 | 同（Android `BuildConfig.VL_ENV`） |
 | `getAppInfo()` | 自研 `NativeBridgePlugin`（注入 + `@objc` 兜底）| 同 |
 | `tokenOverdue()` | 自研 `NativeBridgePlugin`（`bridge.eval` 清 sessionStorage + reload）| 同 |
 | `appExit()` | 官方 `@capacitor/app` `exitApp()` | 同 |

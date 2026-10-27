@@ -13,7 +13,7 @@ Android/
     ├── capacitor-cordova-android-plugins/    # cap 自动生成：cordova 插件兼容层（本工程未用 cordova 插件）
     ├── local.properties                      # sdk.dir（不要提交）
     └── app/
-        ├── build.gradle                      # :app 模块；buildConfigField 注入 DEFAULT_GATEWAY；签名引用 keystore/debug.jks
+        ├── build.gradle                      # :app 模块；buildConfigField 注入 VL_ENV（环境名）与可选 DEFAULT_GATEWAY；签名引用 keystore/debug.jks
         ├── keystore/debug.jks                # debug 占位签名（沿用旧壳）
         └── src/main/
             ├── AndroidManifest.xml           # INTERNET / CAMERA / READ_MEDIA_* / 定位权限；FileProvider；cleartext
@@ -24,8 +24,8 @@ Android/
             ├── res/xml/{file_paths,network_security_config}.xml
             └── java/com/oort/vlstream/app/
                 ├── MainActivity.java          # extends BridgeActivity，注册 NativeBridgePlugin
-                ├── AppConfig.java             # 网关 BuildConfig 读取
-                └── NativeBridgePlugin.java    # 自研业务 Plugin（gateway/appInfo/tokenOverdue + 启动期注入）
+                ├── AppConfig.java             # 环境名 VL_ENV / 网关覆盖 BuildConfig 读取
+                └── NativeBridgePlugin.java    # 自研业务 Plugin（vlEnv+gateway/appInfo/tokenOverdue + 启动期注入）
 ```
 
 > Capacitor 工程放在 `Android/android/` 而非前端根下，通过 `vue3-h5/capacitor.config.json` 的 `android.path: "../Android/android"` 指定（见 `capacitor.config.ts:211` 对 `android.path` 的支持）。
