@@ -8,7 +8,7 @@
 * @Copyright aPaaS-front-team. All rights reserved.
 */
 import { ref, watchEffect } from 'vue'
-import { getActiveThemeName, setActiveThemeName } from '@/utils/cache/localStorage'
+import { getActiveThemeName, setActiveThemeName } from '@/utils/cache'
 
 const DEFAULT_THEME_NAME = 'dark'
 type DefaultThemeNameType = typeof DEFAULT_THEME_NAME
@@ -34,7 +34,7 @@ const themeList: IThemeList[] = [
 ]
 
 /** 正在应用的主题名称 */
-const activeThemeName = ref<ThemeName>(getActiveThemeName() || DEFAULT_THEME_NAME)
+const activeThemeName = ref<ThemeName>((getActiveThemeName() as ThemeName | null) || DEFAULT_THEME_NAME)
 
 const setTheme = (value: ThemeName) => {
   activeThemeName.value = value

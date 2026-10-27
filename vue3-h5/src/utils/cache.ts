@@ -31,3 +31,9 @@ export const removeToken = () => {
   // 把浏览器地址栏的 参数清空
   window.location.search = ''
 }
+
+/** 主题名持久化（localStorage，跨会话生效） */
+const THEME_KEY = 'activeThemeName'
+
+export const getActiveThemeName = () => localStorage.getItem(THEME_KEY)
+export const setActiveThemeName = (name: string) => localStorage.setItem(THEME_KEY, name)

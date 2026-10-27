@@ -40,9 +40,16 @@ export type UserInfo = {
   oort_uuid:string
 }
 
-type LoginRes = {
+export interface IApiResponseData<T = any> {
+  code: number
+  msg?: string
+  data: T
+}
+
+type LoginRes = UserInfo & {
   userInfo: UserInfo,
-  accessToken: string
+  accessToken: string,
+  tenantId: string
 }
 
 export type LoginResponseData = IApiResponseData<LoginRes>
