@@ -27,7 +27,7 @@ import java.util.Collections;
  * <p>
  * 此外，{@link #load()} 通过 {@code WebViewCompat.addDocumentStartJavaScript}
  * 在「document start」时机注入同步静态变量 {@code window.__VL_STATIC__}
- * （gateway / appInfo）、运行环境标志 {@code window.global.is_native_shell=true}，
+ * （vlEnv / gateway / appInfo）、运行环境标志 {@code window.global.is_native_shell=true}，
  * 以及沉浸式状态栏安全区高度 {@code window.__safeAreaTop}（CSS px），
  * 保证它们在任何业务脚本（index.html 的 &lt;script&gt;）之前就绪——从而
  * H5 侧 androidFunUtils.js 能用「同步调用」拿到网关（App.vue 不必改成 async），
@@ -101,7 +101,13 @@ public class NativeBridgePlugin extends Plugin {
 
     private String buildStaticJson() {
         JSObject o = new JSObject();
-        o.put("gateway", AppConfig.getGateway());
+        // 只下发环境名，各服务域名由 H5 的预设表决定；
+        // DEFAULT_GATEWAY 仅在现场部署需要覆盖预设时才填，留空表示不覆盖。
+        o.put("vlEnv", AppConfig.getVlEnv());
+        String gateway = AppConfig.getGateway();
+        if (gateway != null && !gateway.isEmpty()) {
+            o.put("gateway", gateway);
+        }
         o.put("appInfo", appInfoObject());
         return o.toString();
     }

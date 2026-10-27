@@ -22,7 +22,7 @@
 
 import { onMounted, ref } from 'vue'
 
-import Config from '@/config'
+import Config, { applyVlEnv } from '@/config'
 import appConfig from '@/config/AppConfig'
 import { showLoadingToast, showFailToast } from 'vant'
 import { getAccessToken, getGateWay, getAppInfo, getAppInfoFromHttp } from '@/utils/cordovatUtils.js'
@@ -47,6 +47,9 @@ const init = () => {
   Config.appName = configObj.appName
   if (window.global && window.global.is_native_shell) {
     // 新原生壳（AgentWeb）：网关由原生注入，token 由 H5 LoginDev 自取
+    // 原生壳可只下发环境名（multi/single），由 config 预设表决定各服务域名
+    const staticVars = window.__VL_STATIC__ || {}
+    if (staticVars.vlEnv) applyVlEnv(staticVars.vlEnv)
     const gw = window.androidFunUtils && window.androidFunUtils.getGateway
       ? window.androidFunUtils.getGateway()
       : ''
@@ -85,7 +88,8 @@ const init = () => {
       }
     })
   } else {
-    if (window.location.hostname !== 'localhost' && window.location.protocol.startsWith('http')) {
+    // 仅生产构建下按当前源覆盖网关（H5 与网关同源部署时）；dev server 的源不是后端网关，局域网 IP 调试同样不能覆盖
+    if (!import.meta.env.DEV && window.location.protocol.startsWith('http')) {
       Config.URL = window.location.origin + '/'
     }
     showLoginDev.value = true
@@ -93,6 +97,13 @@ const init = () => {
 }
 
 const loginSuccess = async() => {
+  if (Config.authMode === 'local') {
+    // 单租户集群没有 apaas-admin-platform，应用信息退回到原生壳注入的静态值（浏览器调试时为空）
+    Config.appInfo = Config.appInfo || (window.__VL_STATIC__ && window.__VL_STATIC__.appInfo) || {}
+    showLoginDev.value = false
+    isInitFinsh.value = true
+    return
+  }
   let res = await getAppInfoFromHttp()
   if (res.code === 200) {
     showLoginDev.value = false

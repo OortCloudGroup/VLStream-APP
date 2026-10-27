@@ -10,8 +10,12 @@ android {
         versionCode 1
         versionName "1.0.0"
 
-        // 后端网关地址（运行期由 NativeBridgePlugin 注入到 H5 的 window.__VL_STATIC__.gateway）
-        buildConfigField "String", "DEFAULT_GATEWAY", "\"https://workup-dev.myoumuamua.com:6433\""
+        // 后端环境开关：multi=多租户生产 / single=单租户。
+        // 域名预设表在 H5（vue3-h5/src/config/index.js），壳只下发环境名，同一份离线包可切两套环境。
+        buildConfigField "String", "VL_ENV", "\"single\""
+        // 可选：现场部署要覆盖 H5 预设时才填完整业务网关地址（不带末尾斜杠），留空表示不覆盖。
+        // 运行期由 NativeBridgePlugin 注入到 H5 的 window.__VL_STATIC__
+        buildConfigField "String", "DEFAULT_GATEWAY", "\"\""
         buildConfigField "String", "DEFAULT_GATE_WAY", "\"bus/\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

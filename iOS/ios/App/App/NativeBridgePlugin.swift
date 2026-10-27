@@ -46,7 +46,8 @@ public class NativeBridgePlugin: CAPPlugin, CAPBridgedPlugin {
     /// 在此处通过 userContentController 追加 WKUserScript。
     private func injectDocumentStartScript() {
         guard let webView = self.bridge?.webView else { return }
-        let script = Self.bootScript(gateway: AppConfig.gateway,
+        let script = Self.bootScript(vlEnv: AppConfig.vlEnv,
+                                     gateway: AppConfig.gateway,
                                      appId: AppConfig.appId,
                                      appSecret: AppConfig.appSecret,
                                      appLabel: AppConfig.appLabel,
@@ -59,7 +60,8 @@ public class NativeBridgePlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     /// 构造启动注入脚本（运行环境标志 + 同步静态变量）。
-    private static func bootScript(gateway: String,
+    private static func bootScript(vlEnv: String,
+                                   gateway: String,
                                    appId: String,
                                    appSecret: String,
                                    appLabel: String,
@@ -88,7 +90,7 @@ public class NativeBridgePlugin: CAPPlugin, CAPBridgedPlugin {
         window.global.is_cordova=false;
         window.global.is_phone=true;
         window.global.is_harmony=false;
-        window.\(jsStaticVar)={"gateway":\(Self.quote(gateway)),"appInfo":\(appInfoJson)};
+        window.\(jsStaticVar)={"vlEnv":\(Self.quote(vlEnv)),"gateway":\(Self.quote(gateway)),"appInfo":\(appInfoJson)};
         }catch(e){console.error('[NativeBridgePlugin] inject failed',e);}})();
         """
     }

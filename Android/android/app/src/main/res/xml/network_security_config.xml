@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- 后端网关现为 https://workup-dev.myoumuamua.com:6433；
+    <!-- 后端网关现为 https://vlstream.oortcloudsmart.com:2443（aPaaS 平台域名 https://workup.oortcloudsmart.com:2443）；
          允许明文 HTTP 以兼容旧/调试环境（如临时切回 http） -->
     <base-config cleartextTrafficPermitted="true">
         <trust-anchors>

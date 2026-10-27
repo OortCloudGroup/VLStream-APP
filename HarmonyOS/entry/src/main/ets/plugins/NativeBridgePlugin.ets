@@ -8,14 +8,17 @@
  *   - tokenOverdue 清 H5 会话并 reload 重登
  *
  * 此外 handleOnPageStart 在每次页面加载时注入同步静态变量
- * window.__VL_STATIC__（gateway / appInfo）、运行环境标志 is_native_shell=true，
+ * window.__VL_STATIC__（vlEnv / gateway / appInfo）、运行环境标志 is_native_shell=true，
  * 以及沉浸式状态栏安全区高度 window.__safeAreaTop（vp），供 H5 顶部精确留白。
  *
  * 通用能力（拍照、退出、定位）由官方 @capacitor-ohos/app/camera/geolocation 提供。
  */
 import { CapacitorPlugin, PluginCall } from 'harmony-capacitor';
 
-const APP_GATEWAY: string = 'https://workup-dev.myoumuamua.com:6433';
+// 后端环境名：multi=多租户生产 / single=单租户，域名预设表在 H5（vue3-h5/src/config/index.js）
+const APP_VL_ENV: string = 'single';
+// 业务网关覆盖地址（不带末尾斜杠）；留空表示沿用 H5 的环境预设，仅现场部署需要覆盖时填写
+const APP_GATEWAY: string = '';
 const APP_ID: string = '747aa0fa18d047c8b526e242142e0a6c';
 const APP_SECRET: string = '3a97f4f65b204a3a96071746fa42936a';
 const APP_LABEL: string = 'VLStreamCloud';
@@ -40,6 +43,7 @@ export class NativeBridgePlugin extends CapacitorPlugin {
       'version': APP_VERSION
     };
     const appInfoJson: string = JSON.stringify(appInfo);
+    const vlEnvJson: string = JSON.stringify(APP_VL_ENV);
     const gatewayJson: string = JSON.stringify(APP_GATEWAY);
     const safeTop: number = this.getSafeAreaTopVp();
     const js: string =
@@ -49,7 +53,7 @@ export class NativeBridgePlugin extends CapacitorPlugin {
       'window.global.is_cordova=false;' +
       'window.global.is_phone=true;' +
       'window.global.is_harmony=true;' +
-      'window.__VL_STATIC__={"gateway":' + gatewayJson + ',"appInfo":' + appInfoJson + '};' +
+      'window.__VL_STATIC__={"vlEnv":' + vlEnvJson + ',"gateway":' + gatewayJson + ',"appInfo":' + appInfoJson + '};' +
       'window.__safeAreaTop=' + safeTop + ';' +
       '}catch(e){console.error("[NativeBridgePlugin] inject failed",e);}})();';
     try {

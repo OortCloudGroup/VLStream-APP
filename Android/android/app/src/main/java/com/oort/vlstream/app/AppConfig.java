@@ -8,7 +8,12 @@ package com.oort.vlstream.app;
  */
 public final class AppConfig {
 
-    /** 后端网关地址（含端口，不带末尾斜杠）。例如 https://workup-dev.myoumuamua.com:6433 */
+    /** 后端环境名：multi=多租户生产 / single=单租户，域名由 H5 预设表决定 */
+    public static String getVlEnv() {
+        return BuildConfig.VL_ENV;
+    }
+
+    /** 业务网关覆盖地址（含端口，不带末尾斜杠）。留空表示沿用 H5 的环境预设 */
     public static String getGateway() {
         return BuildConfig.DEFAULT_GATEWAY;
     }
