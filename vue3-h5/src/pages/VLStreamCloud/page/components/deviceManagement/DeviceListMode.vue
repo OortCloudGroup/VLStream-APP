@@ -3,13 +3,13 @@
     <div class="table-card">
       <div class="table-head">
         <div class="col name">
-          设备名称
+          {{ $t('设备名称') }}
         </div>
         <div class="col id">
-          设备ID
+          {{ $t('设备ID') }}
         </div>
         <div class="col">
-          状态
+          {{ $t('状态') }}
         </div>
       </div>
 
@@ -33,10 +33,10 @@
               plain
               class="status-tag online"
             >
-              在线
+              {{ $t('在线') }}
             </van-tag>
             <van-tag v-else type="default" plain class="status-tag offline">
-              离线
+              {{ $t('离线') }}
             </van-tag>
           </div>
         </div>
@@ -48,11 +48,9 @@
     </div>
 
     <oort-popup v-model="showDetail" position="right" style="width: 100%;height: 100%;" teleport="body">
-      <DeviceDetailTabs
-        v-if="showDetail"
-        :device-id="currentRow.id"
-        @deleted="handleDeleted"
-        @saved="fetchDevices"
+      <CameraDetail
+        v-if="showDetail && currentRow"
+        :camera="currentRow"
         @close="showDetail = false"
       />
     </oort-popup>
@@ -65,10 +63,13 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { showToast } from 'vant'
 import OortPopup from '@/components/popup/oort_popup.vue'
-import DeviceDetailTabs from '../deviceManagement/DeviceDetailTabs.vue'
+import CameraDetail from '@/pages/VLStreamCloud/page/components/cameraDetail/CameraDetail.vue'
 import EditDevice from '../deviceManagement/EditDevice.vue'
 import { getDeviceList } from '@/api/VLStreamCloud/device'
+import { resolveWvpDeviceRow } from '@/utils/wvpDevice'
 import { useUserStore } from '@/store/modules/useraPaas'
 
 const props = defineProps({
@@ -83,6 +84,8 @@ const props = defineProps({
 })
 
 const store = useUserStore()
+
+const { t } = useI18n()
 
 const rows = ref([])
 
@@ -126,20 +129,23 @@ watch(
 
 const showDetail = ref(false)
 const showAdd = ref(false)
-const currentRow = ref({})
+const currentRow = ref(null)
 
-const openDetail = (row) => {
-  currentRow.value = row
+// 点击设备打开摄像头详情：先按设备序列号找到 WVP 设备行
+const openDetail = async(row) => {
+  showToast({ message: t('正在打开设备详情…'), duration: 0, forbidClick: true })
+  const wvpRow = await resolveWvpDeviceRow(row.deviceId)
+  showToast.clear()
+  if (!wvpRow) {
+    showToast(t('该设备未接入视频平台'))
+    return
+  }
+  currentRow.value = wvpRow
   showDetail.value = true
 }
 
 const onAdd = () => {
   showAdd.value = true
-}
-
-const handleDeleted = () => {
-  showDetail.value = false
-  fetchDevices()
 }
 
 </script>
