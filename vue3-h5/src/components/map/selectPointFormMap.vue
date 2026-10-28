@@ -28,6 +28,7 @@
 
     <div class="map-container">
       <LMap
+        v-if="configLoaded && !mapUnavailable"
         ref="mapRef"
         :base-map-options="baseMapOptions"
         :zoom="zoom"
@@ -39,6 +40,9 @@
         @selectResult="selectResult"
         @mapMove="onMapMove"
       />
+      <div v-if="mapUnavailable" class="map-unavailable">
+        地图服务不可用，请改为手工填写位置
+      </div>
     </div>
 
     <!-- 周边搜索结果列表 -->
@@ -83,7 +87,7 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, nextTick } from 'vue'
 import { debounce } from 'lodash-es'
 import LMap from './leafletMap.vue'
 import AppConfig from '@/config/AppConfig'
@@ -142,14 +146,28 @@ const initMapBaseConfig = async() => {
     size: 999,
     platformAppId: props.appId
   }
-  const res = await mlsBaseMapList(data)
+  let records = []
+  try {
+    const res = await mlsBaseMapList(data)
+    records = res?.data?.records || []
+  } catch (error) {
+    // 底图服务不可用（如单租户集群没有 apaas-map-server），保持空底图并提示
+    mapConfigStore.setBaseMapArray([])
+    mapUnavailable.value = true
+    return
+  }
+  if (!records.length) {
+    mapConfigStore.setBaseMapArray([])
+    mapUnavailable.value = true
+    return
+  }
   // 保存底图列表
-  res.data.records.forEach(item => {
+  records.forEach(item => {
     item.type = item.dataType
   })
-  mapConfigStore.setBaseMapArray(res.data.records || [])
+  mapConfigStore.setBaseMapArray(records)
   // 获取当前生效的底图
-  const currentMap = res.data.records.find((item) => item.status === 2)
+  const currentMap = records.find((item) => item.status === 2)
   if (currentMap) {
     let tempBaseMapOptions = []
     if (currentMap.dataType === 'WMS') {
@@ -177,6 +195,10 @@ const initMapBaseConfig = async() => {
       zoom: currentMap.initLevel,
       center: [currentMap.centerXPoint, currentMap.centerYPoint]
     })
+  } else {
+    // 有底图列表但没有启用中的底图，同样无法出图
+    mapConfigStore.setBaseMapArray([])
+    mapUnavailable.value = true
   }
 }
 
@@ -286,9 +308,15 @@ const mapReady = () => {
 }
 
 const mapRef = ref(null)
+// 底图服务不可用时不初始化地图与绘制
+const mapUnavailable = ref(false)
+const configLoaded = ref(false)
 onMounted(async() => {
   await initMapBaseConfig()
-  mapRef.value.startDraw({ type: 'point', isContinue: true, isReturnResult: true })
+  if (mapUnavailable.value) return
+  configLoaded.value = true
+  await nextTick()
+  if (mapRef.value) mapRef.value.startDraw({ type: 'point', isContinue: true, isReturnResult: true })
 })
 
 </script>
@@ -383,6 +411,16 @@ onMounted(async() => {
     width: 100%;
     flex: 1;
     position: relative;
+}
+
+.map-unavailable {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f6f8;
+    color: rgba(51, 51, 51, 0.6);
+    font-size: 14px;
 }
 
 /* 搜索结果面板样式 */
