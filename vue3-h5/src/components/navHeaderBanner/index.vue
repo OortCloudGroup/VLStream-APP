@@ -29,7 +29,7 @@
       </div>
       <div v-if="searchShow" class="nav_banner_search">
         <img v-if="!searchVis" src="@/assets/img/commandDispatch/search2.png" alt="" @click="searchVis = true" />
-        <van-search v-if="searchVis" v-model="keyword" placeholder="请输入搜索关键词" clear-icon />
+        <van-search v-if="searchVis" v-model="keyword" :placeholder="$t('请输入搜索关键词')" clear-icon />
       </div>
       <div v-if="!exit" class="nav_banner_right">
         <span class="slot_span">
@@ -72,6 +72,7 @@
 
 <script>
 import bus from '@/utils/bus'
+import { pushStatusBar, popStatusBar } from '@/utils/shellStatusBar'
 
 export default {
   name: 'NavHeaderBanner',
@@ -150,6 +151,10 @@ export default {
   created() {
     this.isFull = this.isFullscreen
     this.left_title = this.title
+    // Align the shell status bar with the banner background (no-op in browsers)
+    if (!this.bgOpacity) {
+      pushStatusBar(this.bgColor, '#FFFFFF')
+    }
     if (this.isBackEvent) {
       // 这里做一个监听， 用来是pop类的弹框出现在页面中是，点击物理返回键时会触发返回而不是. 注意这里pop类 包含 pop， imageview(函数触发)
       bus.$on('popShow', this.popShow)
@@ -167,6 +172,10 @@ export default {
     }
   },
   beforeUnmount() {
+    // Restore the shell status bar of the underlying page
+    if (!this.bgOpacity) {
+      popStatusBar()
+    }
     // 销毁监听物理返回
     document.removeEventListener('backbutton', this.backButton, false)
   },

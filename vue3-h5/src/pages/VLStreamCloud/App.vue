@@ -20,20 +20,35 @@
 
 <script setup>
 
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import Config, { applyVlEnv } from '@/config'
 import appConfig from '@/config/AppConfig'
 import { showLoadingToast, showFailToast } from 'vant'
 import { getAccessToken, getGateWay, getAppInfo, getAppInfoFromHttp } from '@/utils/cordovatUtils.js'
+import { pushStatusBar, popStatusBar } from '@/utils/shellStatusBar'
 import { useUserStore } from '@/store/modules/useraPaas'
 import OortPopup from '@/components/popup/oort_popup'
 import LoginDev from '@/components/commonpage/LoginDev'
+
+const { t } = useI18n()
 
 const store = useUserStore()
 
 const showLoginDev = ref(false)
 const isInitFinsh = ref(false)
+
+// The login panel covers the whole screen with a light gradient; align the
+// shell status bar with it while it is visible (no-op in browsers)
+watch(showLoginDev, (visible) => {
+  if (visible) {
+    pushStatusBar('#EEF3FF', '#000000')
+  } else {
+    popStatusBar()
+  }
+})
+
 const init = () => {
 // 设置 应用id等配置
   const configObj = appConfig['VLStreamCloud']
@@ -60,7 +75,7 @@ const init = () => {
     showLoginDev.value = true
   } else if (!!window.cordova && !!window.cordova.exec) {
     let toastInst = showLoadingToast({
-      message: '加载中...',
+      message: t('加载中...'),
       forbidClick: true,
       duration: 0
     })
@@ -82,7 +97,7 @@ const init = () => {
           if (resa) {
             isInitFinsh.value = true
           } else {
-            showFailToast('获取应用信息失败')
+            showFailToast(t('获取应用信息失败'))
           }
         }
       }

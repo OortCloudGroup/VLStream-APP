@@ -4,6 +4,7 @@ import { window } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
 import { display } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { MainWindowHolder } from '../common/MainWindowHolder';
 
 const DOMAIN: number = 0x0000;
 const TAG: string = 'VLStream';
@@ -18,6 +19,8 @@ export default class EntryAbility extends UIAbility {
     // Non-immersive: the window avoids the status bar so H5 content never draws under it
     try {
       const mainWin: window.Window = windowStage.getMainWindowSync();
+      // Share the main window with plugins (status bar color updates)
+      MainWindowHolder.set(mainWin);
       mainWin.setWindowLayoutFullScreen(false);
       // Light status bar background with dark icons, matching the H5 page background
       const barProps: window.SystemBarProperties = {

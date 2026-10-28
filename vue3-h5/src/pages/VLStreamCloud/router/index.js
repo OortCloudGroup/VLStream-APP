@@ -8,6 +8,7 @@
  */
 import { createRouter, createWebHashHistory } from 'vue-router'
 
+import { setRootStatusBar } from '@/utils/shellStatusBar'
 import About from '@/components/commonpage/aboutPage'
 import ContactUS from '@/components/commonpage/contactUS'
 import VersionsPage from '@/components/commonpage/versionsPage'
@@ -142,6 +143,19 @@ const router = createRouter({
   // 4. 内部提供了 history 模式的实现。为了简单起见，我们在这里使用 hash 模式。
   history: createWebHashHistory(),
   routes // `routes: routes` 的缩写
+})
+
+// Status bar stays in the window avoid area; align its background with the top
+// area of the active routed page (see utils/shellStatusBar.ts). Tab pages are
+// covered by bg.png at the top; other routed pages sit under a NavHeaderBanner
+// (#1156a6) which pushes its own overlay style on mount.
+const TAB_ROUTE_NAMES = ['Workbench', 'Video', 'Event', 'My']
+router.afterEach((to) => {
+  if (TAB_ROUTE_NAMES.includes(to.name)) {
+    setRootStatusBar('#306AF8', '#FFFFFF')
+  } else {
+    setRootStatusBar('#1156A6', '#FFFFFF')
+  }
 })
 
 export default router
