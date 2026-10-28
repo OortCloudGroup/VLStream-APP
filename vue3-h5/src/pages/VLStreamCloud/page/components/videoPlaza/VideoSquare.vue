@@ -138,9 +138,9 @@
     </div>
 
     <oort-popup v-model="showDetail" position="right" style="width: 100%;height: 100%;" teleport="body">
-      <VideoViewDetail
-        v-if="currentDevice"
-        :device="currentDevice"
+      <CameraDetail
+        v-if="showDetail && currentDevice"
+        :camera="currentDevice"
         @close="showDetail = false"
       />
     </oort-popup>
@@ -148,11 +148,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { getWvpVlsDeviceList, getWvpVlsDeviceDetail, getWvpVlsDeviceStreams, createWvpVlsDevicePreview } from '@/api/VLStreamCloud/wvp'
 import { CameraRtcPlayer, parseCameraRtcTarget } from '@/utils/cameraRtc'
 import OortPopup from '@/components/popup/oort_popup.vue'
-import VideoViewDetail from './VideoViewDetail.vue'
+import CameraDetail from '@/pages/VLStreamCloud/page/components/cameraDetail/CameraDetail.vue'
 import p1 from '@/assets/img/VLStreamCloud/spgc/p1.png'
 import p4 from '@/assets/img/VLStreamCloud/spgc/p4.png'
 import p6 from '@/assets/img/VLStreamCloud/spgc/p6.png'
@@ -167,8 +167,10 @@ import p9_c from '@/assets/img/VLStreamCloud/spgc/p9_c.png'
 import p16_c from '@/assets/img/VLStreamCloud/spgc/p16_c.png'
 import moreImg from '@/assets/img/VLStreamCloud/spgc/more.png'
 import qp from '@/assets/img/VLStreamCloud/spgc/qp.png'
-import spms from '@/assets/img/VLStreamCloud/spgc/spms.png'
-import dtms from '@/assets/img/VLStreamCloud/spgc/dtms.png'
+
+const props = defineProps<{
+  keyword?: string
+}>()
 
 const showPreview = ref(true)
 
@@ -247,9 +249,7 @@ const activeLayout = ref('p4')
 const showModeMenu = ref(false)
 
 const modeMenu = [
-  { value: 'full', label: '全屏', img: qp },
-  { value: 'video', label: '视频模式', img: spms },
-  { value: 'map', label: '地图模式', img: dtms }
+  { value: 'full', label: '全屏', img: qp }
 ]
 
 const previewGridRef = ref<HTMLElement | null>(null)
@@ -343,12 +343,7 @@ const onSelectMenu = async(value: string) => {
   showModeMenu.value = false
 
   if (value === 'full') {
-    // 全屏模式
     await toggleFullscreen()
-  } else if (value === 'video') {
-    // 视频模式
-  } else if (value === 'map') {
-    // 地图模式
   }
 }
 
@@ -387,7 +382,21 @@ const previewSlots = computed(() => {
 
 const previewCols = computed(() => layoutColsMap[activeLayout.value] || 2)
 
-const devices = ref<any[]>([])
+const allDevices = ref<any[]>([])
+
+// 顶部搜索框的关键字在前缀匹配设备名称/设备ID上过滤，列表与分屏共用同一份结果
+const devices = computed(() => {
+  const kw = (props.keyword || '').trim().toLowerCase()
+  if (!kw) return allDevices.value
+  return allDevices.value.filter(item => String(item.deviceName || '').toLowerCase().includes(kw) || String(item.deviceId || '').toLowerCase().includes(kw))
+})
+
+watch(
+  () => props.keyword,
+  () => {
+    refreshAllPreviewStreams()
+  }
+)
 
 // ========= WVP 预览播放（移动端多分屏） =========
 // 每个分屏一路 CameraRTC 会话：详情校验在线 → 取流列表 → 创建预览 → 信令播放
@@ -469,10 +478,11 @@ const refreshAllPreviewStreams = async() => {
 }
 
 const fetchDevices = async() => {
-  const res: any = await getWvpVlsDeviceList({ pageNum: 1, pageSize: 16 })
+  // 搜索在前端过滤，一次多取一些设备，避免关键字只能命中首屏 16 条
+  const res: any = await getWvpVlsDeviceList({ pageNum: 1, pageSize: 50 })
   // wvp 分页是 RuoYi 格式，记录直接在顶层 rows 上
   if (res.code === 200 && Array.isArray(res.rows)) {
-    devices.value = res.rows.map((item: any) => ({
+    allDevices.value = res.rows.map((item: any) => ({
       ...item,
       status: item.online === true ? '1' : '0',
       deviceType: item.deviceType || item.deviceModel,

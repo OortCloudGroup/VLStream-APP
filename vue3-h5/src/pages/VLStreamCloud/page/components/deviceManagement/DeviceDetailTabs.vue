@@ -8,7 +8,8 @@
     </nav-header-banner>
 
     <div class="detail-body">
-      <img class="hero" :src="heroImg" alt="" />
+      <!-- 图片地址可能是非图片链接（单租户下没有对象存储，只能手填），加载失败就不占位 -->
+      <img v-show="!heroImgFailed" class="hero" :src="heroImg" alt="" @error="heroImgFailed = true" />
 
       <div class="tab-header">
         <div
@@ -30,7 +31,7 @@
       </div>
 
       <div class="tab-body">
-        <PTZPanel v-if="activeTab === 'ptz'" />
+        <PTZPanel v-if="activeTab === 'ptz'" :camera="device" />
         <DeviceInfoPanel v-else :device="device" />
       </div>
     </div>
@@ -68,6 +69,7 @@ const store = useUserStore()
 const activeTab = ref('ptz')
 const showEdit = ref(false)
 const device = ref({})
+const heroImgFailed = ref(false)
 
 const heroImg = computed(() => {
   const d = device.value || {}
@@ -78,7 +80,7 @@ const onEdit = () => {
   showEdit.value = true
 }
 
-const emit = defineEmits(['close', 'deleted'])
+const emit = defineEmits(['close', 'deleted', 'saved'])
 
 const onBack = () => {
   emit('close')
@@ -92,9 +94,11 @@ const onDelete = () => {
     cancelButtonText: '取消'
   })
     .then(async() => {
+      // 后端 /vlsDeviceInfo/remove 收的是 @RequestParam String ids（逗号串），
+      // 传数组会被 axios 序列化成 ids[]= 导致「Required request parameter 'ids'」
       const params = {
         accessToken: store.userInfo?.accessToken,
-        ids: [props.deviceId]
+        ids: String(props.deviceId)
       }
       const res = await removeDevice(params)
       if (res.code === 200) {
@@ -114,12 +118,15 @@ const fetchDeviceDetail = async(id) => {
   }
   const res = await getDeviceDetail(params)
   if (res.code === 200 && res.data) {
+    heroImgFailed.value = false
     device.value = res.data
   }
 }
 
 const handleSaved = () => {
   fetchDeviceDetail(props.deviceId)
+  // 列表页也需要拿到最新名称，否则详情改完回到列表还是旧数据
+  emit('saved')
 }
 
 onMounted(() => {
