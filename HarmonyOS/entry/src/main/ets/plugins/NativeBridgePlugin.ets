@@ -26,7 +26,8 @@ const APP_VL_ENV: string = 'single';
 const APP_GATEWAY: string = '';
 const APP_ID: string = '747aa0fa18d047c8b526e242142e0a6c';
 const APP_SECRET: string = '3a97f4f65b204a3a96071746fa42936a';
-const APP_LABEL: string = 'VLStreamCloud';
+// App display label: consistent with the launcher label (AppScope string.json)
+const APP_LABEL: string = 'VLStream';
 const APP_VERSION: string = '1.0.0';
 const APP_PACKAGE: string = 'com.oort.vlstream.app';
 
