@@ -5,7 +5,7 @@
       <van-tab
         v-for="item in tabs"
         :key="item.name"
-        :title="item.title"
+        :title="$t(item.title)"
         :name="item.name"
       />
     </van-tabs>
@@ -13,7 +13,7 @@
     <!-- 顶部提示条 -->
     <div v-if="showTip" class="tip-bar">
       <van-icon name="info-o" class="tip-icon" />
-      <span class="tip-text">点击算法即可将算法下发至摄像机终端</span>
+      <span class="tip-text">{{ $t('点击算法即可将算法下发至摄像机终端') }}</span>
       <van-icon name="cross" class="tip-close" @click="showTip = false" />
     </div>
 
@@ -21,14 +21,14 @@
     <div>
       <van-pull-refresh
         v-model="refreshing"
-        success-text="刷新成功"
+        :success-text="$t('刷新成功')"
         @refresh="onRefresh"
       >
         <van-list
           v-if="algoList.length"
           v-model:loading="loading"
           :finished="finished"
-          finished-text="没有更多了"
+          :finished-text="$t('没有更多了')"
           @load="onLoad"
         >
           <div class="card-grid">
@@ -54,7 +54,7 @@
         <!-- 空态 -->
         <div v-else class="no_data">
           <img src="@/assets/img/daily_activity/no_data.png" />
-          <span>暂无数据</span>
+          <span>{{ $t('暂无数据') }}</span>
         </div>
       </van-pull-refresh>
     </div>
@@ -112,7 +112,11 @@ const fetchAlgorithmRepository = async() => {
   const params = { current: 1, size: 200 }
   const res: any = await getVlsAlgorithmRepositoryt(params)
   if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
-    const records = res.data.records
+    // 后端列表按 create_time 倒序，与管理端展示顺序不一致；
+    // 管理端配置了 sortOrder，这里按 sortOrder 升序稳定排序（未配置的排在最后）
+    const records = [...res.data.records].sort(
+      (a: any, b: any) => (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER)
+    )
 
     tabs.value = records.map((item: any) => ({
       // 仓库类型会重复（10 个仓库都是 basic），用 id 做 tab 名才能切到各自的算法
