@@ -123,7 +123,9 @@ const tagName = ref<string | null>(null)
 // 调用接口获取设备列表（支持 tag 过滤）
 const fetchDevices = async() => {
   const params: any = {
-    accessToken: store.userInfo?.accessToken
+    accessToken: store.userInfo?.accessToken,
+    current: 1,
+    size: 500
   }
   if (tagName.value) {
     params.tag = tagName.value

@@ -38,7 +38,7 @@
               class="algo-card"
               @click="onClickAlgo(item)"
             >
-              <img :src="item.cover" class="card-img" alt="" />
+              <img :src="item.cover" class="card-img" alt="" @error="useCoverFallback(item)" />
               <div class="card-content">
                 <div class="card-title">
                   {{ item.name }}
@@ -74,6 +74,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { getVlsAlgorithmRepositoryt, getVlsAlgorithmt } from '@/api/VLStreamCloud/algorithm'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import AlgorithmDispatch from './AlgorithmDispatch.vue'
+import { algorithmCoverFallback } from '@/utils/algorithmCover'
 import { useUserStore } from '@/store/modules/useraPaas'
 
 type TabKey = string
@@ -88,6 +89,7 @@ interface AlgoItem {
   name: string
   desc: string
   cover: string
+  coverFallback: string
 }
 
 const allAlgos = ref<AlgoItem[]>([])
@@ -106,20 +108,21 @@ const pageSize = ref(10)
 
 // 获取算法仓库列表
 const fetchAlgorithmRepository = async() => {
-  const params = {}
+  // 后端默认 10 条分页，不传 size 会让算法仓库 tab 少两个
+  const params = { current: 1, size: 200 }
   const res: any = await getVlsAlgorithmRepositoryt(params)
   if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
     const records = res.data.records
 
     tabs.value = records.map((item: any) => ({
-      name: (item.repositoryType || 'basic') as TabKey,
+      // 仓库类型会重复（10 个仓库都是 basic），用 id 做 tab 名才能切到各自的算法
+      name: String(item.id),
       title: item.name || item.repositoryType || '未命名仓库',
       repositoryId: item.id
     }))
 
     if (!activeTab.value && tabs.value.length > 0) {
-      const basicTab = tabs.value.find(t => t.name === 'basic')
-      activeTab.value = (basicTab?.name || tabs.value[0].name) as TabKey
+      activeTab.value = tabs.value[0].name
     }
   } else {
     allAlgos.value = []
@@ -144,12 +147,19 @@ const fetchAlgorithmListByActiveTab = async() => {
     }
     const res: any = await getVlsAlgorithmt(params)
     if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
-      const list = res.data.records.map((item: any, index: number) => ({
-        id: item.id ?? index,
-        name: item.name || '',
-        desc: item.description || '',
-        cover: item.imageUrl || ''
-      }))
+      const list = res.data.records.map((item: any, index: number) => {
+        const id = item.id ?? index
+        const name = item.name || ''
+        const fallback = algorithmCoverFallback(id, currentTab.repositoryId, name)
+        return {
+          id,
+          name,
+          desc: item.description || '',
+          // imageUrl 常为空或指向已失效对象，缺图时用色卡兜底
+          cover: item.imageUrl || fallback,
+          coverFallback: fallback
+        }
+      })
 
       if (page.value === 1) {
         allAlgos.value = list
@@ -198,6 +208,11 @@ const algoList = computed(() => allAlgos.value)
 const onClickAlgo = (item: AlgoItem) => {
   currentAlgo.value = item
   showDispatch.value = true
+}
+
+// 图片地址加载失败时切到本地色卡，避免卡片出现裂图
+const useCoverFallback = (item: AlgoItem) => {
+  if (item.cover !== item.coverFallback) item.cover = item.coverFallback
 }
 
 // 上拉加载更多
