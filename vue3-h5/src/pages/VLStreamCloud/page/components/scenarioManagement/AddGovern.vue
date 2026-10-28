@@ -49,9 +49,17 @@
                   v-model="formData.startDate"
                   is-link
                   readonly
-                  placeholder="日期时间"
+                  placeholder="日期"
                   class="time-field"
                   @click="showStartDatePicker = true"
+                />
+                <van-field
+                  v-model="formData.startTime"
+                  is-link
+                  readonly
+                  placeholder="时间"
+                  class="time-field"
+                  @click="showStartTimePicker = true"
                 />
               </div>
             </div>
@@ -65,27 +73,45 @@
                   v-model="formData.endDate"
                   is-link
                   readonly
-                  placeholder="日期时间"
+                  placeholder="日期"
                   class="time-field"
                   @click="showEndDatePicker = true"
+                />
+                <van-field
+                  v-model="formData.endTime"
+                  is-link
+                  readonly
+                  placeholder="时间"
+                  class="time-field"
+                  @click="showEndTimePicker = true"
                 />
               </div>
             </div>
           </div>
 
-          <!-- 开始/结束时间选择弹窗 -->
-          <oort-popup v-model="showStartDatePicker" position="bottom">
-            <van-date-picker @confirm="onStartDateConfirm" @cancel="showStartDatePicker = false" />
-          </oort-popup>
-          <oort-popup v-model="showStartTimePicker" position="bottom">
-            <van-time-picker @confirm="onStartTimeConfirm" @cancel="showStartTimePicker = false" />
-          </oort-popup>
-          <oort-popup v-model="showEndDatePicker" position="bottom">
-            <van-date-picker @confirm="onEndDateConfirm" @cancel="showEndDatePicker = false" />
-          </oort-popup>
-          <oort-popup v-model="showEndTimePicker" position="bottom">
-            <van-time-picker @confirm="onEndTimeConfirm" @cancel="showEndTimePicker = false" />
-          </oort-popup>
+          <!-- 开始/结束时间选择弹窗（用原生 van-popup，oort-popup 销毁插槽会让连续打开的下一个选择器失效） -->
+          <van-popup v-model:show="showStartDatePicker" position="bottom" round>
+            <van-date-picker v-model="startDateParts" @confirm="onStartDateConfirm" @cancel="showStartDatePicker = false" />
+          </van-popup>
+          <van-popup v-model:show="showStartTimePicker" position="bottom" round>
+            <van-time-picker
+              v-model="startTimeParts"
+              :columns-type="['hour', 'minute', 'second']"
+              @confirm="onStartTimeConfirm"
+              @cancel="showStartTimePicker = false"
+            />
+          </van-popup>
+          <van-popup v-model:show="showEndDatePicker" position="bottom" round>
+            <van-date-picker v-model="endDateParts" @confirm="onEndDateConfirm" @cancel="showEndDatePicker = false" />
+          </van-popup>
+          <van-popup v-model:show="showEndTimePicker" position="bottom" round>
+            <van-time-picker
+              v-model="endTimeParts"
+              :columns-type="['hour', 'minute', 'second']"
+              @confirm="onEndTimeConfirm"
+              @cancel="showEndTimePicker = false"
+            />
+          </van-popup>
         </template>
         <template v-else>
           <!-- 循环治理：模仿循环巡查任务的时间设置 -->
@@ -226,6 +252,54 @@
                     </template>
                   </van-field>
 
+                  <!-- 每周：勾选星期 -->
+                  <van-field
+                    v-if="localEvery === 'week'"
+                    label-width="80px"
+                    required
+                    label="星期"
+                    class="taskDesc"
+                    readonly
+                  >
+                    <template #input>
+                      <div class="day-picker">
+                        <div
+                          v-for="day in weekDayOptions"
+                          :key="day.value"
+                          class="day-chip"
+                          :class="{ active: loopForm.weekly_days.includes(day.value) }"
+                          @click="toggleWeekDay(day.value)"
+                        >
+                          {{ day.label }}
+                        </div>
+                      </div>
+                    </template>
+                  </van-field>
+
+                  <!-- 每月：勾选日期 -->
+                  <van-field
+                    v-if="localEvery === 'month'"
+                    label-width="80px"
+                    required
+                    label="日期"
+                    class="taskDesc"
+                    readonly
+                  >
+                    <template #input>
+                      <div class="day-picker">
+                        <div
+                          v-for="day in monthDayOptions"
+                          :key="day"
+                          class="day-chip"
+                          :class="{ active: loopForm.monthly_days.includes(day) }"
+                          @click="toggleMonthDay(day)"
+                        >
+                          {{ day }}
+                        </div>
+                      </div>
+                    </template>
+                  </van-field>
+
                   <!-- 结束时间 -->
                   <van-field
                     v-model="loopForm.end_at"
@@ -311,6 +385,22 @@
             </div>
           </div>
         </van-popup>
+
+        <!-- 单租户无区域服务，分析区域改为手填 -->
+        <oort-popup v-model="showAreaInput" position="bottom" style="width: 100%;">
+          <div class="area-input-popup">
+            <div class="area-input-header">
+              <span @click="showAreaInput = false">取消</span>
+              <span class="area-input-title">输入分析区域</span>
+              <span class="area-input-confirm" @click="onAreaInputConfirm">确定</span>
+            </div>
+            <van-field
+              v-model="areaInput"
+              placeholder="请输入分析区域名称"
+              class="area-input-field"
+            />
+          </div>
+        </oort-popup>
 
         <!-- AI 算法 -->
         <div class="section">
@@ -398,7 +488,7 @@
                 <van-checkbox
                   v-for="item in deviceOptions"
                   :key="item.id"
-                  :name="item.deviceName"
+                  :name="String(item.id)"
                   shape="square"
                   class="camera-checkbox"
                 >
@@ -440,6 +530,7 @@ import { saveVlsMobileSceneGovernanceImmediate, saveVlsMobileSceneGovernanceLoop
 import { getDeviceList } from '@/api/VLStreamCloud/device'
 import { definitionDataGroupList } from '@/api/VLStreamCloud/region'
 import { getVlsAlgorithmRepositoryt, getVlsAlgorithmt } from '@/api/VLStreamCloud/algorithm'
+import config from '@/config'
 import { useUserStore } from '@/store/modules/useraPaas'
 import CommonExpressions from '@/components/commonExpressions.vue'
 import OortPopup from '@/components/popup/oort_popup.vue'
@@ -477,6 +568,9 @@ const formData = ref({
 
 const store = useUserStore()
 
+// 单租户集群没有 apaas-location-service，分析区域级联没有数据源，改为手填名称
+const isLocalAuth = config.authMode === 'local'
+
 // 循环治理时间配置
 const localEvery = ref('next')
 const startDatePicker = ref(false)
@@ -490,12 +584,27 @@ const showStartTimePicker = ref(false)
 const showEndDatePicker = ref(false)
 const showEndTimePicker = ref(false)
 
+const pad2 = (value) => String(value).padStart(2, '0')
+const todayParts = () => {
+  const d = new Date()
+  return [String(d.getFullYear()), pad2(d.getMonth() + 1), pad2(d.getDate())]
+}
+// 选择器默认停在今天/整点，而不是各列的第一个值
+const startDateParts = ref(todayParts())
+const endDateParts = ref(todayParts())
+const startTimeParts = ref(['00', '00', '00'])
+const endTimeParts = ref(['23', '59', '59'])
+
 // 分析区域列表（级联）
 const areaOptions = ref([])
 const showAreaPopup = ref(false)
 const areaCascaderValue = ref('')
 const tempAreaCascaderValue = ref('')
 const tempAreaSelectedOptions = ref([])
+// 与 formData.areas 一一对应的区域 uid（后端 location_ids 存的是 ID 集合）
+const selectedAreaIds = ref([])
+const showAreaInput = ref(false)
+const areaInput = ref('')
 
 // 算法列表（级联：仓库 -> 算法）
 const algoOptions = ref([])
@@ -510,13 +619,49 @@ const selectedAlgoNames = ref([])
 const deviceOptions = ref([])
 const showCameraPopup = ref(false)
 const tempCameras = ref([])
+// 摄像头按 ID 选中，避免同名设备被合并；formData.cameras 只用于展示
+const selectedCameraIds = ref([])
 
 const loopForm = ref({
   start_at: '',
   end_at: '',
   loop_time: [''],
-  loop_gap: 1
+  loop_gap: 1,
+  weekly_days: [],
+  monthly_days: []
 })
+
+const weekDayOptions = [
+  { value: 1, label: '一' },
+  { value: 2, label: '二' },
+  { value: 3, label: '三' },
+  { value: 4, label: '四' },
+  { value: 5, label: '五' },
+  { value: 6, label: '六' },
+  { value: 7, label: '日' }
+]
+
+const monthDayOptions = Array.from({ length: 31 }, (_v, i) => i + 1)
+
+const toggleWeekDay = (value) => {
+  const list = loopForm.value.weekly_days
+  const index = list.indexOf(value)
+  if (index === -1) {
+    list.push(value)
+  } else {
+    list.splice(index, 1)
+  }
+}
+
+const toggleMonthDay = (value) => {
+  const list = loopForm.value.monthly_days
+  const index = list.indexOf(value)
+  if (index === -1) {
+    list.push(value)
+  } else {
+    list.splice(index, 1)
+  }
+}
 
 const minStartDate = computed(() => {
   const today = new Date()
@@ -539,12 +684,17 @@ const minEndDate = computed(() => {
 
 const removeArea = (index) => {
   formData.value.areas.splice(index, 1)
+  selectedAreaIds.value.splice(index, 1)
 }
 const removeAlgo = (index) => {
   formData.value.algos.splice(index, 1)
+  // 三个数组按下标一一对应，漏删会让 algorithmIds 和展示名错位
+  selectedAlgoIds.value.splice(index, 1)
+  selectedAlgoNames.value.splice(index, 1)
 }
 const removeCamera = (index) => {
   formData.value.cameras.splice(index, 1)
+  selectedCameraIds.value.splice(index, 1)
 }
 
 const selectContent = (content) => {
@@ -553,33 +703,49 @@ const selectContent = (content) => {
 
 // 分析区域与摄像头逻辑（复用分析申请的实现）
 const fetchDevices = async() => {
-  const params = {
-    accessToken: store.userInfo?.accessToken
-  }
-  const res = await getDeviceList(params)
-  if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
-    deviceOptions.value = res.data.records
-  } else {
+  try {
+    const params = {
+      accessToken: store.userInfo?.accessToken,
+      current: 1,
+      size: 200
+    }
+    const res = await getDeviceList(params)
+    if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
+      deviceOptions.value = res.data.records
+    } else {
+      deviceOptions.value = []
+    }
+  } catch (e) {
     deviceOptions.value = []
   }
 }
 
 // 获取算法仓库（级联第一层）
 const fetchAlgoRepos = async() => {
-  const res = await getVlsAlgorithmRepositoryt({})
-  if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
-    algoOptions.value = res.data.records.map((item) => ({
-      value: item.id, // 仓库ID
-      text: item.name || '未命名算法库',
-      children: []
-    }))
-  } else {
+  try {
+    // 后端默认只返回 10 条分页，不带 size 会悄悄漏掉后面的算法仓库
+    const res = await getVlsAlgorithmRepositoryt({ current: 1, size: 200 })
+    if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
+      algoOptions.value = res.data.records.map((item) => ({
+        value: item.id, // 仓库ID
+        text: item.name || '未命名算法库',
+        children: []
+      }))
+    } else {
+      algoOptions.value = []
+    }
+  } catch (e) {
     algoOptions.value = []
   }
 }
 
 // 获取分析区域列表（第一级）
 const fetchAreas = async() => {
+  // 单租户集群没有 apaas-location-service，请求只会变成一条 Network Error 提示
+  if (isLocalAuth) {
+    areaOptions.value = []
+    return
+  }
   const params = {
     accessToken: store.userInfo?.accessToken,
     group_type: 1,
@@ -587,14 +753,18 @@ const fetchAreas = async() => {
     pagesize: 99,
     puid: ''
   }
-  const res = await definitionDataGroupList(params)
-  if (res && res.code === 200 && res.data && Array.isArray(res.data.list)) {
-    areaOptions.value = res.data.list.map((item) => ({
-      value: item.uid,
-      text: item.name,
-      children: []
-    }))
-  } else {
+  try {
+    const res = await definitionDataGroupList(params)
+    if (res && res.code === 200 && res.data && Array.isArray(res.data.list)) {
+      areaOptions.value = res.data.list.map((item) => ({
+        value: item.uid,
+        text: item.name,
+        children: []
+      }))
+    } else {
+      areaOptions.value = []
+    }
+  } catch (e) {
     areaOptions.value = []
   }
 }
@@ -686,13 +856,17 @@ const onAreaChange = async({ selectedOptions }) => {
     pagesize: 99,
     puid: parentValue
   }
-  const res = await definitionDataGroupList(params)
-  if (res && res.code === 200 && res.data && Array.isArray(res.data.list) && res.data.list.length > 0) {
-    last.children = res.data.list.map((item) => ({
-      value: item.uid,
-      text: item.name
-    }))
-  } else {
+  try {
+    const res = await definitionDataGroupList(params)
+    if (res && res.code === 200 && res.data && Array.isArray(res.data.list) && res.data.list.length > 0) {
+      last.children = res.data.list.map((item) => ({
+        value: item.uid,
+        text: item.name
+      }))
+    } else {
+      delete last.children
+    }
+  } catch (e) {
     delete last.children
   }
 }
@@ -712,29 +886,52 @@ const onAreaCancel = () => {
 // 确认选择区域
 const onAreaConfirm = () => {
   showAreaPopup.value = false
-  const names = (tempAreaSelectedOptions.value || []).map((opt) => opt.text)
-  const text = names.join('/')
-  if (text) {
-    if (!formData.value.areas.includes(text)) {
-      formData.value.areas.push(text)
-    }
+  const opts = tempAreaSelectedOptions.value || []
+  const text = opts.map((opt) => opt.text).join('/')
+  if (text && !formData.value.areas.includes(text)) {
+    formData.value.areas.push(text)
+    const leaf = opts[opts.length - 1]
+    selectedAreaIds.value.push(leaf && leaf.value !== undefined ? String(leaf.value) : text)
   }
   areaCascaderValue.value = tempAreaCascaderValue.value
 }
 
+// 单租户手填分析区域
+const onAreaInputConfirm = () => {
+  const text = areaInput.value.trim()
+  if (text && !formData.value.areas.includes(text)) {
+    formData.value.areas.push(text)
+    selectedAreaIds.value.push(text)
+  }
+  areaInput.value = ''
+  showAreaInput.value = false
+}
+
 const onAddArea = () => {
+  if (isLocalAuth) {
+    showAreaInput.value = true
+    return
+  }
+  if (!areaOptions.value.length) {
+    fetchAreas()
+  }
   tempAreaCascaderValue.value = areaCascaderValue.value
   tempAreaSelectedOptions.value = []
   showAreaPopup.value = true
 }
 
 const onAddCamera = () => {
-  tempCameras.value = [...formData.value.cameras]
+  tempCameras.value = [...selectedCameraIds.value]
   showCameraPopup.value = true
 }
 
 const onCameraConfirm = () => {
-  formData.value.cameras = [...tempCameras.value]
+  selectedCameraIds.value = [...tempCameras.value]
+  const nameMap = {}
+  ;(deviceOptions.value || []).forEach(item => {
+    nameMap[String(item.id)] = item.deviceName
+  })
+  formData.value.cameras = tempCameras.value.map(id => nameMap[String(id)] || id)
   showCameraPopup.value = false
 }
 
@@ -771,13 +968,17 @@ const onAlgoChange = async({ selectedOptions }) => {
   const repoId = last.value
   if (!repoId) return
 
-  const res = await getVlsAlgorithmt({ repositoryId: repoId })
-  if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
-    last.children = res.data.records.map((item) => ({
-      value: item.id,
-      text: item.name || ''
-    }))
-  } else {
+  try {
+    const res = await getVlsAlgorithmt({ repositoryId: repoId, current: 1, size: 200 })
+    if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
+      last.children = res.data.records.map((item) => ({
+        value: item.id,
+        text: item.name || ''
+      }))
+    } else {
+      last.children = []
+    }
+  } catch (e) {
     last.children = []
   }
 }
@@ -798,39 +999,26 @@ const onAlgoConfirm = () => {
   const opts = tempAlgoSelectedOptions.value || []
   if (!opts.length) return
 
-  const names = opts.map(o => o.text).filter(Boolean)
-  const path = names.join('/')
-
   const leaf = opts[opts.length - 1]
   const leafId = leaf && leaf.value
-
-  if (path && !formData.value.algos.includes(path)) {
-    formData.value.algos.push(path)
+  // 后端 algorithm_ids 只认数字 ID，没选到具体算法就确认等于没选
+  if (opts.length < 2 || leafId === undefined || leafId === null) {
+    showToast({ type: 'fail', message: '请选择到具体的算法' })
+    return
   }
 
-  if (path && !selectedAlgoNames.value.includes(path)) {
-    selectedAlgoNames.value.push(path)
-  }
-  if (leafId !== undefined && leafId !== null) {
-    const strId = String(leafId)
-    if (strId && !selectedAlgoIds.value.includes(strId)) {
-      selectedAlgoIds.value.push(strId)
-    }
-  }
+  const path = opts.map(o => o.text).filter(Boolean).join('/')
+  if (!path || formData.value.algos.includes(path)) return
+
+  formData.value.algos.push(path)
+  selectedAlgoNames.value.push(path)
+  selectedAlgoIds.value.push(String(leafId))
 
   algoCascaderValue.value = tempAlgoCascaderValue.value
 }
 
 // 组装通用治理参数
 const buildBasePayload = () => {
-  const selectedNames = formData.value.cameras || []
-  const selectedIds = (deviceOptions.value || [])
-    .filter((item) => selectedNames.includes(item.deviceName))
-    .map((item) => item.id)
-  const cameraIds = selectedIds.join(',')
-  const locationIdsArr = Array.isArray(formData.value.areas) ? [...formData.value.areas] : []
-  const locationIds = locationIdsArr.join(',')
-
   return {
     name: formData.value.name || '',
     governanceMode: formData.value.mode === 'now' ? 'immediate' : 'loop',
@@ -841,20 +1029,31 @@ const buildBasePayload = () => {
     startTime: '',
     endTime: '',
     triggerTimes: '',
-    locationIds,
-    algorithmIds: Array.isArray(selectedAlgoIds.value) ? selectedAlgoIds.value.join(',') : '',
-    cameraIds,
+    locationIds: (selectedAreaIds.value || []).join(','),
+    algorithmIds: (selectedAlgoIds.value || []).join(','),
+    cameraIds: (selectedCameraIds.value || []).join(','),
     description: formData.value.describe || '',
-    algorithmNames: Array.isArray(selectedAlgoNames.value) && selectedAlgoNames.value.length
-      ? selectedAlgoNames.value.join(',')
-      : (Array.isArray(formData.value.algos) ? formData.value.algos.join(',') : ''),
-    cameraNames: Array.isArray(formData.value.cameras) ? formData.value.cameras.join(',') : ''
+    algorithmNames: (selectedAlgoNames.value || []).join(','),
+    cameraNames: (formData.value.cameras || []).join(',')
   }
 }
 
 const submit = async() => {
   if (!formData.value.name) {
     showToast({ type: 'fail', message: '请填写治理名称' })
+    return
+  }
+  // 后端 validateCommon 这四个字段都是必填，先在前端拦住，避免只拿到一句接口报错
+  if (!formData.value.areas.length) {
+    showToast({ type: 'fail', message: '请选择分析区域' })
+    return
+  }
+  if (!selectedAlgoIds.value.length) {
+    showToast({ type: 'fail', message: '请选择AI算法' })
+    return
+  }
+  if (!selectedCameraIds.value.length) {
+    showToast({ type: 'fail', message: '请选择摄像头' })
     return
   }
 
@@ -866,15 +1065,20 @@ const submit = async() => {
     const hasEndDate = !!formData.value.endDate
     const hasEndTime = !!formData.value.endTime
 
+    if (!hasStartDate || !hasEndDate) {
+      showToast({ type: 'fail', message: '请选择开始和结束日期' })
+      return
+    }
+
     const defaultTime = '00:00:00'
 
-    const startDateTime = hasStartDate
-      ? `${formData.value.startDate} ${hasStartTime ? formData.value.startTime : defaultTime}`
-      : ''
+    const startDateTime = `${formData.value.startDate} ${hasStartTime ? formData.value.startTime : defaultTime}`
+    const endDateTime = `${formData.value.endDate} ${hasEndTime ? formData.value.endTime : defaultTime}`
 
-    const endDateTime = hasEndDate
-      ? `${formData.value.endDate} ${hasEndTime ? formData.value.endTime : defaultTime}`
-      : ''
+    if (moment(endDateTime).isBefore(moment(startDateTime))) {
+      showToast({ type: 'fail', message: '结束时间不能早于开始时间' })
+      return
+    }
 
     payload.startTime = startDateTime
     payload.endTime = endDateTime
@@ -898,15 +1102,39 @@ const submit = async() => {
     } else if (localEvery.value === 'next') {
       payload.cycleType = 'everyOtherDay'
       payload.intervalDays = loopForm.value.loop_gap || 0
+      if (!payload.intervalDays || payload.intervalDays <= 0) {
+        showToast({ type: 'fail', message: '隔天模式间隔天数必须大于0' })
+        return
+      }
     } else if (localEvery.value === 'week') {
       payload.cycleType = 'weekly'
+      payload.weeklyDays = [...loopForm.value.weekly_days].sort((a, b) => a - b).join(',')
+      if (!payload.weeklyDays) {
+        showToast({ type: 'fail', message: '请选择每周执行日' })
+        return
+      }
     } else if (localEvery.value === 'month') {
       payload.cycleType = 'monthly'
+      payload.monthlyDays = [...loopForm.value.monthly_days].sort((a, b) => a - b).join(',')
+      if (!payload.monthlyDays) {
+        showToast({ type: 'fail', message: '请选择每月执行日' })
+        return
+      }
     }
 
-    payload.startTime = loopForm.value.start_at ? `${loopForm.value.start_at} 00:00:00` : ''
-    payload.endTime = loopForm.value.end_at ? `${loopForm.value.end_at} 00:00:00` : ''
+    if (!loopForm.value.start_at || !loopForm.value.end_at) {
+      showToast({ type: 'fail', message: '请选择开始和结束时间' })
+      return
+    }
+
     const times = Array.isArray(loopForm.value.loop_time) ? loopForm.value.loop_time.filter(t => t) : []
+    if (!times.length) {
+      showToast({ type: 'fail', message: '请选择触发时间' })
+      return
+    }
+
+    payload.startTime = `${loopForm.value.start_at} 00:00:00`
+    payload.endTime = `${loopForm.value.end_at} 23:59:59`
     payload.triggerTimes = times.join(',')
 
     try {
@@ -1295,6 +1523,50 @@ onMounted(() => {
 /* 隐藏 van-cascader 的默认头部 */
 :deep(.van-cascader__header) {
   display: none !important;
+}
+
+.day-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.day-chip {
+  min-width: 28px;
+  padding: 4px 8px;
+  text-align: center;
+  border-radius: 14px;
+  background: #f2f4f8;
+  color: #646566;
+  font-size: 13px;
+}
+
+.day-chip.active {
+  background: rgba(47, 105, 248, 1);
+  color: #fff;
+}
+
+.area-input-popup {
+  padding: 12px 16px 20px;
+}
+
+.area-input-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #646566;
+  margin-bottom: 12px;
+}
+
+.area-input-title {
+  font-weight: 600;
+  color: #323233;
+}
+
+.area-input-confirm {
+  color: #1989fa;
 }
 </style>
 

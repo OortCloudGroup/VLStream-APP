@@ -73,7 +73,7 @@
                   <span>AI算法</span>
                 </div>
                 <div class="value">
-                  {{ item.algorithmNames || '-' }}
+                  {{ sub.algorithmNames || item.algorithmNames || '-' }}
                 </div>
               </div>
               <div class="info-row">
@@ -91,7 +91,7 @@
                   <span>摄像头</span>
                 </div>
                 <div class="value multi-line">
-                  {{ sub.cameraNames || '-' }}
+                  {{ sub.cameraNames || item.cameraNames || '-' }}
                 </div>
               </div>
               <div class="info-row">
