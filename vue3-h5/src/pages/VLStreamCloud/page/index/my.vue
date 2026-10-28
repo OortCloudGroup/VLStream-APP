@@ -12,8 +12,11 @@
     <div class="my-content">
       <!-- 用户信息卡片 -->
       <div class="profile-card">
-        <div class="avatar">
-          <OortImage class="avatar-img" default-type="user" />
+        <div class="avatar" @click="onChangeAvatar">
+          <img v-if="customAvatar" :src="customAvatar" class="avatar-img" alt="" />
+          <div v-else class="avatar-img avatar-generated" :style="{ background: avatarColor }">
+            {{ avatarLetter }}
+          </div>
         </div>
         <div class="profile-info">
           <div class="name-row">
@@ -60,6 +63,22 @@
       :cancel-text="$t('取消')"
       @select="onLanguageSelect"
     />
+
+    <!-- 头像操作 -->
+    <van-action-sheet
+      v-model:show="showAvatarActions"
+      :actions="avatarActions"
+      :cancel-text="$t('取消')"
+      @select="onAvatarSelect"
+    />
+
+    <input
+      ref="fileInputRef"
+      type="file"
+      accept="image/*"
+      class="avatar-input"
+      @change="onFileChange"
+    />
   </div>
 </template>
 
@@ -76,7 +95,6 @@ import helpImg from '@/assets/img/VLStreamCloud/mine/bz.png'
 import aboutImg from '@/assets/img/VLStreamCloud/mine/gywm.png'
 import arrowImg from '@/assets/img/VLStreamCloud/mine/jt.png'
 import settingImg from '@/assets/img/VLStreamCloud/mine/sz.png'
-import OortImage from '@/components/image/oort_image.vue'
 
 const { t } = useI18n()
 
@@ -93,6 +111,74 @@ const menuItems = computed(() => [
   { key: 'about', title: t('关于我们'), icon: aboutImg },
   { key: 'settings', title: t('设置'), icon: settingImg }
 ])
+
+// ========= 头像（默认由用户名生成，支持本地更换） =========
+const AVATAR_COLORS = ['#2f69f8', '#00ba52', '#ff8d1e', '#e33645', '#7b61ff', '#00b8d4']
+const avatarStorageKey = computed(() => `vlstream_avatar_${store.userInfo?.userName || 'default'}`)
+const customAvatar = ref(localStorage.getItem(avatarStorageKey.value) || '')
+const avatarLetter = computed(() => {
+  const name = (store.userInfo?.userName || '').trim()
+  return name ? name.charAt(0).toUpperCase() : 'U'
+})
+const avatarColor = computed(() => {
+  const name = store.userInfo?.userName || ''
+  let hash = 0
+  for (let i = 0; i < name.length; i += 1) {
+    hash = (hash * 31 + name.charCodeAt(i)) % 997
+  }
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length]
+})
+
+const showAvatarActions = ref(false)
+const fileInputRef = ref(null)
+const avatarActions = computed(() => (customAvatar.value
+  ? [{ name: t('更换头像'), key: 'change' }, { name: t('恢复默认'), key: 'reset' }]
+  : [{ name: t('更换头像'), key: 'change' }]))
+
+const onChangeAvatar = () => {
+  showAvatarActions.value = true
+}
+
+const onAvatarSelect = (action) => {
+  showAvatarActions.value = false
+  if (action.key === 'reset') {
+    localStorage.removeItem(avatarStorageKey.value)
+    customAvatar.value = ''
+    return
+  }
+  if (fileInputRef.value) fileInputRef.value.click()
+}
+
+// 压缩到 256px 再存 dataURL，避免 localStorage 超限
+const onFileChange = (event) => {
+  const file = event.target.files && event.target.files[0]
+  event.target.value = ''
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = () => {
+    const img = new Image()
+    img.onload = () => {
+      const size = 256
+      const scale = Math.min(size / img.width, size / img.height, 1)
+      const w = Math.max(1, Math.round(img.width * scale))
+      const h = Math.max(1, Math.round(img.height * scale))
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+      try {
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9)
+        localStorage.setItem(avatarStorageKey.value, dataUrl)
+        customAvatar.value = dataUrl
+        showToast(t('头像已更新'))
+      } catch (e) {
+        showToast(t('头像保存失败'))
+      }
+    }
+    img.src = reader.result
+  }
+  reader.readAsDataURL(file)
+}
 
 // ========= 设置菜单 =========
 const showSettings = ref(false)
@@ -214,6 +300,18 @@ const onLanguageSelect = (action) => {
   object-fit: cover;
 }
 
+.avatar-generated {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.avatar-input {
+  display: none;
+}
 
 .profile-info {
   flex: 1;
