@@ -83,7 +83,7 @@ onMounted(() => {
   workListFn() // 流程管理-事件管理
 })
 
-defineExpose({ form, vmFormRef, appObj, selectedOptions_1 })
+defineExpose({ form, vmFormRef, appObj, selectedOptions_1, options })
 </script>
 
 <style lang="scss" scoped>

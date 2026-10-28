@@ -37,7 +37,7 @@ import FeedbackRecordWork from '@/pages/VLStreamCloud/page/components/event/feed
 
 const router = useRouter()
 const route = useRoute()
-const activeTab = ref('全部')
+const activeTab = ref('反馈记录')
 
 const tabs = ref([{
   title: '反馈记录',

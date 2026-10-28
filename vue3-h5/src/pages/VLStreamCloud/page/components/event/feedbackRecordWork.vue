@@ -125,9 +125,10 @@ const event_listFn = async(id) => {
     procInsId.value = res.data?.work_order_data?.procInsId
     taskId.value = res.data?.work_order_data?.taskId
     if (procInsId.value) await getProcessDetail()
+    if (!res.data?.work_order_data) return
     let D = { ...res.data }
     let W = { ...res.data?.work_order_data }
-    W.packageName = config.appInfo.apppackage // h5包名
+    W.packageName = config.appInfo?.apppackage // h5包名
     W.groupName = W.title // 群名
     W.primaryKey = D.id // 唯一值（群聊里面跳转事件详情页）
     W.groupDesc = D.describe // 群描述

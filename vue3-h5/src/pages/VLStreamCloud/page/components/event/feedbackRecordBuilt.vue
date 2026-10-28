@@ -50,8 +50,8 @@
         :list-obj="eventInfoData"
         class="eventItem"
       />
-      <!-- 事件图片-->
-      <div class="eventItem">
+      <!-- 事件图片（单租户集群没有对象存储服务，反馈照片无处上传）-->
+      <div v-if="!isLocalAuth" class="eventItem">
         <div class="eventItem_c flexRowAC">
           <img src="@/assets/img/eventMana/photo1.png" alt="" />
           <span class="title">反馈照片（{{ imgArr.length }}/5）</span>
@@ -76,10 +76,10 @@
       </div>
       <!-- 事件位置-->
       <div class="eventItem">
-        <div class="eventItem_c flexRowAC" @click=" selectLocationVisible = true">
+        <div class="eventItem_c flexRowAC" @click="!isLocalAuth && (selectLocationVisible = true)">
           <img src="@/assets/img/eventMana/event_location.png" alt="" />
           <span class="title">事件反馈位置</span>
-          <img class="arrow-icon" src="@/assets/img/ancientTrees/biaodan-icon-tiaozhuan.png" alt="跳转" />
+          <img v-if="!isLocalAuth" class="arrow-icon" src="@/assets/img/ancientTrees/biaodan-icon-tiaozhuan.png" alt="跳转" />
         </div>
         <div class="e_r locationBox flexRowAC">
           <span class="red">*</span>
@@ -87,9 +87,9 @@
             v-model="form.point.address"
             class="location"
             autosize
-            readonly
+            :readonly="!isLocalAuth"
             clearable
-            placeholder="请选择区域"
+            :placeholder="isLocalAuth ? '请输入反馈位置' : '请选择区域'"
           />
         </div>
         <div class="e_r locationBox flexRowAC">
@@ -174,6 +174,7 @@
 <script setup>
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
 import { event_back_add, event_info } from '@/api/eventManagement'
+import config from '@/config'
 import { useUserStore } from '@/store/modules/useraPaas'
 import { useRoute, useRouter } from 'vue-router'
 import { showSuccessToast, showToast, showConfirmDialog } from 'vant'
@@ -190,6 +191,8 @@ const store = useUserStore()
 const route = useRoute()
 const router = useRouter()
 let queryTemp = ref(route.query)
+// 单租户集群没有 aPaaS 的对象存储与地图服务：反馈只能提交文字（位置手工填写）
+const isLocalAuth = config.authMode === 'local'
 let showUploader = ref(false)// 从相册选择
 const flowFormRef = ref(null) // 工单
 const eventInfoData = ref('') // 工单
@@ -342,12 +345,14 @@ const getImg = (file) => {
 // 保存
 const submit = async() => {
   const processKey = flowFormRef.value?.form.processKey
-  if (form.work_order_status === 1 && !processKey) return showToast('请选择工单')
+  // 没有可用的流程模型（单租户集群未部署工单流程）时不能强求选择工单，否则提交永远被拦住
+  const hasFlowModels = !!flowFormRef.value?.options?.length
+  if (form.work_order_status === 1 && hasFlowModels && !processKey) return showToast('请选择工单')
   if (queryTemp.value.mod_type === '2' && !form.mod_status) return showToast('告警事件未选择')
-  if (!form.point?.lat) return showToast('位置为空')
+  if (isLocalAuth ? !form.point.address : !form.point?.lat) return showToast('位置为空')
   if (!form.describe) return showToast('请输入事件描述')
   // 是否转工单 1:是 0:否(默认) 工单关联的是事件,一个事件只能关联1个工单  已关联的不允许再关联
-  if (form.work_order_status === 1) {
+  if (form.work_order_status === 1 && hasFlowModels) {
     let val = await addWorkorderFn()
     if (!val) return
   }
