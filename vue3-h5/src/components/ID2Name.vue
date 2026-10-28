@@ -50,7 +50,7 @@ const setDisplayName = (userInfo: any) => {
   // 根据用户信息和props.format设置显示的名字
   if (userInfo.user_name) {
     displayName.value = userInfo.user_name
-  } else if (userInfo.user_detail.ex_data.realName) {
+  } else if (userInfo.user_detail?.ex_data?.realName) {
     displayName.value = userInfo.user_detail.ex_data.realName
   } else {
     displayName.value = '用户' + props.id.slice(0, 4) // 默认显示ID前4位

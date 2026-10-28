@@ -40,17 +40,19 @@ const props = defineProps({
 let imageSrc = ref('')
 let defaultStyle = ref(false)
 watch(() => props.src, (val) => {
-  if (val && val.includes('http')) {
-    let arr = val.split('/wj1/')
-    if (arr.length === 2) {
-      // this.firstTemp++
-      imageSrc.value = Config.platformURL + Config.gateWay + 'wj1/' + arr[1]
-    } else if (val.split('/oortwj1/').length === 2) {
-      imageSrc.value = Config.platformURL + Config.gateWay + 'oortwj1/' + val.split('/oortwj1/')[1]
-    }
+  if (!val) {
+    imageError()
+    return
+  }
+  // 只有 aPaaS 老对象存储的相对路径才需要改写域名；已经是完整 URL（例如单租户 S3 预签名事件图片）直接用
+  const wj1 = val.split('/wj1/')
+  const oortwj1 = val.split('/oortwj1/')
+  if (val.includes('http') && wj1.length === 2) {
+    imageSrc.value = Config.platformURL + Config.gateWay + 'wj1/' + wj1[1]
+  } else if (val.includes('http') && oortwj1.length === 2) {
+    imageSrc.value = Config.platformURL + Config.gateWay + 'oortwj1/' + oortwj1[1]
   } else {
     imageSrc.value = val
-    if (!val) imageError()
   }
 }, { immediate: true })
 
