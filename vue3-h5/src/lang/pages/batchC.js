@@ -1,0 +1,91 @@
+/**
+ * 页面文案英文映射（key 为中文原文，扁平结构）。
+ * 批次 C：event / intelligentAnalysis 组件新增文案。
+ * 配合 src/lang/index.js 的自定义 messageResolver：
+ * 中文原文含 "."、"…" 等字符也能整键匹配，缺失的 key 回落中文原文。
+ * 新增文案时保持 key 与页面里的原文完全一致。
+ */
+export default {
+  // 审批 / 流程操作
+  '抄送人': 'CC',
+  '抄送人：': 'CC: ',
+  '审批人': 'Approver',
+  '审批意见': 'Approval Comment',
+  '委派操作时必填': 'Required when assigning',
+  '转办操作时必填': 'Required when transferring',
+  '退回节点': 'Return Node',
+  '退回节点：': 'Return Node: ',
+  '开始': 'Start',
+  '编辑': 'Edit',
+  '收起': 'Collapse',
+  '发起群聊': 'Start Group Chat',
+  '更多': 'More',
+  '强制关闭': 'Force Close',
+  '重新发起': 'Restart',
+
+  // 事件 / 工单
+  '事件位置': 'Event Location',
+  '事件名称：': 'Event Name: ',
+  '事件描述：': 'Event Description: ',
+  '事件位置：': 'Event Location: ',
+  '事件类型：': 'Event Type: ',
+  '事件时间：': 'Event Time: ',
+  '拍传：': 'Snapshots: ',
+  '上报人员：': 'Reported By: ',
+  '上报时间：': 'Reported At: ',
+  '执行人员': 'Executor',
+  '执行人员：': 'Executors: ',
+  '车辆': 'Vehicle',
+  '车辆：': 'Vehicles: ',
+  '完成时间：': 'Completed At: ',
+  '设备名称：': 'Device Name: ',
+  '设备ID：': 'Device ID: ',
+  '抓拍照片：': 'Captured Photos: ',
+  '录制视频：': 'Recorded Video: ',
+  '未录制': 'Not Recorded',
+  '任务位置：': 'Task Location: ',
+  '工单编号：': 'Work Order No.: ',
+  '工单来源：': 'Source: ',
+  '工单名称': 'Work Order Name',
+  '提交时间：': 'Submitted At: ',
+  '待完成': 'Pending',
+  '待确认': 'To Confirm',
+  '未完成': 'Not Completed',
+  '处置记录': 'Handling Records',
+  '反馈信息': 'Feedback',
+
+  // 事件新建 / 反馈
+  '上传图片': 'Upload Image',
+  '添加为常用语': 'Add as Common Phrase',
+  '确认开始': 'Confirm & Start',
+  '添加图片/视频': 'Add Photo/Video',
+  '照片/视频': 'Photo/Video',
+  '描述：': 'Description: ',
+  '添加事件处置记录': 'Add Event Handling Record',
+  '事件闭环，问题整改': 'Close the loop, resolve the issue',
+  '告警事件': 'Alarm Event',
+  '真实告警': 'Real Alarm',
+  '误报': 'False Alarm',
+  '是否转工单': 'Convert to Work Order?',
+  '反馈照片': 'Feedback Photos',
+  '拍照/上传': 'Take Photo/Upload',
+  '事件反馈位置': 'Event Feedback Location',
+  '请输入反馈位置': 'Enter feedback location',
+  '是否完成养护': 'Maintenance Completed?',
+  '提交': 'Submit',
+
+  // 智能分析
+  '分析类型': 'Analysis Type',
+  '分析区域': 'Analysis Area',
+  '选择分析区域': 'Select Analysis Area',
+  '输入分析区域': 'Enter Analysis Area',
+  '分析图片': 'Analysis Images',
+  '分析时段': 'Analysis Period',
+  '摄像头': 'Camera',
+  '选择摄像头': 'Select Camera',
+  '描述': 'Description',
+  '申请时间': 'Applied At',
+  '完成时间': 'Completed At',
+  '确认申请': 'Submit Application',
+  '播放中': 'Playing'
+}

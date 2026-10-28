@@ -5,7 +5,7 @@
 
     <div class="my-header">
       <div class="top-title">
-        我的
+        {{ $t('我的') }}
       </div>
     </div>
 
@@ -45,11 +45,20 @@
       </div>
     </div>
 
+    <!-- 设置菜单 -->
     <van-action-sheet
       v-model:show="showSettings"
       :actions="settingsActions"
-      cancel-text="取消"
+      :cancel-text="$t('取消')"
       @select="onSettingsSelect"
+    />
+
+    <!-- 语言设置 -->
+    <van-action-sheet
+      v-model:show="showLanguage"
+      :actions="languageActions"
+      :cancel-text="$t('取消')"
+      @select="onLanguageSelect"
     />
   </div>
 </template>
@@ -57,8 +66,10 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { showConfirmDialog } from 'vant'
+import { showConfirmDialog, showToast } from 'vant'
+import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store/modules/useraPaas'
+import { getAppLocale, setAppLocale } from '@/lang/index'
 import config from '@/config'
 import bgImg from '@/assets/img/VLStreamCloud/bg.png'
 import helpImg from '@/assets/img/VLStreamCloud/mine/bz.png'
@@ -66,6 +77,8 @@ import aboutImg from '@/assets/img/VLStreamCloud/mine/gywm.png'
 import arrowImg from '@/assets/img/VLStreamCloud/mine/jt.png'
 import settingImg from '@/assets/img/VLStreamCloud/mine/sz.png'
 import OortImage from '@/components/image/oort_image.vue'
+
+const { t } = useI18n()
 
 // 用户信息
 const store = useUserStore()
@@ -75,14 +88,18 @@ const displayPhone = computed(() => store.userInfo?.phone || '--')
 const displayDept = computed(() => store.userInfo?.deptName || '--')
 
 // 菜单配置
-const menuItems = [
-  { key: 'help', title: '帮助', icon: helpImg },
-  { key: 'about', title: '关于我们', icon: aboutImg },
-  { key: 'settings', title: '设置', icon: settingImg }
-]
+const menuItems = computed(() => [
+  { key: 'help', title: t('帮助'), icon: helpImg },
+  { key: 'about', title: t('关于我们'), icon: aboutImg },
+  { key: 'settings', title: t('设置'), icon: settingImg }
+])
 
+// ========= 设置菜单 =========
 const showSettings = ref(false)
-const settingsActions = [{ name: '退出登录' }]
+const settingsActions = computed(() => [
+  { name: t('语言设置'), key: 'language' },
+  { name: t('退出登录'), key: 'logout' }
+])
 
 const onMenuClick = (item) => {
   if (item.key === 'help') {
@@ -98,24 +115,45 @@ const onMenuClick = (item) => {
   }
 }
 
-const onSettingsSelect = async() => {
+const onSettingsSelect = async(action) => {
   showSettings.value = false
-  try {
-    await showConfirmDialog({ title: '提示', message: '确认退出登录？' })
-  } catch (e) {
+  if (action.key === 'language') {
+    showLanguage.value = true
     return
   }
-
-  // 单租户集群没有 apaas-sso，服务端 logout 接口不存在，只清本地登录态
-  if (config.authMode !== 'local') {
+  if (action.key === 'logout') {
     try {
-      await store.loginOut(store.getStoreToken())
+      await showConfirmDialog({ title: t('提示'), message: t('确认退出登录？') })
     } catch (e) {
-      // 服务端退出失败也要清掉本地，避免停在登录态
+      return
     }
+
+    // 单租户集群没有 apaas-sso，服务端 logout 接口不存在，只清本地登录态
+    if (config.authMode !== 'local') {
+      try {
+        await store.loginOut(store.getStoreToken())
+      } catch (e) {
+        // 服务端退出失败也要清掉本地，避免停在登录态
+      }
+    }
+    store.removeStoreToken()
+    location.reload()
   }
-  store.removeStoreToken()
-  location.reload()
+}
+
+// ========= 语言设置 =========
+const showLanguage = ref(false)
+// 语言名用各自母语显示，不随语言切换翻译
+const languageActions = [
+  { name: '中文', key: 'cn' },
+  { name: 'English', key: 'en' }
+]
+
+const onLanguageSelect = (action) => {
+  showLanguage.value = false
+  if (action.key === getAppLocale()) return
+  setAppLocale(action.key)
+  showToast(t('操作成功'))
 }
 </script>
 
@@ -175,6 +213,7 @@ const onSettingsSelect = async() => {
   border-radius: 50%;
   object-fit: cover;
 }
+
 
 .profile-info {
   flex: 1;
