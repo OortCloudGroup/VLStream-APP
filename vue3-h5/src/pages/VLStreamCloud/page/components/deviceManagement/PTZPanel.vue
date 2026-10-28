@@ -1,117 +1,274 @@
 <template>
   <div class="ptz-panel">
-    <div class="control-wheel">
-      <div class="dir up" @click="noop">
+    <div v-if="!canMove" class="ptz-notice">
+      <van-icon name="info-o" class="notice-icon" />
+      <span class="notice-text">{{ noticeText }}</span>
+      <van-button
+        v-if="canRetry"
+        size="mini"
+        plain
+        type="primary"
+        @click="checkCapabilities"
+      >
+        重新检查
+      </van-button>
+    </div>
+
+    <div class="control-wheel" :class="{ 'is-disabled': !canMove }">
+      <div class="dir up" @pointerdown="startMove('up')" @pointerup="stopMove" @pointerleave="stopMove" @pointercancel="stopMove">
         <img src="@/assets/img/VLStreamCloud/PTZ/jt.png" alt="" />
       </div>
-      <div class="dir left" @click="noop">
+      <div class="dir left" @pointerdown="startMove('left')" @pointerup="stopMove" @pointerleave="stopMove" @pointercancel="stopMove">
         <img src="@/assets/img/VLStreamCloud/PTZ/jt.png" alt="" />
       </div>
-      <div class="dir center" @click="noop">
+      <div class="dir center" @click="stopMove">
         <img src="@/assets/img/VLStreamCloud/PTZ/jz.png" alt="" />
       </div>
-      <div class="dir right" @click="noop">
+      <div class="dir right" @pointerdown="startMove('right')" @pointerup="stopMove" @pointerleave="stopMove" @pointercancel="stopMove">
         <img src="@/assets/img/VLStreamCloud/PTZ/jt.png" alt="" />
       </div>
-      <div class="dir down" @click="noop">
+      <div class="dir down" @pointerdown="startMove('down')" @pointerup="stopMove" @pointerleave="stopMove" @pointercancel="stopMove">
         <img src="@/assets/img/VLStreamCloud/PTZ/jt.png" alt="" />
       </div>
     </div>
 
-    <div class="zoom-bar">
-      <div @click="noop">
-        <img src="@/assets/img/VLStreamCloud/PTZ/bs_d.png" alt="" />
-      </div>
-      <span class="zoom-label">变倍</span>
-      <div @click="noop">
-        <img src="@/assets/img/VLStreamCloud/PTZ/bs_a.png" alt="" />
-      </div>
+    <div class="speed-bar" :class="{ 'is-disabled': !canMove }">
+      <span class="speed-label">速度</span>
+      <van-slider v-model="speed" :min="0.1" :max="1" :step="0.1" :disabled="!canMove" class="speed-slider" />
+      <span class="speed-value">{{ speed.toFixed(1) }}</span>
     </div>
 
-    <div class="quick-grid">
-      <div
-        v-for="item in quickActions"
-        :key="item.label"
-        class="quick-item"
-        @click="noop"
-      >
-        <div class="quick-icon">
-          <img :src="item.icon" alt="" />
-        </div>
-        <div class="quick-text">
-          {{ item.label }}
+    <div v-if="canPreset" class="preset-section">
+      <div class="preset-title">
+        预置点
+      </div>
+      <div class="preset-add">
+        <van-field v-model="presetName" placeholder="请输入预置点名称" class="preset-input" />
+        <van-button size="small" type="primary" :disabled="!presetName.trim()" @click="addPreset">
+          添加
+        </van-button>
+      </div>
+      <div v-if="presets.length" class="preset-list">
+        <div v-for="item in presets" :key="item.token" class="preset-item">
+          <span class="preset-name">{{ item.name || item.token }}</span>
+          <div class="preset-actions">
+            <span @click="gotoPreset(item)">调用</span>
+            <span class="danger" @click="deletePreset(item)">删除</span>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="more-toggle" @click="showMore = !showMore">
-      <span>更多</span>
-      <van-icon :name="showMore ? 'arrow-up' : 'arrow-down'" />
-    </div>
-
-    <div v-if="showMore" class="more-grid">
-      <div
-        v-for="item in moreActions"
-        :key="item.label"
-        class="more-item"
-        @click="noop"
-      >
-        <div class="more-icon">
-          <img :src="item.icon" alt="" />
-        </div>
-        <div class="more-text">
-          {{ item.label }}
-        </div>
-      </div>
-    </div>
-
-    <div class="footer-link" @click="noop">
-      <img src="@/assets/img/VLStreamCloud/PTZ/sxj.png" alt="" />
-      <div>
-        摄像机管理后台
+      <div v-else class="preset-empty">
+        {{ presetsLoading ? '预置点加载中…' : '暂无预置点' }}
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import cd from '@/assets/img/VLStreamCloud/PTZ/cd.png'
-import fzjj from '@/assets/img/VLStreamCloud/PTZ/fzjj.png'
-import gq_a from '@/assets/img/VLStreamCloud/PTZ/gq_a.png'
-import gq_d from '@/assets/img/VLStreamCloud/PTZ/gq_d.png'
-import jj_d from '@/assets/img/VLStreamCloud/PTZ/jj_d.png'
-import jtcsh from '@/assets/img/VLStreamCloud/PTZ/jtcsh.png'
-import sdgz from '@/assets/img/VLStreamCloud/PTZ/sdgz.png'
-import tj_a from '@/assets/img/VLStreamCloud/PTZ/tj_a.png'
-import tj_d from '@/assets/img/VLStreamCloud/PTZ/tj_d.png'
-import yjsw from '@/assets/img/VLStreamCloud/PTZ/yjsw.png'
-import yjxh from '@/assets/img/VLStreamCloud/PTZ/yjxh.png'
-import ddw from '@/assets/img/VLStreamCloud/PTZ/ddw.png'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { showToast } from 'vant'
+import {
+  addOnvifPreset,
+  getOnvifDeviceList,
+  getOnvifPresets,
+  getPtzCapabilities,
+  gotoOnvifPreset,
+  onvifPtzStart,
+  onvifPtzStop,
+  removeOnvifPreset
+} from '@/api/VLStreamCloud/onvif'
+import { getWvpVlsDeviceList } from '@/api/VLStreamCloud/wvp'
+import {
+  PTZ_DIRECTIONS,
+  canUsePtzMovement,
+  canUsePtzPresets,
+  checkingCapabilities,
+  createPtzHoldController,
+  normalizePtzCapabilities,
+  unsupportedCapabilities
+} from '@/utils/onvifPtz'
 
-const showMore = ref(false)
+const props = defineProps({
+  // 摄像头对象：WVP 设备行（ipAddr）或 vlsDeviceInfo 记录（deviceId，需要回查 WVP）
+  camera: {
+    type: Object,
+    default: null
+  }
+})
 
-const quickActions = [
-  { label: '调焦+', icon: tj_a },
-  { label: '聚焦+', icon: jj_d },
-  { label: '光圈+', icon: gq_a },
-  { label: '调焦-', icon: tj_d },
-  { label: '聚焦-', icon: jj_d },
-  { label: '光圈-', icon: gq_d }
-]
+const speed = ref(0.1)
+const presetName = ref('')
+const presets = ref([])
+const presetsLoading = ref(false)
+const capabilities = ref(null)
+const presetParams = ref(null)
 
-const moreActions = [
-  { label: '灯光', icon: ddw },
-  { label: '辅助聚焦', icon: fzjj },
-  { label: '镜头初始化', icon: jtcsh },
-  { label: '菜单', icon: cd },
-  { label: '手动跟踪', icon: sdgz },
-  { label: '3D定位', icon: ddw },
-  { label: '一键巡航', icon: yjxh },
-  { label: '一键守望', icon: yjsw }
-]
+let generation = 0
 
-const noop = () => {}
+const canMove = computed(() => canUsePtzMovement(capabilities.value))
+const canPreset = computed(() => !!presetParams.value && canUsePtzPresets(capabilities.value))
+const canRetry = computed(() => !!props.camera && capabilities.value && capabilities.value.status !== 'checking')
+const noticeText = computed(() => {
+  const state = capabilities.value
+  if (!props.camera) return '请选择摄像头'
+  if (!state || state.status === 'checking') return '正在检查云台能力，请稍候'
+  if (state.status === 'supported') return '该摄像头不支持连续方向控制'
+  return state.reason || '该摄像头不支持云台控制'
+})
+
+const hold = createPtzHoldController({
+  startRequest: onvifPtzStart,
+  stopRequest: onvifPtzStop
+})
+
+const startMove = direction => {
+  if (!canMove.value) return
+  hold.start({ id: capabilities.value.onvifId, direction: PTZ_DIRECTIONS[direction], speed: speed.value })
+}
+
+const stopMove = () => {
+  hold.stop()
+}
+
+const stopWhenHidden = () => {
+  if (document.hidden) stopMove()
+}
+
+const cameraKey = computed(() => {
+  const camera = props.camera || {}
+  return `${camera.ipAddr || camera.ip || ''}|${camera.deviceId || ''}|${camera.capabilitiesJson || ''}`
+})
+
+// vlsDeviceInfo 记录没有 IP，用设备序列号回查 WVP 推送设备拿到 ipAddr
+const resolveCameraIp = async(camera) => {
+  if (camera.ipAddr || camera.ip) return { ip: camera.ipAddr || camera.ip, capabilitiesJson: camera.capabilitiesJson }
+  if (!camera.deviceId) return null
+  const res = await getWvpVlsDeviceList({ pageNum: 1, pageSize: 200 })
+  const rows = res && Array.isArray(res.rows) ? res.rows : []
+  const matched = rows.find(item => item.deviceId === camera.deviceId)
+  return matched ? { ip: matched.ipAddr, capabilitiesJson: matched.capabilitiesJson } : null
+}
+
+const checkCapabilities = async() => {
+  const camera = props.camera
+  if (!camera) return
+  const current = ++generation
+  capabilities.value = checkingCapabilities()
+  presetParams.value = null
+  presets.value = []
+  try {
+    const resolved = await resolveCameraIp(camera)
+    if (current !== generation) return
+    if (!resolved || !resolved.ip) {
+      capabilities.value = unsupportedCapabilities('设备没有上报 IP 地址，无法检查云台能力')
+      return
+    }
+    const listRes = await getOnvifDeviceList({ page: 1, count: 200 })
+    if (current !== generation) return
+    const list = Array.isArray(listRes && listRes.data) ? listRes.data : []
+    const onvifDevice = list.find(item => String(item.ip || '').trim() === String(resolved.ip).trim())
+    if (!onvifDevice) {
+      const declared = /"ptz"/.test(String(resolved.capabilitiesJson || ''))
+      capabilities.value = unsupportedCapabilities(declared
+        ? '设备声明支持云台，但未接入 ONVIF 云台服务'
+        : '该摄像头不支持云台控制')
+      return
+    }
+    const capsRes = await getPtzCapabilities({ id: onvifDevice.id, refresh: true })
+    if (current !== generation) return
+    const normalized = normalizePtzCapabilities(capsRes && capsRes.data, onvifDevice.channel || '')
+    capabilities.value = { ...normalized, onvifId: onvifDevice.id }
+    if (normalized.presets) {
+      presetParams.value = {
+        ip: onvifDevice.ip,
+        username: onvifDevice.userName,
+        password: onvifDevice.password,
+        profileToken: normalized.profileToken
+      }
+    }
+  } catch (error) {
+    if (current !== generation) return
+    capabilities.value = normalizePtzCapabilities({
+      status: 'unknown',
+      reason: error?.response?.data?.msg || error?.message || '云台能力检查失败'
+    })
+  }
+}
+
+watch(cameraKey, () => {
+  stopMove()
+  const camera = props.camera || {}
+  if (!camera.ipAddr && !camera.ip && !camera.deviceId) {
+    generation += 1
+    presetParams.value = null
+    presets.value = []
+    capabilities.value = unsupportedCapabilities('请选择摄像头')
+    return
+  }
+  checkCapabilities()
+}, { immediate: true })
+
+const presetQuery = (extra = {}) => ({ ...(presetParams.value || {}), ...extra })
+
+const loadPresets = async() => {
+  if (!canPreset.value) {
+    presets.value = []
+    return
+  }
+  presetsLoading.value = true
+  try {
+    const res = await getOnvifPresets(presetQuery())
+    presets.value = res && Array.isArray(res.data) ? res.data : []
+  } catch (error) {
+    presets.value = []
+  } finally {
+    presetsLoading.value = false
+  }
+}
+
+const addPreset = async() => {
+  const name = presetName.value.trim()
+  if (!canPreset.value || !name) return
+  const res = await addOnvifPreset(presetQuery({ presetToken: name }))
+  if (res && res.code === 200) {
+    presetName.value = ''
+    showToast('操作成功')
+    await loadPresets()
+  }
+}
+
+const gotoPreset = async(item) => {
+  if (!canPreset.value || !item?.token) return
+  const res = await gotoOnvifPreset(presetQuery({ presetToken: item.token }))
+  if (res && res.code === 200) showToast('操作成功')
+}
+
+const deletePreset = async(item) => {
+  if (!canPreset.value || !item?.token) return
+  const res = await removeOnvifPreset(presetQuery({ presetToken: item.token }))
+  if (res && res.code === 200) {
+    showToast('操作成功')
+    await loadPresets()
+  }
+}
+
+watch(canPreset, () => loadPresets(), { immediate: true })
+
+onMounted(() => {
+  window.addEventListener('pointerup', stopMove)
+  window.addEventListener('pointercancel', stopMove)
+  window.addEventListener('blur', stopMove)
+  document.addEventListener('visibilitychange', stopWhenHidden)
+})
+
+onBeforeUnmount(() => {
+  stopMove()
+  generation += 1
+  window.removeEventListener('pointerup', stopMove)
+  window.removeEventListener('pointercancel', stopMove)
+  window.removeEventListener('blur', stopMove)
+  document.removeEventListener('visibilitychange', stopWhenHidden)
+})
 </script>
 
 <style scoped lang="scss">
@@ -123,6 +280,28 @@ const noop = () => {}
   gap: 20px;
 }
 
+.ptz-notice {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255, 141, 34, 0.1);
+  color: #c26a10;
+  font-size: 13px;
+  line-height: 18px;
+  box-sizing: border-box;
+}
+
+.notice-icon {
+  flex: none;
+}
+
+.notice-text {
+  flex: 1;
+}
+
 .control-wheel {
   width: 220px;
   height: 220px;
@@ -131,18 +310,24 @@ const noop = () => {}
   position: relative;
   display: grid;
   place-items: center;
+
+  &.is-disabled {
+    opacity: 0.45;
+  }
 }
 
 .dir {
-  width:44px;
-  height:24.75px;
+  width: 44px;
+  height: 24.75px;
   position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #1c6cff;
   font-size: 22px;
-  img{
+  touch-action: none;
+
+  img {
     width: 100%;
     height: 100%;
   }
@@ -172,118 +357,111 @@ const noop = () => {}
   }
 
   &.center {
-    width:93.5px;
-    height:93.5px;
+    width: 93.5px;
+    height: 93.5px;
     border-radius: 50%;
   }
 }
 
-.zoom-bar {
+.speed-bar {
   width: 90%;
   max-width: 360px;
-  background: rgba(227, 234, 255, 1);
+  background: #fff;
   border-radius: 999px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 20px;
-
-  .zoom-label {
-    line-height: 19px;
-    color: #1a53ff;
-    font-size: 14px;
-  }
-
-  img{
-    width: 24px;
-    height: 24px;
-  }
-}
-
-.quick-grid {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  padding: 12px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+
+  &.is-disabled {
+    opacity: 0.45;
+  }
 }
 
-.quick-item {
-  padding: 6px 7px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.speed-label {
   font-size: 14px;
-  color: #333;
-  height: 44px;
-  background: #f0f2f5;
+  color: #333333;
+  white-space: nowrap;
+}
+
+.speed-slider {
+  flex: 1;
+}
+
+.speed-value {
+  width: 28px;
+  text-align: right;
+  font-size: 14px;
+  color: #1a53ff;
+}
+
+.preset-section {
+  width: 100%;
+  background: #fff;
   border-radius: 8px;
+  padding: 12px;
   box-sizing: border-box;
 }
 
-.quick-icon {
-  width: 32px;
-  height: 32px;
-  img{
-    width: 100%;
-    height: 100%;
-  }
+.preset-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 10px;
 }
 
-.quick-text {
-  font-size: 14px;
-}
-
-.more-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #1c6cff;
-  font-size: 14px;
-}
-
-.more-grid {
-  padding: 12px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
-  background: #f0f2f5;
-  border-radius: 8px;
-}
-
-.more-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-size: 14px;
-  color: #333;
-}
-
-.more-icon {
-  width: 32px;
-  height: 32px;
-  img{
-    width: 100%;
-    height: 100%;
-  }
-}
-
-.footer-link {
-  height: 53px;
+.preset-add {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  width: 100%;
-  background: #e3eaff;
+}
+
+.preset-input {
+  flex: 1;
+  border: 1px solid #c3c3c3;
   border-radius: 8px;
-  color: #1a53ff;
-  font-size: 16px;
-  img{
-    width: 48px;
-    height: 48px;
+  padding: 4px 8px;
+}
+
+.preset-list {
+  margin-top: 8px;
+}
+
+.preset-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-top: 1px solid rgba(235, 237, 240, 1);
+  font-size: 14px;
+  color: #333333;
+}
+
+.preset-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preset-actions {
+  display: flex;
+  gap: 16px;
+  color: #2f69f8;
+  font-size: 14px;
+
+  .danger {
+    color: #e33645;
   }
+}
+
+.preset-empty {
+  margin-top: 8px;
+  padding: 8px 0;
+  text-align: center;
+  font-size: 13px;
+  color: #999999;
 }
 </style>

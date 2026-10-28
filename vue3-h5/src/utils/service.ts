@@ -16,7 +16,8 @@ import { showToast } from 'vant'
 import { ensureVlstreamToken, removeVlstreamToken, EXCHANGE_PATH } from './vlstreamAuth'
 
 const VLS_SERVICE = 'apaas-vls-server'
-const WVP_SERVICE = 'apaas-wvp-server'
+// apaas-wvp-server 是聚合网关前缀，wvp-server 是 WVP 原生服务（ONVIF 云台等），共用同一套鉴权头
+const WVP_SERVICE = 'wvp-server'
 // 节流白名单
 const whiteApi = ['/menu/v1/myAuth', 'sso/v1/getUserList', 'sso/v1/getDeptUser']
 function includeApi(url) {
