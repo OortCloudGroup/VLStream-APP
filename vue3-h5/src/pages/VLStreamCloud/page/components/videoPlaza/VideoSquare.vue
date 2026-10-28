@@ -1,138 +1,143 @@
 <template>
-  <div class="video-square">
-    <div v-show="showPreview" class="preview-section">
-      <!-- 布局切换 -->
-      <div class="layout-row">
-        <div class="layout-buttons">
-          <div
-            v-for="mode in layoutModes"
-            :key="mode.value"
-            class="layout-icon"
-            @click="changeLayout(mode.value)"
-          >
-            <img :src="activeLayout === mode.value ? mode.activeImg : mode.img" alt="" class="layout-img" />
-          </div>
-        </div>
-
-        <van-popover v-model:show="showModeMenu" trigger="click" placement="bottom-end">
-          <template #reference>
-            <img :src="moreImg" alt="" class="more-icon" />
-          </template>
-          <div class="mode-menu">
-            <div
-              v-for="item in modeMenu"
-              :key="item.value"
-              class="mode-menu-item"
-              @click="onSelectMenu(item.value)"
-            >
-              <img :src="item.img" alt="" class="mode-menu-icon" />
-              <span>{{ item.label }}</span>
-            </div>
-          </div>
-        </van-popover>
-      </div>
-
-      <!-- 预览区域：根据布局和设备列表分屏播放 WebRTC 视频 -->
-      <div
-        ref="previewGridRef"
-        class="preview-grid"
-        :class="[`cols-${previewCols}`, `layout-${activeLayout}`, { 'fullscreen-mode': isFullscreen }]"
-      >
-        <div
-          v-for="slot in previewSlots"
-          :key="slot.id"
-          class="preview-cell"
-        >
-          <!-- 有设备：播放 WVP 预览流 -->
-          <div v-if="slot.device" class="preview-video-wrapper">
-            <video
-              :id="`vs-webrtc-${slot.device.id}`"
-              class="preview-video"
-              autoplay
-              muted
-              playsinline
-              controls
-            />
-            <!-- 自定义全屏 -->
-            <div class="cell-fullscreen-btn" @click.stop="enterCellFullscreen(slot.device.id)">
-              <van-icon name="expand-o" />
-            </div>
-            <div v-if="previewStates[slot.device.id]" class="cell-status">
-              {{ previewStates[slot.device.id] }}
-            </div>
-          </div>
-          <!-- 无设备：占位 -->
-          <div v-else class="preview-empty">
-            无信号
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 中间小滑块条（可拖动控制预览区域显示/隐藏） -->
+  <div ref="squareRef" class="video-square">
+    <!-- 预览区域：铺满整个内容区，设备列表以抽屉形式浮在视频上方 -->
     <div
-      class="slider-bar"
-      :class="{ dragging: isDragging }"
-      @touchstart.prevent="onSliderTouchStart"
-      @touchmove.prevent="onSliderTouchMove"
-      @touchend.prevent="onSliderTouchEnd"
-      @mousedown.prevent="onSliderMouseDown"
+      ref="previewGridRef"
+      class="preview-grid"
+      :class="[`cols-${previewCols}`, `layout-${activeLayout}`, { 'fullscreen-mode': isFullscreen }]"
     >
-      <div class="slider-thumb" />
+      <div
+        v-for="slot in previewSlots"
+        :key="slot.id"
+        class="preview-cell"
+      >
+        <!-- 有设备：播放 WVP 预览流 -->
+        <div v-if="slot.device" class="preview-video-wrapper">
+          <video
+            :id="`vs-webrtc-${slot.device.id}`"
+            class="preview-video"
+            autoplay
+            muted
+            playsinline
+            controls
+          />
+          <!-- 自定义全屏 -->
+          <div class="cell-fullscreen-btn" @click.stop="enterCellFullscreen(slot.device.id)">
+            <van-icon name="expand-o" />
+          </div>
+          <div v-if="previewStates[slot.device.id]" class="cell-status">
+            {{ previewStates[slot.device.id] }}
+          </div>
+        </div>
+        <!-- 无设备：占位 -->
+        <div v-else class="preview-empty">
+          {{ $t('无信号') }}
+        </div>
+      </div>
     </div>
 
-    <!-- 设备卡片列表 -->
-    <div class="device-list">
+    <!-- 布局切换（浮在视频上方） -->
+    <div class="layout-row">
+      <div class="layout-buttons">
+        <div
+          v-for="mode in layoutModes"
+          :key="mode.value"
+          class="layout-icon"
+          @click="changeLayout(mode.value)"
+        >
+          <img :src="activeLayout === mode.value ? mode.activeImg : mode.img" alt="" class="layout-img" />
+        </div>
+      </div>
+
+      <van-popover v-model:show="showModeMenu" trigger="click" placement="bottom-end">
+        <template #reference>
+          <img :src="moreImg" alt="" class="more-icon" />
+        </template>
+        <div class="mode-menu">
+          <div
+            v-for="item in modeMenu"
+            :key="item.value"
+            class="mode-menu-item"
+            @click="onSelectMenu(item.value)"
+          >
+            <img :src="item.img" alt="" class="mode-menu-icon" />
+            <span>{{ item.label }}</span>
+          </div>
+        </div>
+      </van-popover>
+    </div>
+
+    <!-- 设备列表抽屉：往上拉覆盖视频全屏显示列表，往下拉隐藏列表 -->
+    <div
+      class="device-drawer"
+      :class="{ dragging: drawerDragging }"
+      :style="{ height: `${drawerHeight}px` }"
+    >
       <div
-        v-for="item in devices"
-        :key="item.id"
-        class="device-card"
-        @click="openDetail(item)"
+        class="drawer-handle"
+        @touchstart="onHandleTouchStart"
+        @touchmove="onHandleTouchMove"
+        @touchend="onHandleTouchEnd"
+        @mousedown="onHandleMouseDown"
       >
-        <div class="card-header">
-          <div class="name">
-            {{ item.deviceName }}
-          </div>
-          <span v-if="item.privacy" class="privacy-tag">
-            {{ item.privacy }}
-          </span>
+        <div class="drawer-thumb" />
+        <div class="drawer-title">
+          {{ $t('设备列表') }}
         </div>
+      </div>
 
-        <div class="info-row" style="width: 90%">
-          <img src="@/assets/img/VLStreamCloud/spgc/sbId.png" alt="" />
-          <div class="label">
-            设备ID
+      <div class="drawer-list">
+        <div
+          v-for="item in devices"
+          :key="item.id"
+          class="device-card"
+          @click="openDetail(item)"
+        >
+          <div class="card-header">
+            <div class="name">
+              {{ item.deviceName }}
+            </div>
+            <span v-if="item.privacy" class="privacy-tag">
+              {{ item.privacy }}
+            </span>
           </div>
-          <div class="value">
-            {{ item.deviceId }}
-          </div>
-        </div>
-        <div class="info-row">
-          <img src="@/assets/img/VLStreamCloud/spgc/sbwz.png" alt="" />
-          <div class="label">
-            设备位置
-          </div>
-          <div class="value">
-            {{ item.address }}
-          </div>
-        </div>
 
-        <div class="card-footer">
-          <div class="chips">
-            <div class="chip" :class="{ offline: item.status != '1' }">
-              {{ item.status == '1' ? '在线' : '离线' }}
+          <div class="info-row" style="width: 90%">
+            <img src="@/assets/img/VLStreamCloud/spgc/sbId.png" alt="" />
+            <div class="label">
+              {{ $t('设备ID') }}
             </div>
-            <div v-if="item.deviceType" class="chip">
-              {{ item.deviceType }}
-            </div>
-            <div v-if="item.heightPosition" class="chip">
-              {{ item.heightPosition }}
+            <div class="value">
+              {{ item.deviceId }}
             </div>
           </div>
-        </div>
-        <div class="play-btn">
-          <img v-if="item.status == '1'" src="@/assets/img/VLStreamCloud/spgc/playing.png" alt="" />
-          <img v-else src="@/assets/img/VLStreamCloud/spgc/no_playing.png" alt="" />
+          <div class="info-row">
+            <img src="@/assets/img/VLStreamCloud/spgc/sbwz.png" alt="" />
+            <div class="label">
+              {{ $t('设备位置') }}
+            </div>
+            <div class="value">
+              {{ item.address }}
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div class="chips">
+              <div class="chip" :class="{ offline: item.status != '1' }">
+                {{ item.status == '1' ? $t('在线') : $t('离线') }}
+              </div>
+              <div v-if="item.deviceType" class="chip">
+                {{ item.deviceType }}
+              </div>
+              <div v-if="item.heightPosition" class="chip">
+                {{ item.heightPosition }}
+              </div>
+            </div>
+          </div>
+          <div class="play-btn">
+            <img v-if="item.status == '1'" src="@/assets/img/VLStreamCloud/spgc/playing.png" alt="" />
+            <img v-else src="@/assets/img/VLStreamCloud/spgc/no_playing.png" alt="" />
+          </div>
         </div>
       </div>
     </div>
@@ -149,8 +154,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getWvpVlsDeviceList, getWvpVlsDeviceDetail, getWvpVlsDeviceStreams, createWvpVlsDevicePreview } from '@/api/VLStreamCloud/wvp'
 import { CameraRtcPlayer, parseCameraRtcTarget } from '@/utils/cameraRtc'
+import { setImmersive } from '@/utils/shellStatusBar'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import CameraDetail from '@/pages/VLStreamCloud/page/components/cameraDetail/CameraDetail.vue'
 import p1 from '@/assets/img/VLStreamCloud/spgc/p1.png'
@@ -172,67 +179,99 @@ const props = defineProps<{
   keyword?: string
 }>()
 
-const showPreview = ref(true)
+const { t } = useI18n()
 
-// 拖拽相关状态
-const isDragging = ref(false)
-const startY = ref(0)
-const dragThreshold = 20 // 拖动阈值，超过这个距离才切换状态
+// ========= 设备列表抽屉（浮在满屏视频上方） =========
+const squareRef = ref<HTMLElement | null>(null)
+const containerHeight = ref(0)
+// 收起时仅露出把手一行；展开时抽屉高度等于容器高度（列表覆盖视频全屏显示）
+const COLLAPSED_HEIGHT = 64
+const drawerHeight = ref(COLLAPSED_HEIGHT)
+const drawerDragging = ref(false)
+let dragStartY = 0
+let dragStartHeight = COLLAPSED_HEIGHT
+let dragMoved = false
 
-// 触摸事件处理（上拉隐藏，下拉显示）
-const onSliderTouchStart = (e: TouchEvent) => {
-  const touch = e.touches[0]
-  isDragging.value = true
-  startY.value = touch.clientY
+const isDrawerExpanded = () => containerHeight.value > 0 && drawerHeight.value >= containerHeight.value - 4
+
+const clampHeight = (height: number) => {
+  if (containerHeight.value <= 0) return height
+  return Math.min(Math.max(height, COLLAPSED_HEIGHT), containerHeight.value)
 }
 
-const onSliderTouchMove = (e: TouchEvent) => {
-  if (!isDragging.value) return
-  const touch = e.touches[0]
-  const deltaY = touch.clientY - startY.value
+const toggleDrawer = () => {
+  drawerHeight.value = isDrawerExpanded() ? COLLAPSED_HEIGHT : containerHeight.value
+}
 
-  // 上拉（deltaY < 0）：隐藏预览区域
-  // 下拉（deltaY > 0）：显示预览区域
-  if (Math.abs(deltaY) > dragThreshold) {
-    if (deltaY < 0 && showPreview.value) {
-      showPreview.value = false
-      isDragging.value = false
-    } else if (deltaY > 0 && !showPreview.value) {
-      showPreview.value = true
-      isDragging.value = false
-    }
+// 拖拽结束后的落点：上拉超过阈值展开到全屏列表，下拉超过阈值收起只留把手，小幅位移就近吸附
+const snapDrawer = (deltaY: number) => {
+  const full = containerHeight.value
+  if (deltaY <= -40) {
+    drawerHeight.value = full
+  } else if (deltaY >= 40) {
+    drawerHeight.value = COLLAPSED_HEIGHT
+  } else {
+    const mid = (full + COLLAPSED_HEIGHT) / 2
+    drawerHeight.value = drawerHeight.value > mid ? full : COLLAPSED_HEIGHT
   }
 }
 
-const onSliderTouchEnd = () => {
-  isDragging.value = false
+const onHandleTouchStart = (e: TouchEvent) => {
+  drawerDragging.value = true
+  dragMoved = false
+  dragStartY = e.touches[0].clientY
+  dragStartHeight = drawerHeight.value
 }
 
-// 鼠标事件处理（PC端）
-const onSliderMouseDown = (e: MouseEvent) => {
-  isDragging.value = true
-  startY.value = e.clientY
+const onHandleTouchMove = (e: TouchEvent) => {
+  if (!drawerDragging.value) return
+  const deltaY = e.touches[0].clientY - dragStartY
+  if (Math.abs(deltaY) > 6) dragMoved = true
+  drawerHeight.value = clampHeight(dragStartHeight - deltaY)
 }
 
-const handleMouseMove = (e: MouseEvent) => {
-  if (!isDragging.value) return
-  const deltaY = e.clientY - startY.value
-
-  // 上拉（deltaY < 0）：隐藏预览区域
-  // 下拉（deltaY > 0）：显示预览区域
-  if (Math.abs(deltaY) > dragThreshold) {
-    if (deltaY < 0 && showPreview.value) {
-      showPreview.value = false
-      isDragging.value = false
-    } else if (deltaY > 0 && !showPreview.value) {
-      showPreview.value = true
-      isDragging.value = false
-    }
+const onHandleTouchEnd = (e: TouchEvent) => {
+  if (!drawerDragging.value) return
+  drawerDragging.value = false
+  const deltaY = e.changedTouches[0].clientY - dragStartY
+  if (!dragMoved) {
+    toggleDrawer()
+    return
   }
+  snapDrawer(deltaY)
 }
 
-const handleMouseUp = () => {
-  isDragging.value = false
+// PC 端鼠标拖拽（配合 window 级 mousemove/mouseup）
+const onHandleMouseDown = (e: MouseEvent) => {
+  drawerDragging.value = true
+  dragMoved = false
+  dragStartY = e.clientY
+  dragStartHeight = drawerHeight.value
+}
+
+const onWindowMouseMove = (e: MouseEvent) => {
+  if (!drawerDragging.value) return
+  const deltaY = e.clientY - dragStartY
+  if (Math.abs(deltaY) > 6) dragMoved = true
+  drawerHeight.value = clampHeight(dragStartHeight - deltaY)
+}
+
+const onWindowMouseUp = (e: MouseEvent) => {
+  if (!drawerDragging.value) return
+  drawerDragging.value = false
+  const deltaY = e.clientY - dragStartY
+  if (!dragMoved) {
+    toggleDrawer()
+    return
+  }
+  snapDrawer(deltaY)
+}
+
+const measureContainer = async() => {
+  await nextTick()
+  if (!squareRef.value) return
+  containerHeight.value = squareRef.value.clientHeight
+  if (isDrawerExpanded()) drawerHeight.value = containerHeight.value
 }
 
 const layoutModes = [
@@ -248,12 +287,17 @@ const activeLayout = ref('p4')
 
 const showModeMenu = ref(false)
 
-const modeMenu = [
-  { value: 'full', label: '全屏', img: qp }
-]
+const modeMenu = computed(() => [
+  { value: 'full', label: t('全屏'), img: qp }
+])
 
 const previewGridRef = ref<HTMLElement | null>(null)
 const isFullscreen = ref(false)
+
+// CSS 兜底全屏（ArkWeb 不支持 Fullscreen API 时）也要联动原生沉浸式隐藏状态栏
+watch(isFullscreen, value => {
+  setImmersive(value)
+})
 
 // 全屏相关函数
 const enterFullscreen = async() => {
@@ -337,6 +381,13 @@ const handleFullscreenChange = () => {
     (document as any).msFullscreenElement
   )
   isFullscreen.value = isCurrentlyFullscreen
+}
+
+// 原生壳返回手势退出沉浸式全屏时（vl-exit-fullscreen 事件）同步退出 H5 侧全屏
+const handleNativeExitFullscreen = () => {
+  if (isFullscreen.value) {
+    exitFullscreen()
+  }
 }
 
 const onSelectMenu = async(value: string) => {
@@ -432,21 +483,21 @@ const startPreviewForDevice = async(device: any) => {
   try {
     const detail: any = await getWvpVlsDeviceDetail(device.id)
     if (detail?.data?.device?.online !== true) {
-      setState('设备离线，不允许播放')
+      setState(t('设备离线，不允许播放'))
       return
     }
     const streamsRes: any = await getWvpVlsDeviceStreams(device.id)
     const streams = Array.isArray(streamsRes?.data) ? streamsRes.data : []
     const stream = streams.find((item: any) => item.defaultStream) || streams[0]
     if (!stream) {
-      setState('设备没有上报可用视频流')
+      setState(t('设备没有上报可用视频流'))
       return
     }
     const previewRes: any = await createWvpVlsDevicePreview(device.id, stream.id)
     const preview = previewRes?.data || {}
     const target = preview.playMode === 'cameraRTC' && preview.url ? parseCameraRtcTarget(preview.url) : null
     if (!target) {
-      setState('WVP 未返回可用播放地址')
+      setState(t('WVP 未返回可用播放地址'))
       return
     }
     const player = new CameraRtcPlayer({
@@ -460,7 +511,7 @@ const startPreviewForDevice = async(device: any) => {
     previewPlayers[device.id] = player
     player.start()
   } catch (e: any) {
-    setState(e?.response?.data?.msg || e?.message || '创建预览失败')
+    setState(e?.response?.data?.msg || e?.message || t('创建预览失败'))
   }
 }
 
@@ -493,27 +544,34 @@ const fetchDevices = async() => {
 }
 
 onMounted(async() => {
-  await fetchDevices()
-  window.addEventListener('mousemove', handleMouseMove)
-  window.addEventListener('mouseup', handleMouseUp)
+  measureContainer()
+  window.addEventListener('resize', measureContainer)
+  window.addEventListener('mousemove', onWindowMouseMove)
+  window.addEventListener('mouseup', onWindowMouseUp)
   // 监听全屏状态变化
   document.addEventListener('fullscreenchange', handleFullscreenChange)
   document.addEventListener('webkitfullscreenchange', handleFullscreenChange)
   document.addEventListener('mozfullscreenchange', handleFullscreenChange)
   document.addEventListener('MSFullscreenChange', handleFullscreenChange)
+  document.addEventListener('vl-exit-fullscreen', handleNativeExitFullscreen)
+  await fetchDevices()
 })
 
 onBeforeUnmount(async() => {
-  window.removeEventListener('mousemove', handleMouseMove)
-  window.removeEventListener('mouseup', handleMouseUp)
+  window.removeEventListener('resize', measureContainer)
+  window.removeEventListener('mousemove', onWindowMouseMove)
+  window.removeEventListener('mouseup', onWindowMouseUp)
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
   document.removeEventListener('webkitfullscreenchange', handleFullscreenChange)
   document.removeEventListener('mozfullscreenchange', handleFullscreenChange)
   document.removeEventListener('MSFullscreenChange', handleFullscreenChange)
+  document.removeEventListener('vl-exit-fullscreen', handleNativeExitFullscreen)
   // 退出全屏
   if (isFullscreen.value) {
     await exitFullscreen()
   }
+  // 离开页面兜底恢复系统栏（防止沉浸式状态泄漏到其它页面）
+  setImmersive(false)
   stopAllPreviews()
 })
 
@@ -527,28 +585,37 @@ const openDetail = (item: any) => {
 </script>
 
 <style scoped lang="scss">
+/* 满屏视频 + 底部抽屉：负边距吃掉父级 padding，让视频铺满整个内容区 */
 .video-square {
   position: relative;
   z-index: 1;
+  height: calc(100% + 24px);
+  margin: 0 -16px -24px;
+  overflow: hidden;
+  background: #000;
 }
 
-.preview-section {
-  position: relative;
-}
-
+/* 布局切换浮在视频上方 */
 .layout-row {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  right: 12px;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 0 10px;
+  gap: 8px;
 }
 
 .layout-buttons {
-  flex: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(6px);
 }
 
 .layout-icon {
@@ -557,11 +624,6 @@ const openDetail = (item: any) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  img{
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
 }
 
 .layout-img {
@@ -571,8 +633,13 @@ const openDetail = (item: any) => {
 }
 
 .more-icon {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
+  padding: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(6px);
+  box-sizing: content-box;
   object-fit: contain;
 }
 
@@ -595,15 +662,19 @@ const openDetail = (item: any) => {
   object-fit: contain;
 }
 
+/* 预览分屏铺满整个内容区 */
 .preview-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: grid;
-  height: 280px;
-  border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
 }
 
-/* 全屏模式样式 */
+/* 全屏模式样式（CSS 兜底，ArkWeb 不支持 Fullscreen API 时） */
 .preview-grid.fullscreen-mode {
   position: fixed;
   top: 0;
@@ -708,13 +779,14 @@ const openDetail = (item: any) => {
   grid-column: 4 / 5;
 }
 
-.preview-video-wrapper{
+.preview-video-wrapper {
   width: 100%;
   height: 100%;
   overflow: hidden;
 }
 
-.preview-video,.preview-empty{
+.preview-video,
+.preview-empty {
   width: 100%;
   height: 100%;
 }
@@ -765,15 +837,7 @@ const openDetail = (item: any) => {
   background: rgba(0, 0, 0, 0.45);
 }
 
-.preview-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 .preview-empty {
-  width: 100%;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -782,34 +846,58 @@ const openDetail = (item: any) => {
   background: #000;
 }
 
-.slider-bar {
+/* 设备列表抽屉 */
+.device-drawer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6;
   display: flex;
-  justify-content: center;
-  margin: 12px 0 10px;
+  flex-direction: column;
+  overflow: hidden;
+  background: #F9FAFF;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 20px rgba(17, 24, 39, 0.14);
+  transition: height 0.25s ease;
+}
+
+.device-drawer.dragging {
+  transition: none;
+}
+
+.drawer-handle {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 0 7px;
   cursor: grab;
   user-select: none;
   touch-action: none;
-  padding: 8px 0;
   -webkit-tap-highlight-color: transparent;
 }
 
-.slider-bar.dragging {
-  cursor: grabbing;
-}
-
-.slider-thumb {
-  width: 48px;
+.drawer-thumb {
+  width: 44px;
   height: 4px;
   border-radius: 999px;
   background: rgba(17, 24, 39, 0.18);
-  transition: width 0.18s ease, opacity 0.18s ease;
 }
 
-.device-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 12px;
+.drawer-title {
+  font-size: 12px;
+  line-height: 16px;
+  color: #7a7c85;
+}
+
+.drawer-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 16px 16px;
 }
 
 .device-card {
@@ -817,6 +905,7 @@ const openDetail = (item: any) => {
   background: #fff;
   border-radius: 8px;
   padding: 12px;
+  margin-bottom: 12px;
 }
 
 .card-header {
@@ -851,7 +940,8 @@ const openDetail = (item: any) => {
   margin-top: 4px;
   font-size: 14px;
   line-height: 20px;
-  img{
+
+  img {
     width: 20px;
     height: 20px;
     margin-right: 4px;
@@ -860,12 +950,12 @@ const openDetail = (item: any) => {
 
 .label {
   min-width: 80px;
-  color:#7a7c85;
+  color: #7a7c85;
 }
 
 .value {
   flex: 1;
-  color:#333333;
+  color: #333333;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -914,4 +1004,3 @@ const openDetail = (item: any) => {
   object-fit: contain;
 }
 </style>
-

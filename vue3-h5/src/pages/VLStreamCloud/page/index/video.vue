@@ -5,7 +5,7 @@
     <div class="video-header">
       <div class="top-bar">
         <div class="top-title">
-          视频
+          {{ $t('视频') }}
         </div>
         <div class="top-actions">
           <img class="action-icon" :src="ssImg" alt="" @click="onSearch" />
@@ -18,7 +18,7 @@
         v-model="keyword"
         class="header-search"
         shape="round"
-        placeholder="搜索设备名称或设备ID"
+        :placeholder="$t('搜索设备名称或设备ID')"
       />
 
       <div class="tabs-row">
@@ -31,7 +31,7 @@
           <van-tab
             v-for="tab in topTabs"
             :key="tab.value"
-            :title="tab.label"
+            :title="$t(tab.label)"
             :name="tab.value"
           />
         </van-tabs>
@@ -47,7 +47,7 @@
           <van-tab
             v-for="tab in subTabs"
             :key="tab.value"
-            :title="tab.label"
+            :title="$t(tab.label)"
             :name="tab.value"
           />
         </van-tabs>
@@ -62,14 +62,14 @@
           <van-tab
             v-for="tab in modeTabs"
             :key="tab.value"
-            :title="tab.label"
+            :title="$t(tab.label)"
             :name="tab.value"
           />
         </van-tabs>
       </template>
     </div>
 
-    <div class="video-content">
+    <div class="video-content" :class="{ 'video-content--square': activeTopTab === 'square' }">
       <!-- 视频广场 -->
       <template v-if="activeTopTab === 'square'">
         <VideoSquare :keyword="keyword" />
@@ -107,7 +107,7 @@
           <van-list
             v-model:loading="loading"
             :finished="finished"
-            finished-text="没有更多了"
+            :finished-text="$t('没有更多了')"
             class="video-list"
             @load="onLoad"
           >
@@ -121,7 +121,7 @@
 
       <!-- 其它 tab 占位 -->
       <div v-else class="building">
-        功能建设中
+        {{ $t('功能建设中') }}
       </div>
     </div>
 
@@ -130,8 +130,8 @@
     <van-action-sheet
       v-model:show="showMenu"
       :actions="menuActions"
-      title="切换模块"
-      cancel-text="取消"
+      :title="$t('切换模块')"
+      :cancel-text="$t('取消')"
       close-on-click-action
       @select="onMenuSelect"
     />
@@ -139,8 +139,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { List as VanList } from 'vant'
 import config from '@/config'
 import ssImg from '@/assets/img/VLStreamCloud/ss.png'
@@ -158,6 +159,7 @@ import MyVideo from '@/pages/VLStreamCloud/page/components/myVideo/MyVideo.vue'
 import bgImg from '@/assets/img/VLStreamCloud/bg.png'
 
 const route = useRoute()
+const { t } = useI18n()
 
 const topTabs = ref([
   { label: '视频广场', value: 'square' },
@@ -193,7 +195,7 @@ const showSearch = ref(false)
 const keyword = ref('')
 const showMenu = ref(false)
 
-const menuActions = topTabs.value.map(tab => ({ name: tab.label, value: tab.value }))
+const menuActions = computed(() => topTabs.value.map(tab => ({ name: t(tab.label), value: tab.value })))
 
 const onLoad = () => {
   // 这里可以根据业务追加数据，当前直接标记为加载完成
@@ -298,6 +300,11 @@ const onMenuSelect = (action) => {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+/* 视频广场：视频铺满内容区，滚动只发生在抽屉列表内部 */
+.video-content--square {
+  overflow: hidden;
 }
 
 .tabs-row {
