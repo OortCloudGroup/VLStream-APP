@@ -9,6 +9,7 @@
 */
 import { request } from '@/utils/service'
 import config from '@/config'
+import { localGetUserList, localGetDeptUser, localGetUserInfoByUserId } from './localUser'
 
 function commonFunc<T, K>(interfaceName: string, data: T, method = 'post') {
   return request<K>({
@@ -30,6 +31,7 @@ export function usedGet(data) {
 
 // 获取用户信息
 export function getUserList(data) {
+  if (config.authMode === 'local') return localGetUserList(data)
   return commonFunc('sso/v1/getUserList', data, 'post')
 }
 
@@ -39,6 +41,7 @@ export function getDeptList(data) {
 }
 // 部门和用户树
 export function getDeptUser(data) {
+  if (config.authMode === 'local') return localGetDeptUser()
   return commonFunc('sso/v1/getDeptUser', data)
 }
 
@@ -84,5 +87,6 @@ export function agreementList(data) {
 
 // 根据userid获取用户详情
 export function getUserInfoByUserId(data) {
+  if (config.authMode === 'local') return localGetUserInfoByUserId(data)
   return commonFunc('sso/v1/getUserInfoByUserId', data, 'post')
 }

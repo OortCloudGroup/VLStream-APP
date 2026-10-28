@@ -1,17 +1,19 @@
 import { request } from '@/utils/service'
-import config from '@/config'
+import config, { platformBase } from '@/config'
+
+const isLocalAuth = () => config.authMode === 'local'
 
 function commonFunc<T, K>(interfaceName: string, data: T, method: string) {
   return request<K>({
-    url: config.platformURL + config.gateWay + 'apaas-location-service' + interfaceName,
+    url: platformBase('apaas-location-service') + interfaceName,
     method: method,
     data: data
   })
 }
 
-// 任务事件-add
+// 任务事件-add：单租户集群沿用历史路由名 mytask_updata
 export function event_add(data) {
-  return commonFunc('/task/v1/event_add', data, 'post')
+  return commonFunc(isLocalAuth() ? '/task/v1/mytask_updata' : '/task/v1/event_add', data, 'post')
 }
 
 // 任务事件-del

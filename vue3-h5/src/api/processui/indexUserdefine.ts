@@ -8,7 +8,7 @@
 * @Copyright aPaaS-front-team. All rights reserved.
 */
 import { request } from '@/utils/service'
-import config from '@/config'
+import config, { platformBase } from '@/config'
 // import config from '@/config'
 import { getToken } from '@/utils/cache'
 function commonFunc<T, K>(interfaceName: string, data: T, method: string, isParams = false) {
@@ -18,7 +18,7 @@ function commonFunc<T, K>(interfaceName: string, data: T, method: string, isPara
   }
   config.headers.authorization = getToken()
   return request<K>({
-    url: config.platformURL + config.gateWay + 'apaas-workflowforms' + interfaceName,
+    url: platformBase('apaas-workflowforms') + interfaceName,
     // url: '/workflow/' + interfaceName,
     method: method,
     ...params
@@ -30,7 +30,7 @@ function commonFunc<T, K>(interfaceName: string, data: T, method: string, isPara
 
 function commonFuncB<T, K>(interfaceName: string, data: T, method: string) {
   return request<K>({
-    url: config.platformURL + config.gateWay + 'apaas-workflowforms' + interfaceName,
+    url: platformBase('apaas-workflowforms') + interfaceName,
     method: method,
     data: data,
     // responseType: 'blob'
@@ -40,7 +40,7 @@ function commonFuncB<T, K>(interfaceName: string, data: T, method: string) {
 
 function commonFunc2<T, K>(interfaceName: string, data: T, method: string) {
   return request<K>({
-    url: config.platformURL + config.gateWay + 'apaas-workflowforms' + interfaceName,
+    url: platformBase('apaas-workflowforms') + interfaceName,
     method: method,
     data: data,
     responseType: 'blob'

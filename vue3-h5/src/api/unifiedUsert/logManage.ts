@@ -8,7 +8,7 @@
 * @Copyright aPaaS-front-team. All rights reserved.
 */
 import { request } from '@/utils/service'
-import config from '@/config'
+import { platformBase } from '@/config'
 
 function commonFunc<T, K>(interfaceName: string, data: T, method = 'post', isParams = false) {
   let params = method === 'get' || method === 'delete' || method === 'GET' || method === 'DELETE' ? { params: data } : { data: data }
@@ -16,7 +16,7 @@ function commonFunc<T, K>(interfaceName: string, data: T, method = 'post', isPar
     params = { params: data }
   }
   return request < K >({
-    url: config.platformURL + config.gateWay + 'apaas-log-manage' + interfaceName,
+    url: platformBase('apaas-log-manage') + interfaceName,
     method: method,
     ...params
   })
