@@ -201,40 +201,59 @@ const fetchTasks = async() => {
       // processing / completed / failed / cancel
       requestStatus: activeStatus.value
     }
-    const res: any = await getVlsAnalysisk(params)
-    if (res.code === 200 && res.data && Array.isArray(res.data.records)) {
-      const list = res.data.records.map((item: any) => {
-        const imageStr = item.images || ''
-        const imageArr = imageStr ? String(imageStr).split(',') : []
-        const firstImage = imageArr[0] || ''
+    // 已取消的任务（cancel）也归在「已失败」页展示，只查 failed 会永远看不到它们
+    const statusList = activeStatus.value === 'failed' ? ['failed', 'cancel'] : [activeStatus.value]
+    const responses = await Promise.all(statusList.map(status => getVlsAnalysisk({ ...params, requestStatus: status })))
 
-        const rawStatus = item.requestStatus || ''
-        const mappedStatus: TaskStatus | '' =
-          rawStatus === 'cancel' ? 'failed' : (rawStatus as TaskStatus | '')
+    const records: any[] = []
+    let total = 0
+    let successCount = 0
+    responses.forEach((res: any) => {
+      if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
+        successCount += 1
+        records.push(...res.data.records)
+        total += (res.data.total || res.data.count) || 0
+      }
+    })
+    if (successCount) {
+      const seen = new Set()
+      const list = records
+        .filter((item: any) => {
+          const key = String(item.id)
+          if (seen.has(key)) return false
+          seen.add(key)
+          return true
+        })
+        .map((item: any) => {
+          const imageStr = item.images || ''
+          const imageArr = imageStr ? String(imageStr).split(',') : []
+          const firstImage = imageArr[0] || ''
 
-        return {
-          ...item, // 保留原始数据
-          id: item.id,
-          title: item.analysisName || '--',
-          type: item.analysisType || '--',
-          area: item.regionInfo || '--',
-          thumb: firstImage,
-          cameras: item.cameraName || '--',
-          applyTime: formatTime(item.startTime || ''),
-          requestStatus: mappedStatus,
-          status: mappedStatus,
-          imageCount: imageArr.length || 1
-        }
-      })
+          const rawStatus = item.requestStatus || ''
+          const mappedStatus: TaskStatus | '' =
+            rawStatus === 'cancel' ? 'failed' : (rawStatus as TaskStatus | '')
+
+          return {
+            ...item, // 保留原始数据
+            id: item.id,
+            title: item.analysisName || '--',
+            type: item.analysisType || '--',
+            area: item.regionInfo || '--',
+            thumb: firstImage,
+            cameras: item.cameraName || '--',
+            // 申请时间取创建时间，startTime 是分析时段的起点
+            applyTime: formatTime(item.createTime || item.startTime || ''),
+            requestStatus: mappedStatus,
+            status: mappedStatus,
+            imageCount: imageArr.length || 1
+          }
+        })
 
       if (page.value === 1) {
         tasks.value = list
       } else {
         tasks.value = [...tasks.value, ...list]
       }
-
-      const total =
-        (res.data && (res.data.total || res.data.count)) || 0
 
       if (!total || tasks.value.length >= total || list.length === 0) {
         finished.value = true

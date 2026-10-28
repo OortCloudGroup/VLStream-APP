@@ -4,7 +4,7 @@
     <div class="application-content">
       <van-form class="form">
         <!-- 分析名称 -->
-        <van-field v-model="formData.name" placeholder="请输分析名称" class="addMargin">
+        <van-field v-model="formData.name" placeholder="请输入分析名称" class="addMargin">
           <template #left-icon>
             <img :src="fxmc" alt="" class="field-icon" />
           </template>
@@ -51,13 +51,13 @@
         </div>
 
         <oort-popup v-model="showStartDatePicker" position="bottom">
-          <van-date-picker @confirm="onStartDateConfirm" @cancel="showStartDatePicker = false" />
+          <van-date-picker v-model="startDateParts" @confirm="onStartDateConfirm" @cancel="showStartDatePicker = false" />
         </oort-popup>
         <oort-popup v-model="showStartTimePicker" position="bottom">
           <van-time-picker @confirm="onStartTimeConfirm" @cancel="showStartTimePicker = false" />
         </oort-popup>
         <oort-popup v-model="showEndDatePicker" position="bottom">
-          <van-date-picker @confirm="onEndDateConfirm" @cancel="showEndDatePicker = false" />
+          <van-date-picker v-model="endDateParts" @confirm="onEndDateConfirm" @cancel="showEndDatePicker = false" />
         </oort-popup>
         <oort-popup v-model="showEndTimePicker" position="bottom">
           <van-time-picker @confirm="onEndTimeConfirm" @cancel="showEndTimePicker = false" />
@@ -110,6 +110,22 @@
                 @finish="onAreaFinish"
               />
             </div>
+          </div>
+        </van-popup>
+
+        <!-- 单租户无区域服务，分析区域改为手填 -->
+        <van-popup v-model:show="showAreaInput" position="bottom" round>
+          <div class="area-input-popup">
+            <div class="area-input-header">
+              <span @click="showAreaInput = false">取消</span>
+              <span class="area-input-title">输入分析区域</span>
+              <span class="area-input-confirm" @click="onAreaInputConfirm">确定</span>
+            </div>
+            <van-field
+              v-model="areaInput"
+              placeholder="请输入分析区域名称"
+              class="area-input-field"
+            />
           </div>
         </van-popup>
 
@@ -248,6 +264,7 @@ import { getDeviceList } from '@/api/VLStreamCloud/device'
 import { saveVlsAnalysisk } from '@/api/VLStreamCloud/intelligentAnalysis'
 import { definitionDataGroupList } from '@/api/VLStreamCloud/region'
 import { useUserStore } from '@/store/modules/useraPaas'
+import config from '@/config'
 import { showToast } from 'vant'
 import fxmc from '@/assets/img/VLStreamCloud/fxsq/fxmc.png'
 import rq from '@/assets/img/VLStreamCloud/fxsq/rq.png'
@@ -260,6 +277,8 @@ import del from '@/assets/img/VLStreamCloud/fxsq/del.png'
 
 const emit = defineEmits(['close'])
 const store = useUserStore()
+// 单租户集群没有 apaas-location-service，区域级联拿不到数据，改为手填
+const isLocalAuth = config.authMode === 'local'
 
 const formData = ref({
   name: '',
@@ -276,8 +295,18 @@ const showStartDatePicker = ref(false)
 const showStartTimePicker = ref(false)
 const showEndDatePicker = ref(false)
 const showEndTimePicker = ref(false)
+// 日期选择器不传默认值会停在 min-date（2016-01-01），默认选今天
+const pad2 = (value: number) => String(value).padStart(2, '0')
+const todayParts = () => {
+  const d = new Date()
+  return [String(d.getFullYear()), pad2(d.getMonth() + 1), pad2(d.getDate())]
+}
+const startDateParts = ref(todayParts())
+const endDateParts = ref(todayParts())
 const showUploader = ref(false)
 const imgArr = ref<any[]>([])
+const showAreaInput = ref(false)
+const areaInput = ref('')
 
 // 分析区域列表（级联）
 const areaOptions = ref<any[]>([])
@@ -293,7 +322,9 @@ const tempCameras = ref<string[]>([])
 
 const fetchDevices = async() => {
   const params = {
-    accessToken: store.userInfo?.accessToken
+    accessToken: store.userInfo?.accessToken,
+    current: 1,
+    size: 500
   }
   const res: any = await getDeviceList(params)
   if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
@@ -305,6 +336,7 @@ const fetchDevices = async() => {
 
 // 获取分析区域列表（第一级）
 const fetchAreas = async() => {
+  if (isLocalAuth) return
   const params = {
     accessToken: store.userInfo?.accessToken,
     group_type: 1,
@@ -353,9 +385,22 @@ const removeArea = (index: number) => {
 }
 
 const onAddArea = () => {
+  if (isLocalAuth) {
+    showAreaInput.value = true
+    return
+  }
   tempAreaCascaderValue.value = areaCascaderValue.value
   tempAreaSelectedOptions.value = []
   showAreaPopup.value = true
+}
+
+const onAreaInputConfirm = () => {
+  const text = areaInput.value.trim()
+  if (text && !formData.value.areas.includes(text)) {
+    formData.value.areas = [text]
+  }
+  areaInput.value = ''
+  showAreaInput.value = false
 }
 
 // 级联点击时按当前节点
@@ -436,10 +481,20 @@ const onCameraCancel = () => {
 }
 
 const submit = async() => {
+  if (!formData.value.name) {
+    showToast({ type: 'fail', message: '请填写分析名称' })
+    return
+  }
+
   const hasStartDate = !!formData.value.startDate
   const hasStartTime = !!formData.value.startTime
   const hasEndDate = !!formData.value.endDate
   const hasEndTime = !!formData.value.endTime
+
+  if (!hasStartDate || !hasEndDate) {
+    showToast({ type: 'fail', message: '请选择开始和结束时间' })
+    return
+  }
 
   // 默认开始时间 00:00:00，结束时间 23:59:59
   const startDateTime = hasStartDate
@@ -449,6 +504,12 @@ const submit = async() => {
   const endDateTime = hasEndDate
     ? `${formData.value.endDate} ${hasEndTime ? formData.value.endTime : '23:59:59'}`
     : ''
+
+  // 格式固定为 YYYY-MM-DD HH:mm:ss，字符串比较即时间先后
+  if (endDateTime < startDateTime) {
+    showToast({ type: 'fail', message: '结束时间不能早于开始时间' })
+    return
+  }
 
   // 时间范围
   const timeRange =
@@ -856,5 +917,27 @@ onMounted(() => {
   :deep(.van-cell__right-icon){
     display: none;
   }
+}
+
+.area-input-popup {
+  padding: 12px 16px 20px;
+}
+
+.area-input-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #646566;
+  margin-bottom: 12px;
+}
+
+.area-input-title {
+  font-weight: 600;
+  color: #323233;
+}
+
+.area-input-confirm {
+  color: #1989fa;
 }
 </style>
