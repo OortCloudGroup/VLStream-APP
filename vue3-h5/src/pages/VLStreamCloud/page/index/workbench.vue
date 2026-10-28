@@ -9,7 +9,7 @@
         <!-- 顶部标题区域 -->
         <div class="header-section" :style="{ paddingTop: headerPaddingTop }">
           <h1 class="page-title">
-            工作台
+            {{ $t('工作台') }}
           </h1>
 
           <!-- 天气和个人信息卡片 -->
@@ -38,7 +38,7 @@
                   {{ pendingCount }}
                 </div>
                 <div class="status-label">
-                  待审批
+                  {{ $t('待审批') }}
                 </div>
               </div>
               <div class="status-card approved">
@@ -46,7 +46,7 @@
                   {{ approvedCount }}
                 </div>
                 <div class="status-label">
-                  已审批
+                  {{ $t('已审批') }}
                 </div>
               </div>
               <div class="status-card all">
@@ -54,7 +54,7 @@
                   {{ allCount }}
                 </div>
                 <div class="status-label">
-                  所有申请
+                  {{ $t('所有申请') }}
                 </div>
               </div>
             </div>
@@ -65,7 +65,7 @@
         <div class="functions-section">
           <div class="section-header">
             <div class="section-title">
-              常用功能
+              {{ $t('常用功能') }}
             </div>
           </div>
           <div class="functions-grid">
@@ -77,7 +77,7 @@
             >
               <img class="function-icon" :src="item.iconSvg" alt="" />
               <div class="function-label">
-                {{ item.label }}
+                {{ $t(item.label) }}
               </div>
             </div>
           </div>
@@ -87,10 +87,10 @@
         <div class="popular-devices-section">
           <div class="section-header">
             <div class="section-title">
-              热门设备
+              {{ $t('热门设备') }}
             </div>
             <div class="more-link" @click="handleMoreDevices">
-              更多 >
+              {{ $t('更多 >') }}
             </div>
           </div>
           <div class="devices-list">
@@ -114,22 +114,22 @@
         <div v-if="approvalList.length" class="approval-section">
           <div class="section-header">
             <div class="section-title">
-              我的待审批
+              {{ $t('我的待审批') }}
             </div>
             <div class="more-link" @click="handleMoreApprovals">
-              更多 >
+              {{ $t('更多 >') }}
             </div>
           </div>
           <div class="approval-table">
             <div class="approval-header">
               <div class="header-cell device-name-header">
-                设备名称
+                {{ $t('设备名称') }}
               </div>
               <div class="header-cell applicant-header">
-                申请人
+                {{ $t('申请人') }}
               </div>
               <div class="header-cell operation-header">
-                操作
+                {{ $t('操作') }}
               </div>
             </div>
             <div
@@ -145,10 +145,10 @@
               </div>
               <div class="approval-cell operation-cell">
                 <span class="approve-btn" @click="handleApprove(item)">
-                  同意
+                  {{ $t('同意') }}
                 </span>
                 <span class="reject-btn" @click="handleReject(item)">
-                  拒绝
+                  {{ $t('拒绝') }}
                 </span>
               </div>
             </div>
@@ -158,7 +158,11 @@
     </van-pull-refresh>
 
     <oort-popup v-model="showVideoDetail" position="right" style="width: 100%;height: 100%;" teleport="body">
-      <VideoViewDetail v-if="currentDevice" :device="currentDevice" @close="showVideoDetail = false" />
+      <CameraDetail
+        v-if="showVideoDetail && currentDevice"
+        :camera="currentDevice"
+        @close="showVideoDetail = false"
+      />
     </oort-popup>
   </div>
 </template>
@@ -166,11 +170,12 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store/modules/useraPaas'
 import { showToast } from 'vant'
 import OortPopup from '@/components/popup/oort_popup.vue'
-import VideoViewDetail from '@/pages/VLStreamCloud/page/components/videoPlaza/VideoViewDetail.vue'
-import { getDeviceList } from '@/api/VLStreamCloud/device'
+import CameraDetail from '@/pages/VLStreamCloud/page/components/cameraDetail/CameraDetail.vue'
+import { getWvpVlsDeviceList } from '@/api/VLStreamCloud/wvp'
 import { listTodoProcess, listFinishedProcess, listOwnProcess } from '@/api/processui'
 import bgImg from '@/assets/img/VLStreamCloud/bg.png'
 import sxjImg from '@/assets/img/VLStreamCloud/sxj.png'
@@ -190,6 +195,7 @@ import sphf from '@/assets/img/VLStreamCloud/sphf.png'
 
 const router = useRouter()
 const store = useUserStore()
+const { t } = useI18n()
 
 // 热门设备的播放按钮打开设备详情
 const showVideoDetail = ref(false)
@@ -209,7 +215,7 @@ const computeHeaderPadding = () => {
 }
 
 // 用户名
-const userName = ref(store.userInfo.userName || '用户')
+const userName = ref(store.userInfo.userName || t('用户'))
 
 // 下拉刷新状态
 const isLoading = ref(false)
@@ -219,7 +225,7 @@ const now = ref(new Date())
 const weatherTemp = ref('--°C')
 let clockTimer = null
 
-const weekLabels = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
+const weekLabels = computed(() => [t('星期日'), t('星期一'), t('星期二'), t('星期三'), t('星期四'), t('星期五'), t('星期六')])
 const pad2 = (value) => String(value).padStart(2, '0')
 
 const currentDate = computed(() => {
@@ -234,16 +240,16 @@ const currentTime = computed(() => {
 
 const currentDay = computed(() => {
   const date = now.value
-  return weekLabels[date.getDay()]
+  return weekLabels.value[date.getDay()]
 })
 
 const greetingText = computed(() => {
   const hour = now.value.getHours()
-  if (hour >= 5 && hour < 12) return '早上好'
-  if (hour >= 12 && hour < 14) return '中午好'
-  if (hour >= 14 && hour < 18) return '下午好'
-  if (hour >= 18 && hour < 23) return '晚上好'
-  return '夜深了'
+  if (hour >= 5 && hour < 12) return t('早上好')
+  if (hour >= 12 && hour < 14) return t('中午好')
+  if (hour >= 14 && hour < 18) return t('下午好')
+  if (hour >= 18 && hour < 23) return t('晚上好')
+  return t('夜深了')
 })
 
 const updateNow = () => {
@@ -299,50 +305,62 @@ const fetchWeather = async() => {
 // 功能列表
 const functionList = ref([
   {
+    key: 'square',
     label: '视频广场',
     iconSvg: spgc
   },
   {
+    key: 'govern',
     label: '场景治理',
     iconSvg: cjzl
   },
   {
+    key: 'event',
     label: '事件管理',
     iconSvg: sjgl
   },
   {
+    key: 'algo',
     label: '算法超市',
     iconSvg: sfcs
   },
   {
+    key: 'annotation',
     label: '算法标注',
     iconSvg: sfbz
   },
   {
+    key: 'tag',
     label: '标签管理',
     iconSvg: bqgl
   },
   {
+    key: 'playback',
     label: '视频回放',
     iconSvg: sphf
   },
   {
+    key: 'device',
     label: '设备管理',
     iconSvg: sbgl
   },
   {
+    key: 'training',
     label: '算法训练',
     iconSvg: sfxl
   },
   {
+    key: 'orchestration',
     label: '算法编排',
     iconSvg: sfbp
   },
   {
+    key: 'log',
     label: '操作日志',
     iconSvg: czrz
   },
   {
+    key: 'service',
     label: '服务中心',
     iconSvg: fwzx
   }
@@ -351,16 +369,11 @@ const functionList = ref([
 // 热门设备列表
 const popularDevices = ref([])
 
-// 获取热门设备
+// 获取热门设备（与视频广场同源，直接取 WVP 设备行，播放可打开摄像头详情）
 const fetchPopularDevices = async() => {
-  const params = {
-    accessToken: store.userInfo?.accessToken,
-    page: 1,
-    size: 10
-  }
-  const res = await getDeviceList(params)
-  if (res.code === 200 && res.data && Array.isArray(res.data.records)) {
-    popularDevices.value = res.data.records.map((item) => ({
+  const res = await getWvpVlsDeviceList({ pageNum: 1, pageSize: 10 })
+  if (res.code === 200 && Array.isArray(res.rows)) {
+    popularDevices.value = res.rows.map((item) => ({
       id: item.id,
       name: item.deviceName,
       ...item
@@ -442,14 +455,14 @@ onMounted(() => {
 // 处理功能点击
 const handleFunctionClick = (item) => {
   const videoTabMap = {
-    视频广场: 'square',
-    场景治理: 'govern',
-    视频回放: 'playback',
-    设备管理: 'device',
-    算法超市: 'algo'
+    square: 'square',
+    govern: 'govern',
+    playback: 'playback',
+    device: 'device',
+    algo: 'algo'
   }
 
-  const topTab = videoTabMap[item.label]
+  const topTab = videoTabMap[item.key]
 
   if (topTab) {
     router.push({
@@ -461,13 +474,13 @@ const handleFunctionClick = (item) => {
     return
   }
 
-  if (item.label === '事件管理') {
+  if (item.key === 'event') {
     router.push('/event')
     return
   }
 
   // 算法标注 / 标签管理 / 算法训练 / 算法编排 / 操作日志 / 服务中心 只有 PC 端才有
-  showToast('移动端暂不支持该功能')
+  showToast(t('移动端暂不支持该功能'))
 }
 
 // 处理播放
@@ -494,12 +507,12 @@ const handleMoreApprovals = () => {
 // 处理同意
 const handleApprove = (item) => {
   // 审批需要选择下一节点审批人，移动端只做展示，走 PC 端
-  showToast(`审批「${item.deviceName}」请前往 PC 端处理`)
+  showToast(t('审批「{name}」请前往 PC 端处理', { name: item.deviceName }))
 }
 
 // 处理拒绝
 const handleReject = (item) => {
-  showToast(`审批「${item.deviceName}」请前往 PC 端处理`)
+  showToast(t('审批「{name}」请前往 PC 端处理', { name: item.deviceName }))
 }
 
 // 下拉刷新
