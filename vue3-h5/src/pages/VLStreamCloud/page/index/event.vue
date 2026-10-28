@@ -7,6 +7,13 @@
       <div class="top-title">
         事件
       </div>
+      <van-icon
+        class="header-search"
+        name="search"
+        size="22"
+        color="#333333"
+        @click="toggleSearch"
+      />
     </div>
 
     <div class="page-content">
@@ -18,10 +25,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import bgImg from '@/assets/img/VLStreamCloud/bg.png'
+import bus from '@/utils/bus'
 import eventPat from '@/pages/VLStreamCloud/page/components/event/eventPat.vue'
 
 // 事件类型 1:事件拍传 2:主动安全
 const currentModType = ref(2)
+
+// 事件列表页内搜索（eventPat 监听 toggleSearch 切换搜索框）
+const toggleSearch = () => {
+  bus.$emit('toggleSearch')
+}
 </script>
 
 <style lang="scss" scoped>
@@ -48,6 +61,9 @@ const currentModType = ref(2)
   position: relative;
   z-index: 1;
   padding-top: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .top-title {
