@@ -8,11 +8,11 @@
 !-->
 <template>
   <div class="page_container">
-    <nav-header-banner title="联系我们" />
+    <nav-header-banner :title="$t('联系我们')" />
     <div class="contactUS_body">
       <div class="contactUS_body_text">
-        <span>技术支持： <span style="color: #2d8cf0">{{ appInfo?.phone }}</span></span>
-        <span>运维支持： <span style="color: #2d8cf0">{{ appInfo?.operate_phone }}</span></span>
+        <span>{{ $t('技术支持：') }}<span style="color: #2d8cf0">zhanglimin@oortcloudsmart.com</span></span>
+        <span>{{ $t('运维支持：') }}<span style="color: #2d8cf0">zhanglimin@oortcloudsmart.com</span></span>
         <span>{{ appInfo?.develop_unit }}</span>
       </div>
     </div>
