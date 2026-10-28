@@ -1,46 +1,68 @@
 {
-  "app": {
-    "signingConfigs": [],
-    "products": [
+  app: {
+    signingConfigs: [
       {
-        "name": "default",
-        "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.1(13)",
-        "targetSdkVersion": "6.1.1(24)",
-        "runtimeOS": "HarmonyOS",
-        "buildOption": {
-          "strictMode": {
-            "caseSensitiveCheck": true,
-            "useNormalizedOHMUrl": true
-          }
-        }
-      }
+        name: 'default',
+        type: 'HarmonyOS',
+        material: {
+          certpath: 'C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_Qr8ZSlR1zCT8ELXxtBF8icaynHwpP3lLbSk89lOCW30=.cer',
+          keyAlias: 'debugKey',
+          keyPassword: '0000001bb360043fdc2a687781470a159add3a2b92d09b692222b96454c7ee28a84167ef0592e45a2c3dfa',
+          profile: 'C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_Qr8ZSlR1zCT8ELXxtBF8icaynHwpP3lLbSk89lOCW30=.p7b',
+          signAlg: 'SHA256withECDSA',
+          storeFile: 'C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_Qr8ZSlR1zCT8ELXxtBF8icaynHwpP3lLbSk89lOCW30=.p12',
+          storePassword: '0000001bb360043fdc2a687781470a159add3a2b92d09b692222b96454c7ee28a84167ef0592e45a2c3dfa',
+        },
+      },
     ],
-    "buildModeSet": [
-      { "name": "debug" },
-      { "name": "release" }
-    ]
+    products: [
+      {
+        name: 'default',
+        signingConfig: 'default',
+        compatibleSdkVersion: '5.0.1(13)',
+        targetSdkVersion: '6.1.1(24)',
+        runtimeOS: 'HarmonyOS',
+        buildOption: {
+          strictMode: {
+            caseSensitiveCheck: true,
+            useNormalizedOHMUrl: true,
+          },
+        },
+      },
+    ],
+    buildModeSet: [
+      {
+        name: 'debug',
+      },
+      {
+        name: 'release',
+      },
+    ],
   },
-  "modules": [
+  modules: [
     {
-      "name": "entry",
-      "srcPath": "./entry",
-      "targets": [
+      name: 'entry',
+      srcPath: './entry',
+      targets: [
         {
-          "name": "default",
-          "applyToProducts": ["default"]
-        }
-      ]
+          name: 'default',
+          applyToProducts: [
+            'default',
+          ],
+        },
+      ],
     },
     {
-      "name": "capacitor",
-      "srcPath": "./capacitor",
-      "targets": [
+      name: 'capacitor',
+      srcPath: './capacitor',
+      targets: [
         {
-          "name": "default",
-          "applyToProducts": ["default"]
-        }
-      ]
-    }
-  ]
+          name: 'default',
+          applyToProducts: [
+            'default',
+          ],
+        },
+      ],
+    },
+  ],
 }
