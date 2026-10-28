@@ -112,7 +112,7 @@ export function formatDateToHM(value) {
   }
   const date = new Date(value)
   const dateNumFun = (num) => num < 10 ? `0${num}` : num
-  const [Y, M, D, h, m, s] = [
+  const [, , , h, m] = [
     date.getFullYear(),
     dateNumFun(date.getMonth() + 1),
     dateNumFun(date.getDate()),

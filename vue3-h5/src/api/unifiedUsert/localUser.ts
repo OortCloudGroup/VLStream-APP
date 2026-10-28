@@ -24,7 +24,7 @@ function toApaaSUser(user: any) {
     photo: absAvatar(user.avatar),
     dept_id: user.deptId ? String(user.deptId) : '',
     dept_name: user.deptName || '',
-    user_detail: { ex_data: { realName: user.nickName || '' } }
+    user_detail: { ex_data: { realName: user.nickName || '' }}
   }
 }
 
@@ -43,7 +43,7 @@ export async function localGetUserList(data: any) {
   const raw = (data && data.user_id) || []
   const ids: string[] = (Array.isArray(raw) ? raw : [raw]).map(String).filter(Boolean)
   const matched = ids.length ? list.filter(user => ids.includes(user.user_id)) : list
-  return { code: 200, msg: '成功', data: { list: matched, count: matched.length } }
+  return { code: 200, msg: '成功', data: { list: matched, count: matched.length }}
 }
 
 /** 对应 aPaaS sso/v1/getUserInfoByUserId：单个用户详情 */
@@ -51,7 +51,7 @@ export async function localGetUserInfoByUserId(data: any) {
   const userId = data && data.user_id
   const matched = userId
     ? await localGetUserList({ user_id: [userId] })
-    : { data: { list: [] } }
+    : { data: { list: [] }}
   const user = matched.data.list[0]
   return user
     ? { code: 200, msg: '成功', data: user }
@@ -84,7 +84,7 @@ export async function localGetDeptUser() {
       orphanUsers.push(user)
       return
     }
-    ;(usersByDept[user.dept_id] = usersByDept[user.dept_id] || []).push(user)
+    (usersByDept[user.dept_id] = usersByDept[user.dept_id] || []).push(user)
   })
   const roots: DeptNode[] = (treeRes && treeRes.code === 200 ? treeRes.data || [] : [])
     .map((raw: any) => buildNode(raw, usersByDept))
@@ -92,5 +92,5 @@ export async function localGetDeptUser() {
     roots.push({ dept_id: '', dept_name: '所有', dept_photo: '', son_dept: [], users: [] })
   }
   roots[0].users = roots[0].users.concat(orphanUsers)
-  return { code: 200, msg: '成功', data: { list: roots, count: users.length } }
+  return { code: 200, msg: '成功', data: { list: roots, count: users.length }}
 }
