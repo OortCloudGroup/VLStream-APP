@@ -13,9 +13,7 @@
                 事件类型：
               </div>
               <div class="info-content">
-                <span v-if="taskData.mod_status===1">真实告警</span>
-                <span v-if="taskData.mod_status===2">维保</span>
-                <span v-if="taskData.mod_status===3">误报</span>
+                {{ eventType }}
               </div>
             </div>
             <div class="task-desc">
@@ -24,10 +22,10 @@
                 事件位置：
               </div>
               <div class="info-content">
-                {{ taskData.point?.address }}
+                {{ eventLocation }}
               </div>
               <img
-                v-if="taskData.point?.address"
+                v-if="hasLocation"
                 class="event_arrow"
                 src="@/assets/img/eventMana/event_arrow.png"
                 alt=""
@@ -47,6 +45,15 @@
               <div class="info-lable flexRowAC">
                 <img src="@/assets/img/eventMana/service_id1.png" alt="" />
                 设备ID：
+              </div>
+              <div class="info-content">
+                {{ taskData.device_id }}
+              </div>
+            </div>
+            <div class="task-desc">
+              <div class="info-lable flexRowAC">
+                <img src="@/assets/img/eventMana/event_desc.png" alt="" />
+                事件描述：
               </div>
               <div class="info-content">
                 {{ taskData.describe }}
@@ -76,16 +83,18 @@
                 录制视频：
               </div>
               <div class="info-content">
-                <div v-if="taskData.video" class="image-grid">
-                  <div
-                    v-for="(img, index) in taskData.video"
+                <div v-if="eventVideos.length" class="video-list">
+                  <video
+                    v-for="(url, index) in eventVideos"
                     :key="index"
-                    class="image-item"
-                    @click="previewImageHandler(img)"
-                  >
-                    <oort_image :src="img" alt="事件图片" />
-                  </div>
+                    class="event-video"
+                    :src="url"
+                    controls
+                    playsinline
+                    preload="metadata"
+                  />
                 </div>
+                <span v-else class="empty-value">未录制</span>
               </div>
             </div>
             <div class="task-desc">
@@ -192,7 +201,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
 import { showToast } from 'vant'
@@ -202,6 +211,7 @@ import event2 from '@/assets/img/commandDispatch/event2.png'
 import { event_info } from '@/api/eventManagement'
 import { useUserStore } from '@/store/modules/useraPaas'
 import Oort_image from '@/components/image/oort_image.vue'
+import { eventLocationText, eventTypeText, eventVideoSources, hasEventLocation } from '@/utils/eventDisplay'
 
 const store = useUserStore()
 const route = useRoute()
@@ -217,6 +227,11 @@ const eventImages = ref([
   event1,
   event2
 ])
+
+const eventType = computed(() => eventTypeText(taskData.value?.mod_status))
+const eventLocation = computed(() => eventLocationText(taskData.value?.point))
+const hasLocation = computed(() => hasEventLocation(taskData.value?.point))
+const eventVideos = computed(() => eventVideoSources(taskData.value))
 
 // 处理从oort_uploader组件获取的图片URL
 const getImg = (files, imgUrl) => {
@@ -278,8 +293,8 @@ onMounted(() => {
         let data = route.query.task
         event_listFn(data?.id)
       }
-    } catch (error) {
-      console.error('解析任务数据失败:', error)
+    } catch (e) {
+      // 路由参数不是合法 JSON 时保持页面空态
     }
   }
 })
@@ -513,6 +528,25 @@ onMounted(() => {
     width: 100%;
     height: 100%;
     /* object-fit: cover; */
+}
+
+.video-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.event-video {
+    width: 100%;
+    max-width: 320px;
+    border-radius: 8px;
+    background: #000;
+    display: block;
+}
+
+.empty-value {
+    color: #999999;
 }
 
 .image-item {

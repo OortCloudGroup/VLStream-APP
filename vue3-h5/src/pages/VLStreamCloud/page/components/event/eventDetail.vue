@@ -31,10 +31,10 @@
                 事件位置：
               </div>
               <div class="info-content">
-                {{ taskData.point?.address }}
+                {{ eventLocation }}
               </div>
               <img
-                v-if="taskData.point?.address"
+                v-if="hasLocation"
                 class="event_arrow"
                 src="@/assets/img/eventMana/event_arrow.png"
                 alt=""
@@ -209,7 +209,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
 import { showToast } from 'vant'
@@ -221,6 +221,7 @@ import { useUserStore } from '@/store/modules/useraPaas'
 import ID2Name from '@/components/ID2Name.vue'
 import ID2HeadPicMobile from '@/components/ID2HeadPic.vue'
 import Oort_image from '@/components/image/oort_image.vue'
+import { eventLocationText, hasEventLocation } from '@/utils/eventDisplay'
 
 const store = useUserStore()
 const route = useRoute()
@@ -236,6 +237,9 @@ const eventImages = ref([
   event1,
   event2
 ])
+
+const eventLocation = computed(() => eventLocationText(taskData.value?.point))
+const hasLocation = computed(() => hasEventLocation(taskData.value?.point))
 
 // 处理从oort_uploader组件获取的图片URL
 const getImg = (files, imgUrl) => {
@@ -297,8 +301,8 @@ onMounted(() => {
         let data = route.query.task
         event_listFn(data?.id)
       }
-    } catch (error) {
-      console.error('解析任务数据失败:', error)
+    } catch (e) {
+      // 路由参数不是合法 JSON 时保持页面空态
     }
   }
 })

@@ -71,10 +71,10 @@
                       任务位置：
                     </div>
                     <div class="info-content">
-                      {{ task.point?.address }}
+                      {{ eventLocationText(task.point) }}
                     </div>
                     <img
-                      v-if="task.point?.address"
+                      v-if="hasEventLocation(task.point)"
                       class="event_arrow"
                       src="@/assets/img/eventMana/event_arrow.png"
                       alt=""
@@ -111,10 +111,10 @@
                       事件位置：
                     </div>
                     <div class="info-content">
-                      {{ task.point?.address }}
+                      {{ eventLocationText(task.point) }}
                     </div>
                     <img
-                      v-if="task.point?.address"
+                      v-if="hasEventLocation(task.point)"
                       class="event_arrow"
                       src="@/assets/img/eventMana/event_arrow.png"
                       alt=""
@@ -172,6 +172,7 @@ import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/modules/useraPaas'
 import { event_list, myevent_list } from '@/api/eventManagement'
+import { eventLocationText, hasEventLocation } from '@/utils/eventDisplay'
 import ID2HeadPicMobile from '@/components/ID2HeadPic.vue'
 import ID2Name from '@/components/ID2Name.vue'
 import bus from '@/utils/bus'
@@ -189,7 +190,7 @@ const pageSize = ref(10)
 const taskStatus = ref(0) // 默认显示全部任务，可切换为2、1
 const mod_status = ref(0) // 事件状态 1:待确认 2:已确认 0:全部(默认) 只有mod_type=2时,才有效
 let allTasks = ref([])
-let mod_type = ref(undefined) // 事件类型 1:事件拍传 2:主动安全
+let mod_type = ref(props.event === undefined || props.event === null ? undefined : Number(props.event)) // 事件类型 1:事件拍传 2:主动安全
 const showSearch = ref(false) // 搜索框显示状态
 const searchValue = ref('') // 搜索关键词
 
