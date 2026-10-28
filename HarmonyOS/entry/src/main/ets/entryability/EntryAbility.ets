@@ -15,13 +15,20 @@ export default class EntryAbility extends UIAbility {
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
-    // 沉浸式：内容延伸到状态栏，并把状态栏高度(vp)存 AppStorage 供 plugin 读取
+    // Non-immersive: the window avoids the status bar so H5 content never draws under it
     try {
       const mainWin: window.Window = windowStage.getMainWindowSync();
-      mainWin.setWindowLayoutFullScreen(true);
+      mainWin.setWindowLayoutFullScreen(false);
+      // Light status bar background with dark icons, matching the H5 page background
+      const barProps: window.SystemBarProperties = {
+        statusBarColor: '#F9FAFF',
+        statusBarContentColor: '#000000'
+      };
+      mainWin.setWindowSystemBarProperties(barProps);
+      // Store the status bar avoid-area height (vp) in AppStorage for the plugin to inject into H5 (0 when not fullscreen)
       const avoid: window.AvoidArea = mainWin.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM);
       const topPx: number = avoid.topRect.height;
-      // 用 display 的 densityPixels（pixels per vp）换算 vp
+      // Convert px to vp using the display density (pixels per vp)
       const density: number = display.getDefaultDisplaySync().densityPixels;
       const topVp: number = density > 0 ? topPx / density : 0;
       AppStorage.setOrCreate<number>('__safeAreaTop', topVp);
