@@ -111,7 +111,7 @@
         </div>
 
         <!-- 我的待审批区域 -->
-        <div class="approval-section">
+        <div v-if="approvalList.length" class="approval-section">
           <div class="section-header">
             <div class="section-title">
               我的待审批
@@ -156,6 +156,10 @@
         </div>
       </div>
     </van-pull-refresh>
+
+    <oort-popup v-model="showVideoDetail" position="right" style="width: 100%;height: 100%;" teleport="body">
+      <VideoViewDetail v-if="currentDevice" :device="currentDevice" @close="showVideoDetail = false" />
+    </oort-popup>
   </div>
 </template>
 
@@ -163,6 +167,9 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/modules/useraPaas'
+import { showToast } from 'vant'
+import OortPopup from '@/components/popup/oort_popup.vue'
+import VideoViewDetail from '@/pages/VLStreamCloud/page/components/videoPlaza/VideoViewDetail.vue'
 import { getDeviceList } from '@/api/VLStreamCloud/device'
 import { listTodoProcess, listFinishedProcess, listOwnProcess } from '@/api/processui'
 import bgImg from '@/assets/img/VLStreamCloud/bg.png'
@@ -183,6 +190,10 @@ import sphf from '@/assets/img/VLStreamCloud/sphf.png'
 
 const router = useRouter()
 const store = useUserStore()
+
+// 热门设备的播放按钮打开设备详情
+const showVideoDetail = ref(false)
+const currentDevice = ref(null)
 
 // 沉浸式状态栏适配：原生壳注入 window.__safeAreaTop（CSS px），
 // 非原生环境（浏览器/PC）留少量默认留白。
@@ -449,36 +460,46 @@ const handleFunctionClick = (item) => {
     })
     return
   }
+
+  if (item.label === '事件管理') {
+    router.push('/event')
+    return
+  }
+
+  // 算法标注 / 标签管理 / 算法训练 / 算法编排 / 操作日志 / 服务中心 只有 PC 端才有
+  showToast('移动端暂不支持该功能')
 }
 
 // 处理播放
 const handlePlay = (device) => {
-  // eslint-disable-next-line no-console
-  console.log('播放设备:', device.name)
+  currentDevice.value = device
+  showVideoDetail.value = true
 }
 
 // 处理更多设备
 const handleMoreDevices = () => {
-  // eslint-disable-next-line no-console
-  console.log('查看更多设备')
+  router.push({
+    path: '/video',
+    query: {
+      topTab: 'square'
+    }
+  })
 }
 
 // 处理更多审批
 const handleMoreApprovals = () => {
-  // eslint-disable-next-line no-console
-  console.log('查看更多审批')
+  router.push('/myWorkorder')
 }
 
 // 处理同意
 const handleApprove = (item) => {
-  // eslint-disable-next-line no-console
-  console.log('同意审批:', item)
+  // 审批需要选择下一节点审批人，移动端只做展示，走 PC 端
+  showToast(`审批「${item.deviceName}」请前往 PC 端处理`)
 }
 
 // 处理拒绝
 const handleReject = (item) => {
-  // eslint-disable-next-line no-console
-  console.log('拒绝审批:', item)
+  showToast(`审批「${item.deviceName}」请前往 PC 端处理`)
 }
 
 // 下拉刷新

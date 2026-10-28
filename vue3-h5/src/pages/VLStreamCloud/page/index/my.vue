@@ -44,12 +44,22 @@
         </div>
       </div>
     </div>
+
+    <van-action-sheet
+      v-model:show="showSettings"
+      :actions="settingsActions"
+      cancel-text="取消"
+      @select="onSettingsSelect"
+    />
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { showConfirmDialog } from 'vant'
 import { useUserStore } from '@/store/modules/useraPaas'
+import config from '@/config'
 import bgImg from '@/assets/img/VLStreamCloud/bg.png'
 import helpImg from '@/assets/img/VLStreamCloud/mine/bz.png'
 import aboutImg from '@/assets/img/VLStreamCloud/mine/gywm.png'
@@ -59,7 +69,7 @@ import OortImage from '@/components/image/oort_image.vue'
 
 // 用户信息
 const store = useUserStore()
-console.log(store)
+const router = useRouter()
 const displayName = computed(() => store.userInfo?.userName || '--')
 const displayPhone = computed(() => store.userInfo?.phone || '--')
 const displayDept = computed(() => store.userInfo?.deptName || '--')
@@ -71,10 +81,41 @@ const menuItems = [
   { key: 'settings', title: '设置', icon: settingImg }
 ]
 
+const showSettings = ref(false)
+const settingsActions = [{ name: '退出登录' }]
+
 const onMenuClick = (item) => {
-  // 这里根据实际路由或业务跳转
-  // eslint-disable-next-line no-console
-  console.log('click my menu:', item.key)
+  if (item.key === 'help') {
+    router.push('/contactUS')
+    return
+  }
+  if (item.key === 'about') {
+    router.push('/aboutAppPage')
+    return
+  }
+  if (item.key === 'settings') {
+    showSettings.value = true
+  }
+}
+
+const onSettingsSelect = async() => {
+  showSettings.value = false
+  try {
+    await showConfirmDialog({ title: '提示', message: '确认退出登录？' })
+  } catch (e) {
+    return
+  }
+
+  // 单租户集群没有 apaas-sso，服务端 logout 接口不存在，只清本地登录态
+  if (config.authMode !== 'local') {
+    try {
+      await store.loginOut(store.getStoreToken())
+    } catch (e) {
+      // 服务端退出失败也要清掉本地，避免停在登录态
+    }
+  }
+  store.removeStoreToken()
+  location.reload()
 }
 </script>
 
