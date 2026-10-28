@@ -6,14 +6,14 @@
       @refresh="onRefresh"
     >
       <van-list
-        v-if="devices.length"
+        v-if="showDevices.length"
         v-model:loading="loading"
         :finished="finished"
         finished-text="没有更多了"
         @load="onLoad"
       >
         <div
-          v-for="item in devices"
+          v-for="item in showDevices"
           :key="item.id"
           class="playback-card"
           @click="openDetail(item)"
@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import VideoPlaybackDetail from './VideoPlaybackDetail.vue'
 import { getDeviceList } from '@/api/VLStreamCloud/device'
@@ -91,7 +91,24 @@ import { useUserStore } from '@/store/modules/useraPaas'
 
 const store = useUserStore()
 
+const props = defineProps({
+  keyword: {
+    type: String,
+    default: ''
+  }
+})
+
 const devices = ref<any[]>([])
+
+// 后端 /vlsDeviceInfo/list 不支持关键字过滤，统一在前端按设备名称/设备ID匹配
+const showDevices = computed(() => {
+  const kw = (props.keyword || '').trim().toLowerCase()
+  if (!kw) return devices.value
+  return devices.value.filter(item =>
+    String(item.deviceName || '').toLowerCase().includes(kw) ||
+    String(item.deviceId || '').toLowerCase().includes(kw)
+  )
+})
 
 // 分页 & 刷新状态
 const refreshing = ref(false)

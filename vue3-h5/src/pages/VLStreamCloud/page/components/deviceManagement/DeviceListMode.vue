@@ -15,7 +15,7 @@
 
       <div class="table-body">
         <div
-          v-for="row in rows"
+          v-for="row in filteredRows"
           :key="row.id"
           class="table-row"
           @click="openDetail(row)"
@@ -52,16 +52,22 @@
         v-if="showDetail"
         :device-id="currentRow.id"
         @deleted="handleDeleted"
+        @saved="fetchDevices"
         @close="showDetail = false"
       />
+    </oort-popup>
+
+    <oort-popup v-model="showAdd" position="right" style="width: 100%;height: 100%;" teleport="body">
+      <EditDevice v-if="showAdd" @saved="fetchDevices" @close="showAdd = false" />
     </oort-popup>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import DeviceDetailTabs from '../deviceManagement/DeviceDetailTabs.vue'
+import EditDevice from '../deviceManagement/EditDevice.vue'
 import { getDeviceList } from '@/api/VLStreamCloud/device'
 import { useUserStore } from '@/store/modules/useraPaas'
 
@@ -69,6 +75,10 @@ const props = defineProps({
   tagName: {
     type: String,
     default: null
+  },
+  keyword: {
+    type: String,
+    default: ''
   }
 })
 
@@ -76,9 +86,21 @@ const store = useUserStore()
 
 const rows = ref([])
 
+// 后端 /vlsDeviceInfo/list 只按实体字段精确匹配，关键字统一在前缀匹配上做
+const filteredRows = computed(() => {
+  const kw = (props.keyword || '').trim().toLowerCase()
+  if (!kw) return rows.value
+  return rows.value.filter(row =>
+    String(row.deviceName || '').toLowerCase().includes(kw) ||
+    String(row.deviceId || '').toLowerCase().includes(kw)
+  )
+})
+
 const fetchDevices = async() => {
   const params = {
-    accessToken: store.userInfo?.accessToken
+    accessToken: store.userInfo?.accessToken,
+    current: 1,
+    size: 200
   }
   // 如果传入了 tagName，则添加到请求参数中
   if (props.tagName) {
@@ -103,6 +125,7 @@ watch(
 )
 
 const showDetail = ref(false)
+const showAdd = ref(false)
 const currentRow = ref({})
 
 const openDetail = (row) => {
@@ -111,6 +134,7 @@ const openDetail = (row) => {
 }
 
 const onAdd = () => {
+  showAdd.value = true
 }
 
 const handleDeleted = () => {

@@ -1,6 +1,6 @@
 <template>
   <div class="edit-device">
-    <nav-header-banner title="编辑设备" :is-call-back="true" @call-back="onBack">
+    <nav-header-banner :title="isCreate ? '新增设备' : '编辑设备'" :is-call-back="true" @call-back="onBack">
       <span class="header-save" @click="onSave">保存</span>
     </nav-header-banner>
     <div class="edit_content">
@@ -94,10 +94,11 @@
 
         <!-- 设备ID -->
         <van-field
-          :model-value="form.deviceId"
+          v-model="form.deviceId"
           placeholder="请输入设备ID"
           label-align="top"
           class="field-item"
+          :readonly="!isCreate"
         >
           <template #label>
             <div class="field-label">
@@ -114,10 +115,17 @@
             <span class="image-title">图片路径</span>
           </div>
           <div class="image-cover flexRowAC">
-            <div class="uploadBox flexRowAC" @click="showUploader = true">
+            <div v-if="!isLocalAuth" class="uploadBox flexRowAC" @click="showUploader = true">
               <img :src="sctp" alt="" />
               上传图片
             </div>
+            <input
+              v-else
+              v-model="form.imageUrl"
+              class="url-input"
+              placeholder="请输入图片地址"
+              @blur="onImageUrlBlur"
+            />
             <template v-if="imgArr && imgArr.length">
               <div class="img1 d">
                 <oort_image class="img1" :src="imgArr[0].url" alt="" />
@@ -140,7 +148,22 @@
             </div>
           </template>
           <template #input>
-            <div class="coord-row" @click="openSelectPoint">
+            <div v-if="isLocalAuth" class="coord-row">
+              <input
+                v-model="form.longitude"
+                class="coord-input"
+                type="digit"
+                placeholder="输入经度"
+              />
+              <span class="coord-split">-</span>
+              <input
+                v-model="form.latitude"
+                class="coord-input"
+                type="digit"
+                placeholder="输入纬度"
+              />
+            </div>
+            <div v-else class="coord-row" @click="openSelectPoint">
               <span class="coord-text">{{ form.longitude || '输入经度' }}</span>
               <span class="coord-split">-</span>
               <span class="coord-text">{{ form.latitude || '输入纬度' }}</span>
@@ -273,10 +296,12 @@
 </template>
 
 <script setup>
-import { reactive, onMounted, ref } from 'vue'
+import { reactive, onMounted, ref, computed } from 'vue'
 import { useCascaderAreaData } from '@vant/area-data'
+import { showToast } from 'vant'
 import CommonExpressions from '@/components/commonExpressions.vue'
-import { getDeviceDetail, updateDevice } from '@/api/VLStreamCloud/device'
+import config from '@/config'
+import { createDevice, getDeviceDetail, updateDevice } from '@/api/VLStreamCloud/device'
 import { getVlsTagManagement } from '@/api/VLStreamCloud/tag'
 import OortUploader from '@/components/uploader/oort_uploader.vue'
 import Oort_image from '@/components/image/oort_image.vue'
@@ -307,6 +332,10 @@ const props = defineProps({
 
 const store = useUserStore()
 const emit = defineEmits(['close', 'saved'])
+
+// 单租户集群没有 apaas-map-server / apaas-fastdfsservice，选点与上传都不可用
+const isLocalAuth = config.authMode === 'local'
+const isCreate = computed(() => !props.deviceId && !props.device?.id)
 
 const form = reactive({
   name: '',
@@ -435,8 +464,31 @@ const onSelectContent = (content) => {
 
 const onSave = async() => {
   const id = props.deviceId || props.device?.id
+  const tagText = form.tags && form.tags.length ? form.tags.join(',') : ''
+  const commonFields = {
+    deviceName: form.name,
+    streamUrl: form.streamUrl,
+    imagePath: form.imageUrl,
+    address: form.address,
+    longitude: form.longitude,
+    latitude: form.latitude,
+    region: form.regions && form.regions.length ? form.regions[0] : '',
+    remark: form.remark,
+    isPublic: form.isPublic ? 1 : 0,
+    tag: tagText
+  }
+
   if (!id) {
-    emit('close')
+    // 新增：POST /vlsDeviceInfo 由服务端生成主键，设备编号需手工填写
+    if (!form.name) return showToast('请输入设备名称')
+    if (!form.deviceId) return showToast('请输入设备ID')
+    if (!form.streamUrl) return showToast('请输入视频流路径')
+    const res = await createDevice({ ...commonFields, deviceId: form.deviceId, selectedTags: form.tags })
+    if (res.code === 200) {
+      showToast('新增成功')
+      emit('saved')
+      emit('close')
+    }
     return
   }
 
@@ -444,6 +496,7 @@ const onSave = async() => {
 
   const payload = {
     ...d,
+    ...commonFields,
     deviceName: form.name || d.deviceName,
     streamUrl: form.streamUrl || d.streamUrl,
     imagePath: form.imageUrl || d.imagePath,
@@ -452,8 +505,6 @@ const onSave = async() => {
     latitude: form.latitude ?? d.latitude,
     region: form.regions && form.regions.length ? form.regions[0] : d.region,
     remark: form.remark || d.remark,
-    isPublic: form.isPublic ? 1 : 0,
-    tag: form.tags && form.tags.length ? form.tags.join(',') : '',
     selectedTags: form.tags && form.tags.length ? form.tags : []
   }
 
@@ -466,6 +517,11 @@ const onSave = async() => {
 
 const openSelectPoint = () => {
   showSelectPoint.value = true
+}
+
+// 单租户下图片用手填地址，失焦时同步预览
+const onImageUrlBlur = () => {
+  imgArr.value = form.imageUrl ? [{ url: form.imageUrl }] : []
 }
 
 const onSelectPointConfirm = (result) => {
@@ -644,6 +700,30 @@ const onBack = () => {
 
 .coord-split {
   color: #999;
+}
+
+.coord-input {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #e3e7f0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+  background: #fff;
+}
+
+.url-input {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #e3e7f0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+  background: #fff;
 }
 
 .tag-picker-wrapper {

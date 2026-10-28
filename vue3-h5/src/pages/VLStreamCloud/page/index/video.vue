@@ -13,6 +13,14 @@
         </div>
       </div>
 
+      <van-search
+        v-if="showSearch"
+        v-model="keyword"
+        class="header-search"
+        shape="round"
+        placeholder="搜索设备名称或设备ID"
+      />
+
       <div class="tabs-row">
         <van-tabs
           v-model:active="activeTopTab"
@@ -64,17 +72,17 @@
     <div class="video-content">
       <!-- 视频广场 -->
       <template v-if="activeTopTab === 'square'">
-        <VideoSquare />
+        <VideoSquare :keyword="keyword" />
       </template>
 
       <!-- 我的视频 -->
       <template v-else-if="activeTopTab === 'my'">
-        <MyVideo />
+        <MyVideo :keyword="keyword" />
       </template>
 
       <!-- 视频回放 -->
       <template v-else-if="activeTopTab === 'playback'">
-        <VideoPlaybackList />
+        <VideoPlaybackList :keyword="keyword" />
       </template>
 
       <!-- 算法仓库 -->
@@ -103,11 +111,11 @@
             class="video-list"
             @load="onLoad"
           >
-            <DeviceManage :active-mode="activeDeviceMode" />
+            <DeviceManage :active-mode="activeDeviceMode" :keyword="keyword" :tag-name="filterTagName || ''" />
           </van-list>
         </template>
         <template v-else>
-          <DeviceManage style="width: 100%;height: 100%" :active-mode="activeDeviceMode" />
+          <DeviceManage style="width: 100%;height: 100%" :active-mode="activeDeviceMode" :keyword="keyword" :tag-name="filterTagName || ''" />
         </template>
       </template>
 
@@ -117,7 +125,16 @@
       </div>
     </div>
 
-    <VideoFilterPanel v-model:show="showFilter" />
+    <VideoFilterPanel v-model:show="showFilter" @confirm="onFilterConfirm" />
+
+    <van-action-sheet
+      v-model:show="showMenu"
+      :actions="menuActions"
+      title="切换模块"
+      cancel-text="取消"
+      close-on-click-action
+      @select="onMenuSelect"
+    />
   </div>
 </template>
 
@@ -125,6 +142,7 @@
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { List as VanList } from 'vant'
+import config from '@/config'
 import ssImg from '@/assets/img/VLStreamCloud/ss.png'
 import sxImg from '@/assets/img/VLStreamCloud/sx.png'
 import sx2Img from '@/assets/img/VLStreamCloud/sx2.png'
@@ -158,16 +176,24 @@ const subTabs = ref([
 ])
 const activeSubTab = ref('now')
 
-const modeTabs = ref([
+const modeTabsAll = [
   { label: '列表模式', value: 'list' },
   { label: '地图模式', value: 'map' },
   { label: '卡片模式', value: 'card' }
-])
+]
+// 单租户集群没有底图服务（apaas-map-server），地图模式会是一片裂图，直接不提供入口
+const modeTabs = ref(config.authMode === 'local' ? modeTabsAll.filter(tab => tab.value !== 'map') : modeTabsAll)
 const activeDeviceMode = ref('list')
 
 const loading = ref(false)
 const finished = ref(false)
 const showFilter = ref(false)
+const filterTagName = ref(null)
+const showSearch = ref(false)
+const keyword = ref('')
+const showMenu = ref(false)
+
+const menuActions = topTabs.value.map(tab => ({ name: tab.label, value: tab.value }))
 
 const onLoad = () => {
   // 这里可以根据业务追加数据，当前直接标记为加载完成
@@ -176,17 +202,30 @@ const onLoad = () => {
 }
 
 const onSearch = () => {
-  // eslint-disable-next-line no-console
-  console.log('search')
+  showSearch.value = !showSearch.value
+  if (!showSearch.value) keyword.value = ''
 }
 
 const onFilter = () => {
   showFilter.value = true
 }
 
+const onFilterConfirm = (filters) => {
+  keyword.value = (filters.keyword || '').trim()
+  filterTagName.value = filters.tagName || null
+  // 关键字与标签都来自筛选面板，打开搜索框让用户能看到当前生效的条件
+  showSearch.value = !!keyword.value
+  showFilter.value = false
+}
+
 const onMenu = () => {
-  // eslint-disable-next-line no-console
-  console.log('menu')
+  showMenu.value = true
+}
+
+const onMenuSelect = (action) => {
+  if (!action || !action.value) return
+  activeTopTab.value = action.value
+  showMenu.value = false
 }
 
 </script>
@@ -232,6 +271,17 @@ const onMenu = () => {
   display: flex;
   gap: 16px;
   align-items: center;
+}
+
+.header-search {
+  position: relative;
+  z-index: 1;
+  padding: 8px 0;
+  background: transparent;
+}
+
+.header-search :deep(.van-search__content) {
+  background: rgba(255, 255, 255, 0.85);
 }
 
 .action-icon {

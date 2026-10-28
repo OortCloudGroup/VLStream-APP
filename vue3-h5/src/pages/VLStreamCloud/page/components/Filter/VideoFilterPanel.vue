@@ -13,7 +13,7 @@
         </div>
         <div class="header-actions">
           <img class="action-icon" :src="ssImg" alt="" @click="onSearch" />
-          <img class="action-icon" :src="sxImg" alt="" />
+          <img class="action-icon" :src="sxImg" alt="" @click="onRefresh" />
         </div>
       </div>
 
@@ -138,7 +138,7 @@
 
         <!-- 标签：平铺标签样式 -->
         <template v-else>
-          <div class="tag-list">
+          <div v-if="tagOptions.length" class="tag-list">
             <div
               v-for="item in tagOptions"
               :key="item"
@@ -148,6 +148,9 @@
             >
               {{ item }}
             </div>
+          </div>
+          <div v-else class="placeholder">
+            暂无标签
           </div>
         </template>
       </div>
@@ -296,7 +299,8 @@ const selectedTag = ref<string | null>(null)
 
 // 从后端获取标签列表（parentId = 1）
 const fetchTags = async() => {
-  const params = { parentId: 1 }
+  // 后端默认 10 条分页，不传 size 会漏标签
+  const params = { parentId: 1, current: 1, size: 200 }
   const res: any = await getVlsTagManagement(params)
   if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
     const names = res.data.records
@@ -339,7 +343,15 @@ const onReset = () => {
 }
 
 const onSearch = () => {
-  // 搜索功能
+  // 面板里的搜索图标直接按当前条件过滤并关闭
+  onConfirm()
+}
+
+const onRefresh = () => {
+  selectedTree.value = [null, null, null]
+  selectedTag.value = null
+  fetchTags()
+  fetchTagTree()
 }
 
 const onConfirm = () => {

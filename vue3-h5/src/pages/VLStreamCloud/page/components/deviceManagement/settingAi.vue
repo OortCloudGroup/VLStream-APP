@@ -53,7 +53,9 @@ const modelList = ref<any[]>([])
 // 获取算法列表
 const fetchModelList = async() => {
   const params: any = {
-    accessToken: store.userInfo?.accessToken
+    accessToken: store.userInfo?.accessToken,
+    current: 1,
+    size: 500
   }
   try {
     const res: any = await getVlsAlgorithmt(params)

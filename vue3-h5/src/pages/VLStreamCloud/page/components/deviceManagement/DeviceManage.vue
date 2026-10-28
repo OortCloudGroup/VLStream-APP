@@ -17,9 +17,9 @@
       </div>
     </div>
 
-    <DeviceListMode v-if="activeMode === 'list'" :tag-name="tagName" />
+    <DeviceListMode v-if="activeMode === 'list'" :tag-name="activeTagName || ''" :keyword="searchKeyword" />
     <DeviceMapMode v-else-if="activeMode === 'map'" />
-    <DeviceCardMode v-else :tag-name="tagName" />
+    <DeviceCardMode v-else :tag-name="activeTagName || ''" :keyword="searchKeyword" />
 
     <!-- 顶部筛选弹出面板 -->
     <VideoFilterPanel
@@ -31,22 +31,37 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import DeviceListMode from './DeviceListMode.vue'
 import DeviceMapMode from './DeviceMapMode.vue'
 import DeviceCardMode from './DeviceCardMode.vue'
 import VideoFilterPanel from '../Filter/VideoFilterPanel.vue'
 
-defineProps({
+const props = defineProps({
   activeMode: {
     type: String,
     default: 'list'
+  },
+  keyword: {
+    type: String,
+    default: ''
+  },
+  tagName: {
+    type: String,
+    default: ''
   }
 })
 
 const showFilterPanel = ref(false)
 const filterType = ref('tree')
-const tagName = ref(null)
+const localTagName = ref(null)
+const filterKeyword = ref('')
+
+// 页面顶部筛选面板通过 tagName 传入，设备管理自己面板选中的优先
+const activeTagName = computed(() => localTagName.value || props.tagName || null)
+
+// 顶部搜索框和筛选面板的关键字是两套入口，取后输入的那个生效
+const searchKeyword = computed(() => filterKeyword.value || props.keyword)
 
 const onFilter = (type) => {
   filterType.value = type
@@ -54,12 +69,13 @@ const onFilter = (type) => {
 }
 
 const onFilterConfirm = (filters) => {
+  filterKeyword.value = (filters.keyword || '').trim()
   if (filters.filterType === 'tag' && filters.filterValue) {
-    tagName.value = filters.filterValue
+    localTagName.value = filters.filterValue
   } else if (filters.filterType === 'tree' && filters.filterValue) {
-    tagName.value = filters.filterValue
+    localTagName.value = filters.filterValue
   } else {
-    tagName.value = null
+    localTagName.value = null
   }
   showFilterPanel.value = false
 }
