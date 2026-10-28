@@ -1,6 +1,6 @@
 <template>
   <div class="analysis-detail">
-    <nav-header-banner title="查看视频" :is-call-back="true" @call-back="onBack" />
+    <nav-header-banner :title="$t('查看视频')" :is-call-back="true" @call-back="onBack" />
 
     <div class="detail-body">
       <!-- 视频播放器 -->
@@ -23,10 +23,10 @@
 
       <!-- Tab 切换 -->
       <van-tabs v-model:active="activeTab" class="content-tabs" line-width="28">
-        <van-tab title="视频列表" name="video">
+        <van-tab :title="$t('视频列表')" name="video">
           <VideoListTab :task="task" @play="onPlay" />
         </van-tab>
-        <van-tab title="申请详情" name="detail">
+        <van-tab :title="$t('申请详情')" name="detail">
           <ApplicationDetailTab :task="task" />
         </van-tab>
       </van-tabs>

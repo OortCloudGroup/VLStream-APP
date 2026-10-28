@@ -1,7 +1,7 @@
 <template>
   <div class="config-record">
-    <nav-header-banner title="配置录像" :is-call-back="true" @call-back="onBack">
-      <span class="header-save" @click="onSave">保存</span>
+    <nav-header-banner :title="$t('配置录像')" :is-call-back="true" @call-back="onBack">
+      <span class="header-save" @click="onSave">{{ $t('保存') }}</span>
     </nav-header-banner>
 
     <div class="config-content">
@@ -36,7 +36,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { showToast } from 'vant'
 import { getVlsTimeStrategy, updateVlsTimeStrategy } from '@/api/VLStreamCloud/device'
 import DefenseTimeMobile from '@/pages/VLStreamCloud/page/components/DefenseTimeMobile.vue'
@@ -54,10 +55,12 @@ const props = defineProps({
 
 const store = useUserStore()
 
-const tabs = [
-  { label: '时间策略', value: 'time' },
-  { label: '事件策略', value: 'event' }
-]
+const { t } = useI18n()
+
+const tabs = computed(() => [
+  { label: t('时间策略'), value: 'time' },
+  { label: t('事件策略'), value: 'event' }
+])
 
 const activeTab = ref('time')
 
@@ -98,7 +101,7 @@ const fetchTimeStrategy = async() => {
 
 const onSave = async() => {
   if (!props.deviceId) {
-    showToast({ type: 'fail', message: '缺少设备ID' })
+    showToast({ type: 'fail', message: t('缺少设备ID') })
     return
   }
 

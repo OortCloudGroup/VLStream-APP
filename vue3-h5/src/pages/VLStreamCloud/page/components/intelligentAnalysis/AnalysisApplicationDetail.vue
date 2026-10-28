@@ -1,7 +1,7 @@
 <template>
   <div class="analysis-application-detail">
-    <nav-header-banner title="分析申请" :is-call-back="true" @call-back="onBack">
-      <span class="header-cancel" @click="onCancel">取消申请</span>
+    <nav-header-banner :title="$t('分析申请')" :is-call-back="true" @call-back="onBack">
+      <span class="header-cancel" @click="onCancel">{{ $t('取消申请') }}</span>
     </nav-header-banner>
 
     <div class="detail-body">
@@ -22,7 +22,7 @@
         <div class="info-row">
           <div class="label">
             <img :src="fxlx" alt="" class="info-icon" />
-            <span>分析类型</span>
+            <span>{{ $t('分析类型') }}</span>
           </div>
           <div class="value">
             {{ task.type }}
@@ -32,7 +32,7 @@
         <div class="info-row">
           <div class="label">
             <img :src="fxql" alt="" class="info-icon" />
-            <span>分析区域</span>
+            <span>{{ $t('分析区域') }}</span>
           </div>
           <div class="value">
             {{ task.area }}
@@ -42,7 +42,7 @@
         <div class="info-row">
           <div class="label">
             <img :src="fxtp" alt="" class="info-icon" />
-            <span>分析图片</span>
+            <span>{{ $t('分析图片') }}</span>
           </div>
           <div class="thumb-grid">
             <img
@@ -58,7 +58,7 @@
         <div class="info-row">
           <div class="label">
             <img :src="sxt" alt="" class="info-icon" />
-            <span>摄像头</span>
+            <span>{{ $t('摄像头') }}</span>
           </div>
           <div class="value multi-line">
             {{ camerasText }}
@@ -68,7 +68,7 @@
         <div class="info-row">
           <div class="label">
             <img :src="sqsj" alt="" class="info-icon" />
-            <span>分析时段</span>
+            <span>{{ $t('分析时段') }}</span>
           </div>
           <div class="value">
             {{ periodText }}
@@ -78,7 +78,7 @@
         <div class="info-row">
           <div class="label">
             <img :src="fxlx" alt="" class="info-icon" />
-            <span>描述</span>
+            <span>{{ $t('描述') }}</span>
           </div>
           <div class="value">
             {{ descriptionText }}
@@ -88,7 +88,7 @@
         <div class="info-row">
           <div class="label">
             <img :src="sqsj" alt="" class="info-icon" />
-            <span>申请时间</span>
+            <span>{{ $t('申请时间') }}</span>
           </div>
           <div class="value">
             {{ applyTimeText }}
@@ -98,7 +98,7 @@
         <div class="info-row">
           <div class="label">
             <img :src="sqsj" alt="" class="info-icon" />
-            <span>完成时间</span>
+            <span>{{ $t('完成时间') }}</span>
           </div>
           <div class="value">
             {{ completeTimeText }}
@@ -111,6 +111,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { showConfirmDialog } from 'vant'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
 import fxlx from '@/assets/img/VLStreamCloud/znfx/fxlx.png'
@@ -148,6 +149,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['cancel', 'close'])
+const { t: tt } = useI18n()
 
 // 分析图片
 const analysisImages = computed(() => {
@@ -180,7 +182,7 @@ const periodText = computed(() => {
 // 描述
 const descriptionText = computed(() => {
   const t: any = props.task || {}
-  return t.description || '智能分析描述'
+  return t.description || tt('智能分析描述')
 })
 
 // 申请时间
@@ -199,8 +201,8 @@ const completeTimeText = computed(() => {
 const onCancel = async() => {
   try {
     await showConfirmDialog({
-      title: '取消申请',
-      message: '确认取消当前分析申请？'
+      title: tt('取消申请'),
+      message: tt('确认取消当前分析申请？')
     })
   } catch {
     return

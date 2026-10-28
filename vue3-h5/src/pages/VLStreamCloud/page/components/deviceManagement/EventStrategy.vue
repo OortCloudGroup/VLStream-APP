@@ -6,17 +6,17 @@
         <van-checkbox-group v-model="formData.enableOptions" shape="square">
           <div class="enable-option-item">
             <van-checkbox name="motionDetection">
-              启用移动侦测
+              {{ $t('启用移动侦测') }}
             </van-checkbox>
           </div>
           <div class="enable-option-item">
             <van-checkbox name="ptzAlarm">
-              启用PTZ运动报警上报
+              {{ $t('启用PTZ运动报警上报') }}
             </van-checkbox>
           </div>
           <div class="enable-option-item">
             <van-checkbox name="dynamicAnalysis">
-              启用动态分析
+              {{ $t('启用动态分析') }}
             </van-checkbox>
           </div>
         </van-checkbox-group>
@@ -25,15 +25,15 @@
       <!-- 触发报警时 -->
       <div class="section">
         <div class="section-label">
-          触发报警时
+          {{ $t('触发报警时') }}
         </div>
         <div class="radio-group">
           <van-radio-group v-model="formData.triggerAction" direction="horizontal">
             <van-radio name="snapshot">
-              抓图
+              {{ $t('抓图') }}
             </van-radio>
             <van-radio name="record">
-              录像
+              {{ $t('录像') }}
             </van-radio>
           </van-radio-group>
         </div>
@@ -43,12 +43,12 @@
       <van-field
         v-model="formData.recordBefore"
         type="number"
-        label="触发报警前录制时间"
-        placeholder="请输入"
+        :label="$t('触发报警前录制时间')"
+        :placeholder="$t('请输入')"
         class="addMargin"
       >
         <template #right-icon>
-          <span class="unit-text">秒</span>
+          <span class="unit-text">{{ $t('秒') }}</span>
         </template>
       </van-field>
 
@@ -56,12 +56,12 @@
       <van-field
         v-model="formData.recordAfter"
         type="number"
-        label="触发报警后录制时间"
-        placeholder="请输入"
+        :label="$t('触发报警后录制时间')"
+        :placeholder="$t('请输入')"
         class="addMargin"
       >
         <template #right-icon>
-          <span class="unit-text">秒</span>
+          <span class="unit-text">{{ $t('秒') }}</span>
         </template>
       </van-field>
 
@@ -69,33 +69,33 @@
       <van-field
         v-model="formData.alarmFrequency"
         type="number"
-        label="告警频率"
-        placeholder="请输入"
+        :label="$t('告警频率')"
+        :placeholder="$t('请输入')"
         class="addMargin2"
       >
         <template #right-icon>
-          <span class="unit-text">分钟/次</span>
+          <span class="unit-text">{{ $t('分钟/次') }}</span>
         </template>
       </van-field>
 
       <!-- 告警级别 -->
       <div class="section">
         <div class="section-label">
-          告警级别
+          {{ $t('告警级别') }}
         </div>
         <div class="radio-group">
           <van-radio-group v-model="formData.alarmLevel" direction="horizontal">
             <van-radio name="important">
-              重要
+              {{ $t('重要') }}
             </van-radio>
             <van-radio name="general">
-              一般
+              {{ $t('一般') }}
             </van-radio>
             <van-radio name="tip">
-              提示
+              {{ $t('提示') }}
             </van-radio>
             <van-radio name="urgent">
-              紧急
+              {{ $t('紧急') }}
             </van-radio>
           </van-radio-group>
         </div>
@@ -104,24 +104,24 @@
       <!-- 告警方式 -->
       <div class="section">
         <div class="section-label">
-          告警方式
+          {{ $t('告警方式') }}
         </div>
         <div class="checkbox-group">
           <van-checkbox-group v-model="formData.alarmMethods" shape="square" direction="horizontal">
             <van-checkbox name="sms">
-              短信
+              {{ $t('短信') }}
             </van-checkbox>
             <van-checkbox name="message">
-              消息
+              {{ $t('消息') }}
             </van-checkbox>
             <van-checkbox name="site">
-              站内
+              {{ $t('站内') }}
             </van-checkbox>
             <van-checkbox name="phone">
-              电话
+              {{ $t('电话') }}
             </van-checkbox>
             <van-checkbox name="email">
-              邮件
+              {{ $t('邮件') }}
             </van-checkbox>
           </van-checkbox-group>
         </div>
@@ -130,7 +130,7 @@
       <!-- 接收人 -->
       <div class="maintainPerson">
         <div class="personTitle">
-          接收人
+          {{ $t('接收人') }}
         </div>
         <div class="person_list">
           <div
@@ -168,6 +168,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { showToast } from 'vant'
 import { getVlsRecordEventStrategy, saveVlsRecordEventStrategy } from '@/api/VLStreamCloud/device'
 import { getUserInfoByUserId } from '@/api/unifiedUsert/sso'
@@ -185,6 +186,8 @@ const props = defineProps({
 })
 
 const store = useUserStore()
+
+const { t } = useI18n()
 
 const formData = ref({
   enableOptions: [], // ['motionDetection', 'ptzAlarm', 'dynamicAnalysis']
@@ -302,7 +305,7 @@ const fetchStrategy = async() => {
 
 const save = async() => {
   if (!props.deviceId) {
-    showToast({ type: 'fail', message: '缺少设备ID' })
+    showToast({ type: 'fail', message: t('缺少设备ID') })
     return
   }
 
@@ -332,7 +335,7 @@ const save = async() => {
 
   const res = await saveVlsRecordEventStrategy(body)
   if (res && res.code === 200) {
-    showToast({ type: 'success', message: res.msg || '保存成功' })
+    showToast({ type: 'success', message: res.msg || t('保存成功') })
     await fetchStrategy()
   }
 }

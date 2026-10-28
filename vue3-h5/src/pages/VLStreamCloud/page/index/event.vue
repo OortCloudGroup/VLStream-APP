@@ -5,7 +5,7 @@
 
     <div class="event-header">
       <div class="top-title">
-        事件
+        {{ $t('事件') }}
       </div>
       <van-icon
         class="header-search"

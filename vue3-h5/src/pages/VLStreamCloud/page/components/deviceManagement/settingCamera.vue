@@ -1,8 +1,8 @@
 <template>
   <div class="device-detail">
-    <nav-header-banner title="设置摄像机" :is-call-back="true" @call-back="onBack">
+    <nav-header-banner :title="$t('设置摄像机')" :is-call-back="true" @call-back="onBack">
       <div class="header-actions">
-        <span class="action edit" @click="onEdit">恢复默认值</span>
+        <span class="action edit" @click="onEdit">{{ $t('恢复默认值') }}</span>
       </div>
     </nav-header-banner>
 
@@ -13,7 +13,7 @@
           :class="{ active: activeTab === 'ptz' }"
           @click="activeTab = 'ptz'"
         >
-          显示设置
+          {{ $t('显示设置') }}
           <div v-if="activeTab === 'ptz'" class="tab-underline" />
         </div>
         <div
@@ -21,7 +21,7 @@
           :class="{ active: activeTab === 'info' }"
           @click="activeTab = 'info'"
         >
-          OSD设置
+          {{ $t('OSD设置') }}
           <div v-if="activeTab === 'info'" class="tab-underline" />
         </div>
       </div>

@@ -2,22 +2,22 @@
   <div class="smart-analysis">
     <!-- 二级标签：分析中 / 已完成 / 已失败 -->
     <van-tabs v-model:active="activeStatus" class="status-tabs" line-width="28">
-      <van-tab title="分析中" name="processing" />
-      <van-tab title="已完成" name="completed" />
-      <van-tab title="已失败" name="failed" />
+      <van-tab :title="$t('分析中')" name="processing" />
+      <van-tab :title="$t('已完成')" name="completed" />
+      <van-tab :title="$t('已失败')" name="failed" />
     </van-tabs>
 
     <div class="task-list">
       <van-pull-refresh
         v-model="refreshing"
-        success-text="刷新成功"
+        :success-text="$t('刷新成功')"
         @refresh="onRefresh"
       >
         <van-list
           v-if="tasks.length"
           v-model="loading"
           :finished="finished"
-          finished-text="没有更多了"
+          :finished-text="$t('没有更多了')"
           @load="onLoad"
         >
           <div
@@ -53,7 +53,7 @@
             <div class="info-row">
               <div class="label">
                 <img :src="fxlx" alt="" class="info-icon" />
-                <span>分析类型</span>
+                <span>{{ $t('分析类型') }}</span>
               </div>
               <div class="value">
                 {{ task.type }}
@@ -63,7 +63,7 @@
             <div class="info-row">
               <div class="label">
                 <img :src="fxql" alt="" class="info-icon" />
-                <span>分析区域</span>
+                <span>{{ $t('分析区域') }}</span>
               </div>
               <div class="value">
                 {{ task.area }}
@@ -73,7 +73,7 @@
             <div class="info-row">
               <div class="label">
                 <img :src="fxtp" alt="" class="info-icon" />
-                <span>分析图片</span>
+                <span>{{ $t('分析图片') }}</span>
               </div>
               <div class="thumb">
                 <div class="thumb-wrapper">
@@ -88,7 +88,7 @@
             <div class="info-row">
               <div class="label">
                 <img :src="sxt" alt="" class="info-icon" />
-                <span>摄像头</span>
+                <span>{{ $t('摄像头') }}</span>
               </div>
               <div class="value multi-line">
                 {{ task.cameras }}
@@ -98,7 +98,7 @@
             <div class="info-row">
               <div class="label">
                 <img :src="sqsj" alt="" class="info-icon" />
-                <span>申请时间</span>
+                <span>{{ $t('申请时间') }}</span>
               </div>
               <div class="value">
                 {{ task.applyTime }}
@@ -110,7 +110,7 @@
         <!-- 空态 -->
         <div v-else class="no_data">
           <img src="@/assets/img/daily_activity/no_data.png" />
-          <span>暂无数据</span>
+          <span>{{ $t('暂无数据') }}</span>
         </div>
       </van-pull-refresh>
     </div>

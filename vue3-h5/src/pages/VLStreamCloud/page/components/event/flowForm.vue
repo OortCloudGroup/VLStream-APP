@@ -2,7 +2,7 @@
   <div class="eventItem">
     <div class="eventItem_c flexRowAC" @click="workPicker=true">
       <img src="@/assets/img/eventMana/work.png" alt="" />
-      <span class="title">工单名称</span>
+      <span class="title">{{ $t('工单名称') }}</span>
       <img class="arrow-icon" src="@/assets/img/ancientTrees/biaodan-icon-tiaozhuan.png" />
     </div>
     <div class="e_r locationBox flexRowAC">
@@ -13,14 +13,14 @@
         autosize
         readonly
         clearable
-        placeholder="请选择工单"
+        :placeholder="$t('请选择工单')"
       />
     </div>
     <!--选择工单-->
     <van-popup v-model:show="workPicker" position="bottom">
       <van-picker
         :columns="options"
-        title="选择工单"
+        :title="$t('选择工单')"
         value-key="text"
         :columns-field-names="{ text: 'modelName', value: 'modelKey' }"
         @cancel="workPicker = false"

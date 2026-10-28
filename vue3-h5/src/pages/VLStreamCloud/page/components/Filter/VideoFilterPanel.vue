@@ -9,7 +9,7 @@
       <!-- 顶部标题栏 -->
       <div class="filter-header">
         <div class="header-title">
-          视频
+          {{ $t('视频') }}
         </div>
         <div class="header-actions">
           <img class="action-icon" :src="ssImg" alt="" @click="onSearch" />
@@ -34,7 +34,7 @@
           :class="{ active: activeTab === 'tree' }"
           @click="activeTab = 'tree'"
         >
-          设备树
+          {{ $t('设备树') }}
           <van-icon :name="activeTab === 'tree' ? 'arrow-up' : 'arrow-down'" class="tab-icon" />
         </div>
         <!-- 分组标签页 -->
@@ -51,7 +51,7 @@
           :class="{ active: activeTab === 'tag' }"
           @click="activeTab = 'tag'"
         >
-          标签
+          {{ $t('标签') }}
           <van-icon :name="activeTab === 'tag' ? 'arrow-up' : 'arrow-down'" class="tab-icon" />
         </div>
       </div>
@@ -150,7 +150,7 @@
             </div>
           </div>
           <div v-else class="placeholder">
-            暂无标签
+            {{ $t('暂无标签') }}
           </div>
         </template>
       </div>
@@ -163,7 +163,7 @@
           class="reset-btn"
           @click="onReset"
         >
-          重置
+          {{ $t('重置') }}
         </van-button>
         <van-button
           round
@@ -171,7 +171,7 @@
           class="confirm-btn"
           @click="onConfirm"
         >
-          确定
+          {{ $t('确定') }}
         </van-button>
       </div>
     </div>

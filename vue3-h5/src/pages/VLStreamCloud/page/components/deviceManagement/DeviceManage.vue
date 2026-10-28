@@ -3,7 +3,7 @@
     <!-- 筛选栏 -->
     <div class="filters">
       <div class="filter-item" @click="onFilter('tree')">
-        <span>设备树</span>
+        <span>{{ $t('设备树') }}</span>
         <van-icon name="arrow-down" class="filter-icon" />
       </div>
       <!-- 分组 -->
@@ -12,7 +12,7 @@
         <van-icon name="arrow-down" class="filter-icon" />
       </div> -->
       <div class="filter-item" @click="onFilter('tag')">
-        <span>标签</span>
+        <span>{{ $t('标签') }}</span>
         <van-icon name="arrow-down" class="filter-icon" />
       </div>
     </div>

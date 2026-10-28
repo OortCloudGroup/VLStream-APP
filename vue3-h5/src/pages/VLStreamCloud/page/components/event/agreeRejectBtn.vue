@@ -3,16 +3,16 @@
     <!--  同意,拒绝  -->
     <van-popup v-model:show="showSub" round mode="center" border-radius="14" :style="{ width: '80%' }">
       <div class="fadein">
-        <span v-if="approveStatus === '0'" class="title t1">同意</span>
-        <span v-if="approveStatus === '1'" class="title t1">委派</span>
-        <span v-if="approveStatus === '2'" class="title t1">转办</span>
-        <span v-if="approveStatus === '3'" class="title t1">退回</span>
-        <span v-if="approveStatus === '4'" class="title t2">拒绝</span>
+        <span v-if="approveStatus === '0'" class="title t1">{{ $t('同意') }}</span>
+        <span v-if="approveStatus === '1'" class="title t1">{{ $t('委派') }}</span>
+        <span v-if="approveStatus === '2'" class="title t1">{{ $t('转办') }}</span>
+        <span v-if="approveStatus === '3'" class="title t1">{{ $t('退回') }}</span>
+        <span v-if="approveStatus === '4'" class="title t2">{{ $t('拒绝') }}</span>
         <!-- 抄送人 -->
         <div class="addIcon flexRowAC" @click="showContact=true,showType='copy'">
           <div class="flexRowAC">
             <van-icon name="add-o" />
-            <span class="sp">抄送人</span>
+            <span class="sp">{{ $t('抄送人') }}</span>
           </div>
           <div v-if="form.copy.length" class="user_box flexRowAC" @click.stop>
             <div v-for="(item,i) in form.copy" :key="i" class="flexRowAC user_item">
@@ -26,7 +26,7 @@
         <div class="addIcon flexRowAC" @click="showContact=true,showType='next'">
           <div class="flexRowAC">
             <van-icon name="add-o" />
-            <span class="sp">审批人</span>
+            <span class="sp">{{ $t('审批人') }}</span>
           </div>
           <div v-if="form.next.length" class="user_box flexRowAC" @click.stop>
             <div v-for="(item,i) in form.next" :key="i" class="flexRowAC user_item">
@@ -44,8 +44,8 @@
         >
           <div class="flexRowAC">
             <van-icon name="add-o" />
-            <span v-if="approveStatus === '1'" class="sp">委派操作时必填</span>
-            <span v-if="approveStatus === '2'" class="sp">转办操作时必填</span>
+            <span v-if="approveStatus === '1'" class="sp">{{ $t('委派操作时必填') }}</span>
+            <span v-if="approveStatus === '2'" class="sp">{{ $t('转办操作时必填') }}</span>
           </div>
           <div v-if="form.person.length" class="user_box flexRowAC" @click.stop>
             <div v-for="(item,i) in form.person" :key="i" class="flexRowAC user_item">
@@ -57,7 +57,7 @@
         </div>
         <!-- 退回节点 -->
         <div v-if="approveStatus === '3'" class="returnTaskBox flexRowAC">
-          <span class="des"> 退回节点：</span>
+          <span class="des"> {{ $t('退回节点：') }}</span>
           <van-radio-group v-model="targetKey" direction="horizontal">
             <van-radio v-for="(item,i) in returnTaskList" :key="i" :name="item.id">
               <span class="sp"> {{ item.name }}</span>
@@ -66,13 +66,13 @@
         </div>
         <!-- 审批意见 -->
         <div v-if="!editAdvice" class="des_title flexRowAC">
-          <span class="des">审批意见: {{ approveOpinion }} </span>
-          <span class="edit_text" @click="editAdvice=true">编辑</span>
+          <span class="des">{{ $t('审批意见') }}: {{ approveOpinion }} </span>
+          <span class="edit_text" @click="editAdvice=true">{{ $t('编辑') }}</span>
         </div>
         <template v-if="editAdvice">
           <div class="des_title flexRowAC">
-            <span class="des">审批意见</span>
-            <span class="edit_text" @click="editAdvice=false">收起</span>
+            <span class="des">{{ $t('审批意见') }}</span>
+            <span class="edit_text" @click="editAdvice=false">{{ $t('收起') }}</span>
           </div>
           <van-field
             v-model="approveOpinion"
@@ -80,17 +80,17 @@
             autosize
             type="textarea"
             maxlength="256"
-            placeholder="内容（必填）"
+            :placeholder="$t('内容（必填）')"
             show-word-limit
           />
         </template>
         <div class="buttonBox">
           <div class="btns" @click="emits('close')">
-            取消
+            {{ $t('取消') }}
           </div>
           <div class="btnEmp" />
           <div class="btns on" @click="submitTask()">
-            确定
+            {{ $t('确定') }}
           </div>
         </div>
       </div>
@@ -103,10 +103,12 @@
 
 <script setup>
 import { reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { showToast } from 'vant'
 import Contact from '@/components/contactTree/Contact.vue'
 import Oort_popup from '@/components/popup/oort_popup.vue'
 
+const { t } = useI18n()
 let props = defineProps(['act', 'showSub', 'returnTaskList'])
 let showSub = ref(props.showSub)
 const emits = defineEmits(['close', 'handle'])
@@ -140,20 +142,20 @@ const submitTask = () => {
   }
   if (approveStatus.value === '1') {
     if (!approveOpinion.value) approveOpinion.value = '委派'
-    if (!form.person || !form.person.length) return showToast('请选择委派人')
+    if (!form.person || !form.person.length) return showToast(t('请选择委派人'))
   }
   if (approveStatus.value === '2') {
     if (!approveOpinion.value) approveOpinion.value = '转办'
-    if (!form.person || !form.person.length) return showToast('请选择转办人')
+    if (!form.person || !form.person.length) return showToast(t('请选择转办人'))
   }
   if (approveStatus.value === '3') {
     if (!approveOpinion.value) approveOpinion.value = '退回'
-    if (!targetKey.value) return showToast('请选择可退回的节点')
+    if (!targetKey.value) return showToast(t('请选择可退回的节点'))
   }
   if (approveStatus.value === '4') {
     if (!approveOpinion.value) approveOpinion.value = '拒绝'
   }
-  if (!approveOpinion.value) return showToast('请填写审批意见')
+  if (!approveOpinion.value) return showToast(t('请填写审批意见'))
   emits('handle', {
     approveStatus: approveStatus.value,
     nextUserIds: form.next,

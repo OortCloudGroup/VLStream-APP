@@ -2,29 +2,29 @@
   <div class="audio-body">
     <!-- 图像调节模块 -->
     <div class="section-title">
-      图像调节
+      {{ $t('图像调节') }}
     </div>
     <div class="card-container">
       <!-- 音频输入异常 -->
       <van-checkbox-group v-model="audioCheckList" shape="square" class="checkbox-group">
         <van-checkbox name="audioInput">
-          音频输入异常
+          {{ $t('音频输入异常') }}
         </van-checkbox>
       </van-checkbox-group>
 
       <!-- 声强陡升 -->
       <van-checkbox-group v-model="audioCheckList" shape="square" class="checkbox-group">
         <van-checkbox name="audioRise">
-          声强陡升
+          {{ $t('声强陡升') }}
         </van-checkbox>
       </van-checkbox-group>
       <div class="slider-item">
-        <span class="slider-label">灵敏度</span>
+        <span class="slider-label">{{ $t('灵敏度') }}</span>
         <van-slider v-model="riseSensitivity" :max="100" />
         <span class="slider-value">{{ riseSensitivity }}</span>
       </div>
       <div class="slider-item">
-        <span class="slider-label">声音强度阈值</span>
+        <span class="slider-label">{{ $t('声音强度阈值') }}</span>
         <van-slider v-model="riseThreshold" :max="100" />
         <span class="slider-value">{{ riseThreshold }}</span>
       </div>
@@ -32,11 +32,11 @@
       <!-- 声强陡降 -->
       <van-checkbox-group v-model="audioCheckList" shape="square" class="checkbox-group">
         <van-checkbox name="audioDrop">
-          声强陡降
+          {{ $t('声强陡降') }}
         </van-checkbox>
       </van-checkbox-group>
       <div class="slider-item">
-        <span class="slider-label">灵敏度</span>
+        <span class="slider-label">{{ $t('灵敏度') }}</span>
         <van-slider v-model="dropSensitivity" :max="100" />
         <span class="slider-value">{{ dropSensitivity }}</span>
       </div>
@@ -44,7 +44,7 @@
 
     <!-- 异常检测波形图模块 -->
     <div class="section-title">
-      异常检测
+      {{ $t('异常检测') }}
     </div>
     <div class="card-container wave-container">
       <svg viewBox="0 0 800 150" class="wave-svg">

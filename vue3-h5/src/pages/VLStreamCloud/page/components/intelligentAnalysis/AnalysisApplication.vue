@@ -1,10 +1,10 @@
 <template>
   <div class="analysis-application">
-    <nav-header-banner title="分析申请" :is-call-back="true" @call-back="onBack" />
+    <nav-header-banner :title="$t('分析申请')" :is-call-back="true" @call-back="onBack" />
     <div class="application-content">
       <van-form class="form">
         <!-- 分析名称 -->
-        <van-field v-model="formData.name" placeholder="请输入分析名称" class="addMargin">
+        <van-field v-model="formData.name" :placeholder="$t('请输入分析名称')" class="addMargin">
           <template #left-icon>
             <img :src="fxmc" alt="" class="field-icon" />
           </template>
@@ -19,14 +19,14 @@
           <img :src="rq" alt="" class="section-icon" />
           <div class="time-range-item">
             <div class="time-label-row">
-              <span class="section-title">开始</span>
+              <span class="section-title">{{ $t('开始') }}</span>
             </div>
             <div class="time-fields">
               <van-field
                 v-model="formData.startDate"
                 is-link
                 readonly
-                placeholder="日期时间"
+                :placeholder="$t('日期时间')"
                 class="time-field"
                 @click="showStartDatePicker = true"
               />
@@ -35,14 +35,14 @@
           <div class="time-arrow" />
           <div class="time-range-item">
             <div class="time-label-row">
-              <span class="section-title">结束</span>
+              <span class="section-title">{{ $t('结束') }}</span>
             </div>
             <div class="time-fields">
               <van-field
                 v-model="formData.endDate"
                 is-link
                 readonly
-                placeholder="日期时间"
+                :placeholder="$t('日期时间')"
                 class="time-field"
                 @click="showEndDatePicker = true"
               />
@@ -72,7 +72,7 @@
           <div class="section-header">
             <span class="section-label">
               <img :src="fxql" alt="" class="section-icon" />
-              分析区域
+              {{ $t('分析区域') }}
             </span>
             <img :src="add" alt="" class="section-add" @click="onAddArea" />
           </div>
@@ -98,9 +98,9 @@
         >
           <div class="area-popup-wrapper">
             <div class="area-popup-header">
-              <span class="area-popup-cancel" @click="onAreaCancel">取消</span>
-              <span class="area-popup-title">选择分析区域</span>
-              <span class="area-popup-confirm" @click="onAreaConfirm">确定</span>
+              <span class="area-popup-cancel" @click="onAreaCancel">{{ $t('取消') }}</span>
+              <span class="area-popup-title">{{ $t('选择分析区域') }}</span>
+              <span class="area-popup-confirm" @click="onAreaConfirm">{{ $t('确定') }}</span>
             </div>
             <div class="area-popup-content">
               <van-cascader
@@ -117,13 +117,13 @@
         <van-popup v-model:show="showAreaInput" position="bottom" round>
           <div class="area-input-popup">
             <div class="area-input-header">
-              <span @click="showAreaInput = false">取消</span>
-              <span class="area-input-title">输入分析区域</span>
-              <span class="area-input-confirm" @click="onAreaInputConfirm">确定</span>
+              <span @click="showAreaInput = false">{{ $t('取消') }}</span>
+              <span class="area-input-title">{{ $t('输入分析区域') }}</span>
+              <span class="area-input-confirm" @click="onAreaInputConfirm">{{ $t('确定') }}</span>
             </div>
             <van-field
               v-model="areaInput"
-              placeholder="请输入分析区域名称"
+              :placeholder="$t('请输入分析区域名称')"
               class="area-input-field"
             />
           </div>
@@ -138,7 +138,7 @@
           <div class="section-header">
             <span class="section-label">
               <img :src="sxt" alt="" class="section-icon" />
-              摄像头
+              {{ $t('摄像头') }}
             </span>
             <img :src="add" alt="" class="section-add" @click="onAddCamera" />
           </div>
@@ -164,9 +164,9 @@
         >
           <div class="camera-popup-wrapper">
             <div class="camera-popup-header">
-              <span class="camera-popup-cancel" @click="onCameraCancel">取消</span>
-              <span class="camera-popup-title">选择摄像头</span>
-              <span class="camera-popup-confirm" @click="onCameraConfirm">确定</span>
+              <span class="camera-popup-cancel" @click="onCameraCancel">{{ $t('取消') }}</span>
+              <span class="camera-popup-title">{{ $t('选择摄像头') }}</span>
+              <span class="camera-popup-confirm" @click="onCameraConfirm">{{ $t('确定') }}</span>
             </div>
             <div class="camera-popup-content">
               <van-checkbox-group v-model="tempCameras">
@@ -192,12 +192,12 @@
         <div class="section image-section">
           <div class="image-header flexRowAC">
             <img :src="fxtp" alt="" class="image-title-icon" />
-            <span class="image-title">分析图片 ({{ imgArr.length }}/5)</span>
+            <span class="image-title">{{ $t('分析图片') }} ({{ imgArr.length }}/5)</span>
           </div>
           <div class="image-cover flexRowAC">
             <div class="uploadBox flexRowAC" @click="showUploader = true">
               <img :src="sctp" alt="" />
-              上传图片
+              {{ $t('上传图片') }}
             </div>
             <template v-if="imgArr && imgArr.length">
               <div
@@ -224,7 +224,7 @@
         <van-field
           v-model="formData.description"
           type="textarea"
-          placeholder="请输入分析描述"
+          :placeholder="$t('请输入分析描述')"
           rows="4"
           class="taskDesc"
         />
@@ -247,7 +247,7 @@
       <!-- 底部按钮 -->
       <div class="submit-section">
         <van-button type="primary" block round @click="submit">
-          确认申请
+          {{ $t('确认申请') }}
         </van-button>
       </div>
     </div>
@@ -256,6 +256,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import CommonExpressions from '@/components/commonExpressions.vue'
 import OortUploader from '@/components/uploader/oort_uploader.vue'
@@ -276,6 +277,7 @@ import sctp from '@/assets/img/VLStreamCloud/fxsq/sctp.png'
 import del from '@/assets/img/VLStreamCloud/fxsq/del.png'
 
 const emit = defineEmits(['close'])
+const { t } = useI18n()
 const store = useUserStore()
 // 单租户集群没有 apaas-location-service，区域级联拿不到数据，改为手填
 const isLocalAuth = config.authMode === 'local'
@@ -482,7 +484,7 @@ const onCameraCancel = () => {
 
 const submit = async() => {
   if (!formData.value.name) {
-    showToast({ type: 'fail', message: '请填写分析名称' })
+    showToast({ type: 'fail', message: t('请填写分析名称') })
     return
   }
 
@@ -492,7 +494,7 @@ const submit = async() => {
   const hasEndTime = !!formData.value.endTime
 
   if (!hasStartDate || !hasEndDate) {
-    showToast({ type: 'fail', message: '请选择开始和结束时间' })
+    showToast({ type: 'fail', message: t('请选择开始和结束时间') })
     return
   }
 
@@ -507,7 +509,7 @@ const submit = async() => {
 
   // 格式固定为 YYYY-MM-DD HH:mm:ss，字符串比较即时间先后
   if (endDateTime < startDateTime) {
-    showToast({ type: 'fail', message: '结束时间不能早于开始时间' })
+    showToast({ type: 'fail', message: t('结束时间不能早于开始时间') })
     return
   }
 
@@ -553,7 +555,7 @@ const submit = async() => {
 
   const res: any = await saveVlsAnalysisk(payload)
   if (res && res.code === 200) {
-    showToast('申请提交成功')
+    showToast(t('申请提交成功'))
     emit('close')
   }
 }

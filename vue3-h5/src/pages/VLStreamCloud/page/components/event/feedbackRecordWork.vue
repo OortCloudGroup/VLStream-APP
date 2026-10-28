@@ -5,7 +5,7 @@
       <div v-if="work_order_data" class="main_item">
         <div class="main_item_name flexRowAC">
           <div class="line" />
-          工单详情
+          {{ $t('工单详情') }}
         </div>
         <!--总表单-->
         <template v-if="formJson&&formJson.length">
@@ -23,7 +23,7 @@
         </template>
         <div class="main_item_name flexRowAC">
           <div class="line" />
-          处置记录
+          {{ $t('处置记录') }}
         </div>
         <approval-record
           v-if="historyProcNodeList&&historyProcNodeList.length"
@@ -33,7 +33,7 @@
       <!-- 空态 -->
       <div v-if="!work_order_data" class="no_data">
         <img src="@/assets/img/daily_activity/no_data.png" />
-        <span>暂无数据</span>
+        <span>{{ $t('暂无数据') }}</span>
       </div>
     </div>
     <!--拒绝 同意-->

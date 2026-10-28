@@ -12,7 +12,7 @@
       <div class="info-row">
         <div class="label">
           <img :src="fxlx" alt="" class="info-icon" />
-          <span>分析类型</span>
+          <span>{{ $t('分析类型') }}</span>
         </div>
         <div class="value">
           {{ task.type }}
@@ -22,7 +22,7 @@
       <div class="info-row">
         <div class="label">
           <img :src="fxql" alt="" class="info-icon" />
-          <span>分析区域</span>
+          <span>{{ $t('分析区域') }}</span>
         </div>
         <div class="value">
           {{ task.area }}
@@ -32,7 +32,7 @@
       <div class="info-row">
         <div class="label">
           <img :src="fxtp" alt="" class="info-icon" />
-          <span>分析图片</span>
+          <span>{{ $t('分析图片') }}</span>
         </div>
         <div class="thumb-grid">
           <img
@@ -48,7 +48,7 @@
       <div class="info-row">
         <div class="label">
           <img :src="sxt" alt="" class="info-icon" />
-          <span>摄像头</span>
+          <span>{{ $t('摄像头') }}</span>
         </div>
         <div class="value multi-line">
           {{ camerasText }}
@@ -58,7 +58,7 @@
       <div class="info-row">
         <div class="label">
           <img :src="sqsj" alt="" class="info-icon" />
-          <span>分析时段</span>
+          <span>{{ $t('分析时段') }}</span>
         </div>
         <div class="value">
           {{ periodText }}
@@ -68,7 +68,7 @@
       <div class="info-row">
         <div class="label">
           <img :src="fxlx" alt="" class="info-icon" />
-          <span>描述</span>
+          <span>{{ $t('描述') }}</span>
         </div>
         <div class="value">
           {{ descriptionText }}
@@ -78,7 +78,7 @@
       <div class="info-row">
         <div class="label">
           <img :src="sqsj" alt="" class="info-icon" />
-          <span>申请时间</span>
+          <span>{{ $t('申请时间') }}</span>
         </div>
         <div class="value">
           {{ applyTimeText }}
@@ -88,7 +88,7 @@
       <div class="info-row">
         <div class="label">
           <img :src="sqsj" alt="" class="info-icon" />
-          <span>完成时间</span>
+          <span>{{ $t('完成时间') }}</span>
         </div>
         <div class="value">
           {{ completeTimeText }}
@@ -100,6 +100,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import fxlx from '@/assets/img/VLStreamCloud/znfx/fxlx.png'
 import fxql from '@/assets/img/VLStreamCloud/znfx/fxql.png'
 import fxtp from '@/assets/img/VLStreamCloud/znfx/fxtp.png'
@@ -132,6 +133,8 @@ interface TaskInfo {
 const props = defineProps<{
   task: TaskInfo
 }>()
+
+const { t: tt } = useI18n()
 
 // 状态图标：已完成 / 已失败
 const statusImg = computed(() => {
@@ -173,7 +176,7 @@ const periodText = computed(() => {
 // 描述
 const descriptionText = computed(() => {
   const t: any = props.task || {}
-  return t.description || '智能分析描述'
+  return t.description || tt('智能分析描述')
 })
 
 // 申请时间

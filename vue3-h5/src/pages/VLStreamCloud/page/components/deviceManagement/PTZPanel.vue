@@ -10,7 +10,7 @@
         type="primary"
         @click="checkCapabilities"
       >
-        重新检查
+        {{ $t('重新检查') }}
       </van-button>
     </div>
 
@@ -33,32 +33,32 @@
     </div>
 
     <div class="speed-bar" :class="{ 'is-disabled': !canMove }">
-      <span class="speed-label">速度</span>
+      <span class="speed-label">{{ $t('速度') }}</span>
       <van-slider v-model="speed" :min="0.1" :max="1" :step="0.1" :disabled="!canMove" class="speed-slider" />
       <span class="speed-value">{{ speed.toFixed(1) }}</span>
     </div>
 
     <div v-if="canPreset" class="preset-section">
       <div class="preset-title">
-        预置点
+        {{ $t('预置点') }}
       </div>
       <div class="preset-add">
-        <van-field v-model="presetName" placeholder="请输入预置点名称" class="preset-input" />
+        <van-field v-model="presetName" :placeholder="$t('请输入预置点名称')" class="preset-input" />
         <van-button size="small" type="primary" :disabled="!presetName.trim()" @click="addPreset">
-          添加
+          {{ $t('添加') }}
         </van-button>
       </div>
       <div v-if="presets.length" class="preset-list">
         <div v-for="item in presets" :key="item.token" class="preset-item">
           <span class="preset-name">{{ item.name || item.token }}</span>
           <div class="preset-actions">
-            <span @click="gotoPreset(item)">调用</span>
-            <span class="danger" @click="deletePreset(item)">删除</span>
+            <span @click="gotoPreset(item)">{{ $t('调用') }}</span>
+            <span class="danger" @click="deletePreset(item)">{{ $t('删除') }}</span>
           </div>
         </div>
       </div>
       <div v-else class="preset-empty">
-        {{ presetsLoading ? '预置点加载中…' : '暂无预置点' }}
+        {{ presetsLoading ? $t('预置点加载中…') : $t('暂无预置点') }}
       </div>
     </div>
   </div>
@@ -66,6 +66,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { showToast } from 'vant'
 import {
   addOnvifPreset,
@@ -87,6 +88,8 @@ import {
   normalizePtzCapabilities,
   unsupportedCapabilities
 } from '@/utils/onvifPtz'
+
+const { t } = useI18n()
 
 const props = defineProps({
   // 摄像头对象：WVP 设备行（ipAddr）或 vlsDeviceInfo 记录（deviceId，需要回查 WVP）
@@ -110,10 +113,10 @@ const canPreset = computed(() => !!presetParams.value && canUsePtzPresets(capabi
 const canRetry = computed(() => !!props.camera && capabilities.value && capabilities.value.status !== 'checking')
 const noticeText = computed(() => {
   const state = capabilities.value
-  if (!props.camera) return '请选择摄像头'
-  if (!state || state.status === 'checking') return '正在检查云台能力，请稍候'
-  if (state.status === 'supported') return '该摄像头不支持连续方向控制'
-  return state.reason || '该摄像头不支持云台控制'
+  if (!props.camera) return t('请选择摄像头')
+  if (!state || state.status === 'checking') return t('正在检查云台能力，请稍候')
+  if (state.status === 'supported') return t('该摄像头不支持连续方向控制')
+  return state.reason || t('该摄像头不支持云台控制')
 })
 
 const hold = createPtzHoldController({
@@ -160,7 +163,7 @@ const checkCapabilities = async() => {
     const resolved = await resolveCameraIp(camera)
     if (current !== generation) return
     if (!resolved || !resolved.ip) {
-      capabilities.value = unsupportedCapabilities('设备没有上报 IP 地址，无法检查云台能力')
+      capabilities.value = unsupportedCapabilities(t('设备没有上报 IP 地址，无法检查云台能力'))
       return
     }
     const listRes = await getOnvifDeviceList({ page: 1, count: 200 })
@@ -170,8 +173,8 @@ const checkCapabilities = async() => {
     if (!onvifDevice) {
       const declared = /"ptz"/.test(String(resolved.capabilitiesJson || ''))
       capabilities.value = unsupportedCapabilities(declared
-        ? '设备声明支持云台，但未接入 ONVIF 云台服务'
-        : '该摄像头不支持云台控制')
+        ? t('设备声明支持云台，但未接入 ONVIF 云台服务')
+        : t('该摄像头不支持云台控制'))
       return
     }
     const capsRes = await getPtzCapabilities({ id: onvifDevice.id, refresh: true })
@@ -190,7 +193,7 @@ const checkCapabilities = async() => {
     if (current !== generation) return
     capabilities.value = normalizePtzCapabilities({
       status: 'unknown',
-      reason: error?.response?.data?.msg || error?.message || '云台能力检查失败'
+      reason: error?.response?.data?.msg || error?.message || t('云台能力检查失败')
     })
   }
 }
@@ -202,7 +205,7 @@ watch(cameraKey, () => {
     generation += 1
     presetParams.value = null
     presets.value = []
-    capabilities.value = unsupportedCapabilities('请选择摄像头')
+    capabilities.value = unsupportedCapabilities(t('请选择摄像头'))
     return
   }
   checkCapabilities()
@@ -232,7 +235,7 @@ const addPreset = async() => {
   const res = await addOnvifPreset(presetQuery({ presetToken: name }))
   if (res && res.code === 200) {
     presetName.value = ''
-    showToast('操作成功')
+    showToast(t('操作成功'))
     await loadPresets()
   }
 }
@@ -240,14 +243,14 @@ const addPreset = async() => {
 const gotoPreset = async(item) => {
   if (!canPreset.value || !item?.token) return
   const res = await gotoOnvifPreset(presetQuery({ presetToken: item.token }))
-  if (res && res.code === 200) showToast('操作成功')
+  if (res && res.code === 200) showToast(t('操作成功'))
 }
 
 const deletePreset = async(item) => {
   if (!canPreset.value || !item?.token) return
   const res = await removeOnvifPreset(presetQuery({ presetToken: item.token }))
   if (res && res.code === 200) {
-    showToast('操作成功')
+    showToast(t('操作成功'))
     await loadPresets()
   }
 }

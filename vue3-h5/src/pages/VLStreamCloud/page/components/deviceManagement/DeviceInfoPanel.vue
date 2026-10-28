@@ -28,13 +28,13 @@
     </div>
     <div class="bottom-actions">
       <div class="bottom-action-item" @click="openConfigRecord">
-        配置录像
+        {{ $t('配置录像') }}
       </div>
       <div class="bottom-action-item" @click="openSettingAi">
-        配置AI算法
+        {{ $t('配置AI算法') }}
       </div>
       <div class="bottom-action-item" @click="openSettingCamera">
-        设置摄像机
+        {{ $t('设置摄像机') }}
       </div>
     </div>
 
@@ -57,6 +57,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import settingCamera from '@/pages/VLStreamCloud/page/components/deviceManagement/settingCamera.vue'
 import settingAi from '@/pages/VLStreamCloud/page/components/deviceManagement/settingAi.vue'
@@ -80,9 +81,11 @@ const props = defineProps({
 
 const device = computed(() => props.device || {})
 
+const { t } = useI18n()
+
 const privacyText = computed(() => {
   const d = device.value || {}
-  return d.isPublic === 1 ? '公开' : '私有'
+  return d.isPublic === 1 ? t('公开') : t('私有')
 })
 
 const infoList = computed(() => {
@@ -94,17 +97,17 @@ const infoList = computed(() => {
         : ''
 
   return [
-    { label: '路径', value: path || '--', icon: lj },
-    { label: '设备ID', value: d.deviceId || '--', icon: sbid },
-    { label: '设备坐标', value: coord || '--', icon: sbzb },
-    { label: '设备类型', value: d.deviceType || '--', icon: sbbq },
-    { label: '高度位置', value: d.heightPosition || '--', icon: sbwz },
-    { label: '设备区划', value: d.region || '--', icon: sbqh },
-    { label: '设备位置', value: d.address || '--', icon: sbwz },
-    { label: '拥有算法', value: d.algorithmName || '--', icon: yysf },
-    { label: '设备标签', value: d.tag || '--', icon: sbbq },
-    { label: '备注', value: d.remark || '--', icon: bz },
-    { label: '创建时间', value: d.createTime || '--', icon: cjsj }
+    { label: t('路径'), value: path || '--', icon: lj },
+    { label: t('设备ID'), value: d.deviceId || '--', icon: sbid },
+    { label: t('设备坐标'), value: coord || '--', icon: sbzb },
+    { label: t('设备类型'), value: d.deviceType || '--', icon: sbbq },
+    { label: t('高度位置'), value: d.heightPosition || '--', icon: sbwz },
+    { label: t('设备区划'), value: d.region || '--', icon: sbqh },
+    { label: t('设备位置'), value: d.address || '--', icon: sbwz },
+    { label: t('拥有算法'), value: d.algorithmName || '--', icon: yysf },
+    { label: t('设备标签'), value: d.tag || '--', icon: sbbq },
+    { label: t('备注'), value: d.remark || '--', icon: bz },
+    { label: t('创建时间'), value: d.createTime || '--', icon: cjsj }
   ]
 })
 

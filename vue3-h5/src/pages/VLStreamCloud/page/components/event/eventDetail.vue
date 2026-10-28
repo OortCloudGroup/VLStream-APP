@@ -1,6 +1,6 @@
 <template>
   <div class="task-container">
-    <nav-header-banner title="事件详情" />
+    <nav-header-banner :title="$t('事件详情')" />
     <div v-if="taskData" class="task-content">
       <div v-if="taskData">
         <!-- 基本信息 -->
@@ -10,7 +10,7 @@
             <div class="task-desc">
               <div class="info-lable flexRowAC">
                 <img src="@/assets/img/eventMana/theme.png" alt="" />
-                事件名称：
+                {{ $t('事件名称：') }}
               </div>
               <div class="info-content">
                 {{ taskData.name }}
@@ -19,7 +19,7 @@
             <div class="task-desc">
               <div class="info-lable flexRowAC">
                 <img src="@/assets/img/eventMana/event_desc.png" alt="" />
-                事件描述：
+                {{ $t('事件描述：') }}
               </div>
               <div class="info-content">
                 {{ taskData.describe }}
@@ -28,7 +28,7 @@
             <div class="task-desc">
               <div class="info-lable flexRowAC">
                 <img src="@/assets/img/eventMana/event_location.png" alt="" />
-                事件位置：
+                {{ $t('事件位置：') }}
               </div>
               <div class="info-content">
                 {{ eventLocation }}
@@ -43,7 +43,7 @@
             <div class="task-desc2">
               <div class="info-lable flexRowAC">
                 <img src="@/assets/img/eventMana/photo1.png" alt="" />
-                拍传：
+                {{ $t('拍传：') }}
               </div>
               <div class="info-content">
                 <div v-if="taskData.pics" class="image-grid">
@@ -61,7 +61,7 @@
             <div class="task-desc">
               <div class="info-lable flexRowAC">
                 <img src="@/assets/img/eventMana/event_user1.png" alt="" />
-                上报人员：
+                {{ $t('上报人员：') }}
               </div>
               <div class="info-content">
                 <i-d2-head-pic-mobile :id="taskData.uuid" class="info-content-avatar" round />
@@ -71,7 +71,7 @@
             <div class="task-desc">
               <div class="info-lable flexRowAC">
                 <img src="@/assets/img/eventMana/event_user2.png" alt="" />
-                执行人员：
+                {{ $t('执行人员：') }}
               </div>
               <div class="info-content user_box">
                 <template v-if="taskData.u_type1.length">
@@ -85,7 +85,7 @@
             <div class="task-desc">
               <div class="info-lable flexRowAC">
                 <img src="@/assets/img/eventMana/cart.png" alt="" />
-                车辆：
+                {{ $t('车辆：') }}
               </div>
               <div class="info-content user_box">
                 <template v-if="taskData.u_type2.length">
@@ -99,7 +99,7 @@
             <div class="task-desc">
               <div class="info-lable flexRowAC">
                 <img src="@/assets/img/eventMana/event_time1.png" alt="" />
-                上报时间：
+                {{ $t('上报时间：') }}
               </div>
               <div class="info-content">
                 {{ taskData.created_at }}
@@ -108,7 +108,7 @@
             <div class="task-desc">
               <div class="info-lable flexRowAC">
                 <img src="@/assets/img/eventMana/event_time1.png" alt="" />
-                完成时间：
+                {{ $t('完成时间：') }}
               </div>
               <div class="info-content">
                 {{ taskData.finish_at }}
@@ -127,14 +127,14 @@
           <div class="task-title-container">
             <div class="blue-line" />
             <div class="task-title">
-              反馈信息
+              {{ $t('反馈信息') }}
             </div>
           </div>
           <div class="task-item">
             <div class="task-info">
               <div class="task-desc2">
                 <div class="info-lable">
-                  添加图片/视频
+                  {{ $t('添加图片/视频') }}
                 </div>
                 <div class="info-content">
                   <div class="image-grid">
@@ -148,19 +148,19 @@
                     </div>
                     <div class="imageVideo" @click="showUploader = true">
                       <img src="@/assets/img/commandDispatch/camera2.png" alt="视频" />
-                      照片/视频
+                      {{ $t('照片/视频') }}
                     </div>
                   </div>
                 </div>
               </div>
               <div class="info-content">
                 <div class="info-lable">
-                  描述：
+                  {{ $t('描述：') }}
                 </div>
                 <div class="info-content">
                   <textarea
                     v-model="feedbackDescription"
-                    placeholder="请输入描述信息..."
+                    :placeholder="$t('请输入描述信息...')"
                     class="feedback-textarea"
                   />
                 </div>
@@ -171,7 +171,7 @@
         <!-- 待完成、已完成-反馈记录-->
         <div class="submit-btn-container">
           <van-button type="primary" @click="feedbackRecordFn(taskData.id,taskData.mod_type)">
-            反馈记录
+            {{ $t('反馈记录') }}
           </van-button>
           <!--          <van-button v-if="taskData.status === 2" type="primary" @click="handleSubmit">-->
           <!--            确认事件-->
@@ -183,7 +183,7 @@
       </div>
       <div v-else class="no-data">
         <div class="no-data-text">
-          暂无数据
+          {{ $t('暂无数据') }}
         </div>
       </div>
     </div>
@@ -210,6 +210,7 @@
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
 import { showToast } from 'vant'
@@ -224,6 +225,7 @@ import Oort_image from '@/components/image/oort_image.vue'
 import { eventLocationText, hasEventLocation } from '@/utils/eventDisplay'
 
 const store = useUserStore()
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const taskData = ref(null) // 事件-详情
@@ -246,7 +248,7 @@ const getImg = (files, imgUrl) => {
   if (imgUrl) {
     eventImages.value.push(imgUrl)
   }
-  showToast('上传成功')
+  showToast(t('上传成功'))
 }
 
 // 处理提交

@@ -1,11 +1,11 @@
 <template>
   <div class="setting-ai-page">
-    <nav-header-banner title="配置AI算法" :is-call-back="true" @call-back="onBack" />
+    <nav-header-banner :title="$t('配置AI算法')" :is-call-back="true" @call-back="onBack" />
     <div class="model-settings">
       <!-- 模型超市按钮 -->
       <div class="model-btn">
         <img src="@/assets/img/VLStreamCloud/mxcs.png" alt="" />
-        <span>模型超市</span>
+        <span>{{ $t('模型超市') }}</span>
       </div>
 
       <!-- 检测项列表 -->
@@ -33,6 +33,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getVlsAlgorithmt, removeVlsAlgorithmt } from '@/api/VLStreamCloud/algorithm'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import { useUserStore } from '@/store/modules/useraPaas'
@@ -40,6 +41,8 @@ import { showConfirmDialog } from 'vant'
 import aiAbnormal from './aiAbnormal.vue'
 
 const showAi = ref(false)
+
+const { t } = useI18n()
 
 const props = defineProps<{
   deviceId?: string | number
@@ -72,8 +75,8 @@ const fetchModelList = async() => {
 // 删除检测项（确认弹窗 + 删除接口 + 重新获取列表）
 const handleDelete = async(item: any) => {
   showConfirmDialog({
-    title: '提示',
-    message: '确认删除该算法吗？'
+    title: t('提示'),
+    message: t('确认删除该算法吗？')
   })
     .then(async() => {
       const ids = String(item.id)

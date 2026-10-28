@@ -1,21 +1,21 @@
 <template>
   <div class="feedbackRecord-page">
-    <nav-header-banner title="反馈记录" />
+    <nav-header-banner :title="$t('反馈记录')" />
     <div class="content">
       <van-tabs v-model="activeTab">
-        <van-tab v-for="(tab, a) in tabs" :key="a" :title="tab.title" :name="tab.title">
+        <van-tab v-for="(tab, a) in tabs" :key="a" :title="$t(tab.title)" :name="tab.title">
           <template v-if="tab.mod_type===1">
             <div class="eventBuiltBox flexRowAC">
               <div>
                 <div class="t1">
-                  添加事件处置记录
+                  {{ $t('添加事件处置记录') }}
                 </div>
                 <div class="t2">
-                  事件闭环，问题整改
+                  {{ $t('事件闭环，问题整改') }}
                 </div>
               </div>
               <div class="btn flexRowAC" @click="eventBuiltFn">
-                添加反馈
+                {{ $t('添加反馈') }}
                 <van-icon name="plus" />
               </div>
             </div>

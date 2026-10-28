@@ -1,7 +1,7 @@
 <template>
   <van-tabbar v-model="active" route active-color="#1976D2" inactive-color="#999">
     <van-tabbar-item to="/workbench">
-      <span>工作台</span>
+      <span>{{ $t('工作台') }}</span>
       <template #icon="props">
         <van-icon
           name="home-o"
@@ -11,7 +11,7 @@
       </template>
     </van-tabbar-item>
     <van-tabbar-item to="/video">
-      <span>视频</span>
+      <span>{{ $t('视频') }}</span>
       <template #icon="props">
         <van-icon
           name="video-o"
@@ -21,7 +21,7 @@
       </template>
     </van-tabbar-item>
     <van-tabbar-item to="/event">
-      <span>事件</span>
+      <span>{{ $t('事件') }}</span>
       <template #icon="props">
         <van-icon
           name="orders-o"
@@ -31,7 +31,7 @@
       </template>
     </van-tabbar-item>
     <van-tabbar-item to="/my">
-      <span>我的</span>
+      <span>{{ $t('我的') }}</span>
       <template #icon="props">
         <van-icon
           name="user-o"

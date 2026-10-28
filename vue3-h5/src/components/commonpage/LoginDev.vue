@@ -10,14 +10,14 @@
     <div class="brand_area">
       <img class="brand_logo" src="@/assets/img/login_logo.png" alt="VLStream Cloud" />
       <div class="brand_subtitle">
-        视频流云平台
+        {{ $t('视频流云平台') }}
       </div>
     </div>
 
     <!-- 表单卡片 -->
     <div class="form_card">
       <div class="form_card_title">
-        账号登录
+        {{ $t('账号登录') }}
       </div>
 
       <div class="field_group">
@@ -25,7 +25,7 @@
           v-model="username"
           class="login_field"
           left-icon="manager-o"
-          placeholder="请输入用户名"
+          :placeholder="$t('请输入用户名')"
           clearable
         />
         <van-field
@@ -33,7 +33,7 @@
           class="login_field"
           left-icon="lock"
           :type="showPwd ? 'text' : 'password'"
-          placeholder="请输入密码"
+          :placeholder="$t('请输入密码')"
           :right-icon="showPwd ? 'eye-o' : 'closed-eye'"
           @click-right-icon="showPwd = !showPwd"
         />
@@ -45,7 +45,7 @@
           v-model="code"
           class="login_field captcha_field"
           left-icon="shield-o"
-          placeholder="请输入图形验证码"
+          :placeholder="$t('请输入图形验证码')"
         />
         <img
           class="captcha_img"
@@ -60,23 +60,23 @@
           <span class="auto_login_box" :class="{ checked: autoLogin }">
             <van-icon v-if="autoLogin" name="success" />
           </span>
-          <span class="auto_login_text">下次自动登录</span>
+          <span class="auto_login_text">{{ $t('下次自动登录') }}</span>
         </div>
       </div>
 
       <van-button
         class="login_btn"
         :loading="loading"
-        loading-text="登录中..."
+        :loading-text="$t('登录中...')"
         block
         @click="loginBtn"
       >
-        登 录
+        {{ $t('登录') }}
       </van-button>
     </div>
 
     <div class="footer_tip">
-      登录即表示同意平台服务条款
+      {{ $t('登录即表示同意平台服务条款') }}
     </div>
 
     <!-- 租户选择弹窗 -->
@@ -84,10 +84,10 @@
       <div class="tenant_container">
         <div class="tenant_header">
           <div class="tenant_title">
-            请选择登录租户
+            {{ $t('请选择登录租户') }}
           </div>
           <div class="tenant_desc">
-            该账号关联了多个租户
+            {{ $t('该账号关联了多个租户') }}
           </div>
         </div>
         <div class="tenant_list">
@@ -125,6 +125,9 @@ import OortPopup from '@/components/popup/oort_popup'
 
 import { getUserTenants } from '@/api/login/indexapaas.ts'
 import { showToast } from 'vant'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const tenantList = ref([])
 const tenantVis = ref(false)
@@ -152,7 +155,7 @@ const getTenantInfo = () => {
       } else if (tenantList.value.length > 1) {
         tenantVis.value = true
       } else {
-        showToast('暂无租户信息')
+        showToast(t('暂无租户信息'))
       }
     }
   })
@@ -167,7 +170,7 @@ const tenantClickLogin = (item) => {
   }
   store.login(params).then((res) => {
     if (res.code === 200) {
-      showToast('登录成功')
+      showToast(t('登录成功'))
       emits('loginSuccess')
     }
   })
@@ -195,11 +198,11 @@ const refreshCaptcha = () => {
 
 const loginBtn = async() => {
   if (!username.value) {
-    showToast('请输入用户名')
+    showToast(t('请输入用户名'))
     return
   }
   if (!password.value) {
-    showToast('请输入密码')
+    showToast(t('请输入密码'))
     return
   }
   if (autoLogin.value) {
@@ -219,7 +222,7 @@ const loginBtn = async() => {
     if (res.code === 200) {
       if (isLocalAuth) {
         // 单租户一步登录：本地令牌即业务令牌，没有租户选择这一步
-        showToast('登录成功')
+        showToast(t('登录成功'))
         emits('loginSuccess')
         return
       }
@@ -232,7 +235,7 @@ const loginBtn = async() => {
       captchaID.value = res.data && res.data.CaptchaID ? res.data.CaptchaID : ''
     }
   }).catch((error) => {
-    if (isLocalAuth) showToast(error?.response?.data?.msg || error?.message || '登录失败')
+    if (isLocalAuth) showToast(error?.response?.data?.msg || error?.message || t('登录失败'))
   }).finally(() => {
     loading.value = false
   })

@@ -8,7 +8,7 @@
 !-->
 <template>
   <div class="eventBuilt_page">
-    <nav-header-banner title="新建" />
+    <nav-header-banner :title="$t('新建')" />
     <div class="eventBox">
       <div class="eventItem">
         <div class="eventItem_c flexRowAC">
@@ -20,7 +20,7 @@
               class="title p0"
               autosize
               clearable
-              placeholder="请输入事件名称"
+              :placeholder="$t('请输入事件名称')"
             />
           </div>
         </div>
@@ -29,12 +29,12 @@
       <div class="eventItem">
         <div class="eventItem_c flexRowAC">
           <img src="@/assets/img/eventMana/photo1.png" alt="" />
-          <span class="title">事件图片</span>
+          <span class="title">{{ $t('事件图片') }}</span>
         </div>
         <div class="e_r locationBox flexRowAC coverBox">
           <div class="uploadBox flexRowAC" @click="showUploader=true">
             <img src="@/assets/img/eventMana/photo.png" alt="" />
-            上传图片
+            {{ $t('上传图片') }}
           </div>
           <!-- imgArr-->
           <template v-if="imgArr&&imgArr.length">
@@ -49,7 +49,7 @@
       <div class="eventItem">
         <div class="eventItem_c flexRowAC" @click=" selectLocationVisible = true">
           <img src="@/assets/img/eventMana/event_location.png" alt="" />
-          <span class="title">事件位置</span>
+          <span class="title">{{ $t('事件位置') }}</span>
           <img class="arrow-icon" src="@/assets/img/ancientTrees/biaodan-icon-tiaozhuan.png" alt="跳转" />
         </div>
         <div class="e_r locationBox flexRowAC">
@@ -60,7 +60,7 @@
             autosize
             readonly
             clearable
-            placeholder="请选择区域"
+            :placeholder="$t('请选择区域')"
           />
         </div>
         <div class="e_r locationBox flexRowAC">
@@ -72,14 +72,14 @@
             rows="4"
             autosize
             clearable
-            placeholder="请输入事件描述"
+            :placeholder="$t('请输入事件描述')"
           />
         </div>
         <div class="e_r locationBox">
           <div class="addBtnBox flexRowAC">
             <div class="addBtn flexRowAC">
               <van-icon name="plus" />
-              添加为常用语
+              {{ $t('添加为常用语') }}
             </div>
             <div
               v-for="(item,i) in listData"
@@ -97,7 +97,7 @@
         <div class="eventItem_c flexRowAC">
           <img src="@/assets/img/eventMana/event_user1.png" alt="" />
           <span class="red">*</span>
-          <span class="title">执行人员</span>
+          <span class="title">{{ $t('执行人员') }}</span>
         </div>
         <div class="e_r locationBox user_box flexRowAC">
           <img class="add" src="@/assets/img/eventMana/add.png" alt="" @click="showContact=true,showType='u_type1'" />
@@ -114,7 +114,7 @@
       <div class="eventItem">
         <div class="eventItem_c flexRowAC">
           <img src="@/assets/img/eventMana/cart.png" alt="" />
-          <span class="title">车辆</span>
+          <span class="title">{{ $t('车辆') }}</span>
         </div>
         <div class="e_r locationBox user_box flexRowAC">
           <img class="add" src="@/assets/img/eventMana/add.png" alt="" @click="showContact=true,showType='u_type2'" />
@@ -129,7 +129,7 @@
       </div>
       <div class="eventItem primaryBox flexRowAC">
         <van-button type="primary" @click="submit">
-          确认开始
+          {{ $t('确认开始') }}
         </van-button>
       </div>
       <!--      -->
@@ -152,7 +152,7 @@
       style="width: 100%;height: 80%;"
       position="bottom"
       round
-      title="选择位置"
+      :title="$t('选择位置')"
     >
       <select-point-form-map v-if="selectLocationVisible" is-around-search @confirm="confirmLocation" @cancel="selectLocationVisible=false" />
     </oort-popup>
@@ -161,6 +161,7 @@
 
 <script setup>
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
+import { useI18n } from 'vue-i18n'
 import { event_add } from '@/api/eventManagement'
 import { useUserStore } from '@/store/modules/useraPaas'
 import { useRoute, useRouter } from 'vue-router'
@@ -175,6 +176,7 @@ import SelectPointFormMap from '@/components/map/selectPointFormMap.vue'
 import OortPopup from '@/components/popup/oort_popup.vue'
 
 const store = useUserStore()
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 let mod_type = ref(route.query.event)
@@ -243,10 +245,10 @@ const contactClose = (data) => {
 
 // 保存
 const submit = async() => {
-  if (!form.name) return showToast('请输入事件名称')
-  if (!form.point?.lat) return showToast('位置为空')
-  if (!form.describe) return showToast('请输入事件描述')
-  if (!form.u_type1.length) return showToast('执行人员未选择')
+  if (!form.name) return showToast(t('请输入事件名称'))
+  if (!form.point?.lat) return showToast(t('位置为空'))
+  if (!form.describe) return showToast(t('请输入事件描述'))
+  if (!form.u_type1.length) return showToast(t('执行人员未选择'))
   let data = {
     accessToken: store.token,
     tenant_id: store.userInfo.tenantId,
@@ -267,7 +269,7 @@ const submit = async() => {
   }
   let res = await event_add(data)
   if (res.code === 200) {
-    showSuccessToast('操作成功')
+    showSuccessToast(t('操作成功'))
     router.push('/')
   }
 }

@@ -1,10 +1,10 @@
 <template>
   <div class="add-govern">
-    <nav-header-banner title="新增治理" :is-call-back="true" @call-back="onBack" />
+    <nav-header-banner :title="$t('新增治理')" :is-call-back="true" @call-back="onBack" />
     <div class="add_content">
       <van-form class="form">
         <!-- 治理名称 -->
-        <van-field v-model="formData.name" placeholder="请输入治理名称" class="addMargin">
+        <van-field v-model="formData.name" :placeholder="$t('请输入治理名称')" class="addMargin">
           <template #left-icon>
             <img :src="fxqy" alt="必填" class="required-icon" />
           </template>
@@ -17,15 +17,15 @@
         <!-- 治理模式 -->
         <div class="mode-row">
           <div class="mode-label">
-            <img :src="fxqy" alt="必填" class="required-icon" /> 治理模式
+            <img :src="fxqy" alt="必填" class="required-icon" /> {{ $t('治理模式') }}
           </div>
           <div class="mode-radio">
             <van-radio-group v-model="formData.mode" direction="horizontal">
               <van-radio name="now">
-                即时治理
+                {{ $t('即时治理') }}
               </van-radio>
               <van-radio name="loop">
-                循环治理
+                {{ $t('循环治理') }}
               </van-radio>
             </van-radio-group>
           </div>
@@ -42,14 +42,14 @@
             <img :src="rq" alt="" class="section-icon" />
             <div class="time-range-item">
               <div class="time-label-row">
-                <span class="section-title">开始</span>
+                <span class="section-title">{{ $t('开始') }}</span>
               </div>
               <div class="time-fields">
                 <van-field
                   v-model="formData.startDate"
                   is-link
                   readonly
-                  placeholder="日期"
+                  :placeholder="$t('日期')"
                   class="time-field"
                   @click="showStartDatePicker = true"
                 />
@@ -57,7 +57,7 @@
                   v-model="formData.startTime"
                   is-link
                   readonly
-                  placeholder="时间"
+                  :placeholder="$t('时间')"
                   class="time-field"
                   @click="showStartTimePicker = true"
                 />
@@ -66,14 +66,14 @@
             <div class="time-arrow" />
             <div class="time-range-item">
               <div class="time-label-row">
-                <span class="section-title">结束</span>
+                <span class="section-title">{{ $t('结束') }}</span>
               </div>
               <div class="time-fields">
                 <van-field
                   v-model="formData.endDate"
                   is-link
                   readonly
-                  placeholder="日期"
+                  :placeholder="$t('日期')"
                   class="time-field"
                   @click="showEndDatePicker = true"
                 />
@@ -81,7 +81,7 @@
                   v-model="formData.endTime"
                   is-link
                   readonly
-                  placeholder="时间"
+                  :placeholder="$t('时间')"
                   class="time-field"
                   @click="showEndTimePicker = true"
                 />
@@ -125,28 +125,28 @@
                     :class="{ butActive: localEvery === 'every' }"
                     @click="updateEvery('every')"
                   >
-                    每天
+                    {{ $t('每天') }}
                   </div>
                   <div
                     class="timeBut"
                     :class="{ butActive: localEvery === 'next' }"
                     @click="updateEvery('next')"
                   >
-                    隔天
+                    {{ $t('隔天') }}
                   </div>
                   <div
                     class="timeBut"
                     :class="{ butActive: localEvery === 'week' }"
                     @click="updateEvery('week')"
                   >
-                    每周
+                    {{ $t('每周') }}
                   </div>
                   <div
                     class="timeBut"
                     :class="{ butActive: localEvery === 'month' }"
                     @click="updateEvery('month')"
                   >
-                    每月
+                    {{ $t('每月') }}
                   </div>
                 </div>
 
@@ -156,7 +156,7 @@
                     v-model="loopForm.start_at"
                     label-width="80px"
                     required
-                    label="开始时间"
+                    :label="$t('开始时间')"
                     class="taskDesc"
                     readonly
                     @click="startDatePicker = true"
@@ -164,7 +164,7 @@
                     <template #input>
                       <div class="custom-input">
                         <img :src="noto" alt="时间图标" class="input-icon" />
-                        <span v-if="!loopForm.start_at" class="placeholder-text">选择日期时间</span>
+                        <span v-if="!loopForm.start_at" class="placeholder-text">{{ $t('选择日期时间') }}</span>
                         <span v-else>{{ loopForm.start_at }}</span>
                       </div>
                     </template>
@@ -183,7 +183,7 @@
                       <van-field
                         v-model="loopForm.loop_time[index]"
                         label-width="80px"
-                        :label="index === 0 ? '触发时间' : ''"
+                        :label="index === 0 ? $t('触发时间') : ''"
                         class="taskDesc"
                         readonly
                         @click="openTimePicker(index)"
@@ -227,13 +227,13 @@
                     :model-value="loopForm.loop_gap.toString()"
                     label-width="80px"
                     type="number"
-                    label="每隔"
+                    :label="$t('每隔')"
                     class="custom-input"
                     placeholder="0"
                     @input="onLoopGapInput"
                   >
                     <template #right-icon>
-                      <span class="timeUnit">天</span>
+                      <span class="timeUnit">{{ $t('天') }}</span>
                     </template>
                   </van-field>
 
@@ -242,13 +242,13 @@
                     :model-value="loopForm.loop_gap.toString()"
                     label-width="80px"
                     type="number"
-                    label="每隔"
+                    :label="$t('每隔')"
                     class="custom-input"
                     placeholder="0"
                     @input="onLoopGapInput"
                   >
                     <template #right-icon>
-                      <span class="timeUnit">周</span>
+                      <span class="timeUnit">{{ $t('周') }}</span>
                     </template>
                   </van-field>
 
@@ -257,7 +257,7 @@
                     v-if="localEvery === 'week'"
                     label-width="80px"
                     required
-                    label="星期"
+                    :label="$t('星期')"
                     class="taskDesc"
                     readonly
                   >
@@ -270,7 +270,7 @@
                           :class="{ active: loopForm.weekly_days.includes(day.value) }"
                           @click="toggleWeekDay(day.value)"
                         >
-                          {{ day.label }}
+                          {{ $t(day.label) }}
                         </div>
                       </div>
                     </template>
@@ -281,7 +281,7 @@
                     v-if="localEvery === 'month'"
                     label-width="80px"
                     required
-                    label="日期"
+                    :label="$t('日期')"
                     class="taskDesc"
                     readonly
                   >
@@ -305,7 +305,7 @@
                     v-model="loopForm.end_at"
                     label-width="80px"
                     required
-                    label="结束时间"
+                    :label="$t('结束时间')"
                     class="taskDesc"
                     readonly
                     @click="endDatePicker = true"
@@ -313,7 +313,7 @@
                     <template #input>
                       <div class="custom-input">
                         <img :src="noto" alt="时间图标" class="input-icon" />
-                        <span v-if="!loopForm.end_at" class="placeholder-text">选择日期时间</span>
+                        <span v-if="!loopForm.end_at" class="placeholder-text">{{ $t('选择日期时间') }}</span>
                         <span v-else>{{ loopForm.end_at }}</span>
                       </div>
                     </template>
@@ -326,8 +326,7 @@
                   <div class="tipBox">
                     <van-icon name="warning-o" />
                     <span>
-                      说明：在开始时间点触发后，在设置时间间隔天数后的当天内按设置的时间点触发任务，直到截止时间
-                      （截止时间无法一直执行）
+                      {{ $t('说明：在开始时间点触发后，在设置时间间隔天数后的当天内按设置的时间点触发任务，直到截止时间（截止时间无法一直执行）') }}
                     </span>
                   </div>
                 </div>
@@ -345,7 +344,7 @@
           <div class="section-header">
             <span class="section-label">
               <img :src="fxql" alt="" class="section-icon" />
-              分析区域
+              {{ $t('分析区域') }}
             </span>
             <img :src="add" alt="" class="section-add" @click="onAddArea" />
           </div>
@@ -371,9 +370,9 @@
         >
           <div class="area-popup-wrapper">
             <div class="area-popup-header">
-              <span class="area-popup-cancel" @click="onAreaCancel">取消</span>
-              <span class="area-popup-title">选择分析区域</span>
-              <span class="area-popup-confirm" @click="onAreaConfirm">确定</span>
+              <span class="area-popup-cancel" @click="onAreaCancel">{{ $t('取消') }}</span>
+              <span class="area-popup-title">{{ $t('选择分析区域') }}</span>
+              <span class="area-popup-confirm" @click="onAreaConfirm">{{ $t('确定') }}</span>
             </div>
             <div class="area-popup-content">
               <van-cascader
@@ -390,13 +389,13 @@
         <oort-popup v-model="showAreaInput" position="bottom" style="width: 100%;">
           <div class="area-input-popup">
             <div class="area-input-header">
-              <span @click="showAreaInput = false">取消</span>
-              <span class="area-input-title">输入分析区域</span>
-              <span class="area-input-confirm" @click="onAreaInputConfirm">确定</span>
+              <span @click="showAreaInput = false">{{ $t('取消') }}</span>
+              <span class="area-input-title">{{ $t('输入分析区域') }}</span>
+              <span class="area-input-confirm" @click="onAreaInputConfirm">{{ $t('确定') }}</span>
             </div>
             <van-field
               v-model="areaInput"
-              placeholder="请输入分析区域名称"
+              :placeholder="$t('请输入分析区域名称')"
               class="area-input-field"
             />
           </div>
@@ -407,7 +406,7 @@
           <div class="section-header">
             <span class="section-label">
               <img :src="fxqy" alt="必填" class="required-icon" />
-              AI算法
+              {{ $t('AI算法') }}
             </span>
             <img :src="add" alt="" class="section-add" @click="onAddAlgo" />
           </div>
@@ -433,9 +432,9 @@
         >
           <div class="area-popup-wrapper">
             <div class="area-popup-header">
-              <span class="area-popup-cancel" @click="onAlgoCancel">取消</span>
-              <span class="area-popup-title">选择算法</span>
-              <span class="area-popup-confirm" @click="onAlgoConfirm">确定</span>
+              <span class="area-popup-cancel" @click="onAlgoCancel">{{ $t('取消') }}</span>
+              <span class="area-popup-title">{{ $t('选择算法') }}</span>
+              <span class="area-popup-confirm" @click="onAlgoConfirm">{{ $t('确定') }}</span>
             </div>
             <div class="area-popup-content">
               <van-cascader
@@ -453,7 +452,7 @@
           <div class="section-header">
             <span class="section-label">
               <img :src="sxt" alt="" class="section-icon" />
-              摄像头
+              {{ $t('摄像头') }}
             </span>
             <img :src="add" alt="" class="section-add" @click="onAddCamera" />
           </div>
@@ -479,9 +478,9 @@
         >
           <div class="camera-popup-wrapper">
             <div class="camera-popup-header">
-              <span class="camera-popup-cancel" @click="onCameraCancel">取消</span>
-              <span class="camera-popup-title">选择摄像头</span>
-              <span class="camera-popup-confirm" @click="onCameraConfirm">确定</span>
+              <span class="camera-popup-cancel" @click="onCameraCancel">{{ $t('取消') }}</span>
+              <span class="camera-popup-title">{{ $t('选择摄像头') }}</span>
+              <span class="camera-popup-confirm" @click="onCameraConfirm">{{ $t('确定') }}</span>
             </div>
             <div class="camera-popup-content">
               <van-checkbox-group v-model="tempCameras">
@@ -503,7 +502,7 @@
         <van-field
           v-model="formData.describe"
           type="textarea"
-          placeholder="请输入分析描述"
+          :placeholder="$t('请输入分析描述')"
           rows="4"
           class="taskDesc"
         />
@@ -517,7 +516,7 @@
       <!-- 底部按钮 -->
       <div class="submit-section">
         <van-button type="primary" block @click="submit">
-          确认申请
+          {{ $t('确认申请') }}
         </van-button>
       </div>
     </div>
@@ -543,6 +542,9 @@ import add from '@/assets/img/VLStreamCloud/fxsq/add.png'
 import del from '@/assets/img/VLStreamCloud/fxsq/del.png'
 import moment from 'moment/moment'
 import { showToast } from 'vant'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const emit = defineEmits(['close'])
 
@@ -728,7 +730,7 @@ const fetchAlgoRepos = async() => {
     if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
       algoOptions.value = res.data.records.map((item) => ({
         value: item.id, // 仓库ID
-        text: item.name || '未命名算法库',
+        text: item.name || t('未命名算法库'),
         children: []
       }))
     } else {
@@ -1003,7 +1005,7 @@ const onAlgoConfirm = () => {
   const leafId = leaf && leaf.value
   // 后端 algorithm_ids 只认数字 ID，没选到具体算法就确认等于没选
   if (opts.length < 2 || leafId === undefined || leafId === null) {
-    showToast({ type: 'fail', message: '请选择到具体的算法' })
+    showToast({ type: 'fail', message: t('请选择到具体的算法') })
     return
   }
 
@@ -1040,20 +1042,20 @@ const buildBasePayload = () => {
 
 const submit = async() => {
   if (!formData.value.name) {
-    showToast({ type: 'fail', message: '请填写治理名称' })
+    showToast({ type: 'fail', message: t('请填写治理名称') })
     return
   }
   // 后端 validateCommon 这四个字段都是必填，先在前端拦住，避免只拿到一句接口报错
   if (!formData.value.areas.length) {
-    showToast({ type: 'fail', message: '请选择分析区域' })
+    showToast({ type: 'fail', message: t('请选择分析区域') })
     return
   }
   if (!selectedAlgoIds.value.length) {
-    showToast({ type: 'fail', message: '请选择AI算法' })
+    showToast({ type: 'fail', message: t('请选择AI算法') })
     return
   }
   if (!selectedCameraIds.value.length) {
-    showToast({ type: 'fail', message: '请选择摄像头' })
+    showToast({ type: 'fail', message: t('请选择摄像头') })
     return
   }
 
@@ -1066,7 +1068,7 @@ const submit = async() => {
     const hasEndTime = !!formData.value.endTime
 
     if (!hasStartDate || !hasEndDate) {
-      showToast({ type: 'fail', message: '请选择开始和结束日期' })
+      showToast({ type: 'fail', message: t('请选择开始和结束日期') })
       return
     }
 
@@ -1076,7 +1078,7 @@ const submit = async() => {
     const endDateTime = `${formData.value.endDate} ${hasEndTime ? formData.value.endTime : defaultTime}`
 
     if (moment(endDateTime).isBefore(moment(startDateTime))) {
-      showToast({ type: 'fail', message: '结束时间不能早于开始时间' })
+      showToast({ type: 'fail', message: t('结束时间不能早于开始时间') })
       return
     }
 
@@ -1086,13 +1088,13 @@ const submit = async() => {
     try {
       const res = await saveVlsMobileSceneGovernanceImmediate(payload)
       if (res && (res.code === 200)) {
-        showToast({ type: 'success', message: '新增即时治理成功' })
+        showToast({ type: 'success', message: t('新增即时治理成功') })
         emit('close')
       } else {
-        showToast({ type: 'fail', message: res?.msg || '新增即时治理失败' })
+        showToast({ type: 'fail', message: res?.msg || t('新增即时治理失败') })
       }
     } catch (e) {
-      showToast({ type: 'fail', message: '请求失败，请稍后重试' })
+      showToast({ type: 'fail', message: t('请求失败，请稍后重试') })
     }
   } else {
     // 循环治理参数
@@ -1103,33 +1105,33 @@ const submit = async() => {
       payload.cycleType = 'everyOtherDay'
       payload.intervalDays = loopForm.value.loop_gap || 0
       if (!payload.intervalDays || payload.intervalDays <= 0) {
-        showToast({ type: 'fail', message: '隔天模式间隔天数必须大于0' })
+        showToast({ type: 'fail', message: t('隔天模式间隔天数必须大于0') })
         return
       }
     } else if (localEvery.value === 'week') {
       payload.cycleType = 'weekly'
       payload.weeklyDays = [...loopForm.value.weekly_days].sort((a, b) => a - b).join(',')
       if (!payload.weeklyDays) {
-        showToast({ type: 'fail', message: '请选择每周执行日' })
+        showToast({ type: 'fail', message: t('请选择每周执行日') })
         return
       }
     } else if (localEvery.value === 'month') {
       payload.cycleType = 'monthly'
       payload.monthlyDays = [...loopForm.value.monthly_days].sort((a, b) => a - b).join(',')
       if (!payload.monthlyDays) {
-        showToast({ type: 'fail', message: '请选择每月执行日' })
+        showToast({ type: 'fail', message: t('请选择每月执行日') })
         return
       }
     }
 
     if (!loopForm.value.start_at || !loopForm.value.end_at) {
-      showToast({ type: 'fail', message: '请选择开始和结束时间' })
+      showToast({ type: 'fail', message: t('请选择开始和结束时间') })
       return
     }
 
     const times = Array.isArray(loopForm.value.loop_time) ? loopForm.value.loop_time.filter(t => t) : []
     if (!times.length) {
-      showToast({ type: 'fail', message: '请选择触发时间' })
+      showToast({ type: 'fail', message: t('请选择触发时间') })
       return
     }
 
@@ -1140,13 +1142,13 @@ const submit = async() => {
     try {
       const res = await saveVlsMobileSceneGovernanceLoop(payload)
       if (res && (res.code === 0 || res.code === 200 || res.success === true)) {
-        showToast({ type: 'success', message: '新增循环治理成功' })
+        showToast({ type: 'success', message: t('新增循环治理成功') })
         emit('close')
       } else {
-        showToast({ type: 'fail', message: res?.msg || '新增循环治理失败' })
+        showToast({ type: 'fail', message: res?.msg || t('新增循环治理失败') })
       }
     } catch (e) {
-      showToast({ type: 'fail', message: '请求失败，请稍后重试' })
+      showToast({ type: 'fail', message: t('请求失败，请稍后重试') })
     }
   }
 }

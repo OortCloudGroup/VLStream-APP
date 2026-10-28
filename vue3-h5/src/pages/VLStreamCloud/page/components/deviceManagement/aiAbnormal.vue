@@ -1,7 +1,7 @@
 <template>
   <div class="audio-detection-page">
-    <nav-header-banner title="音频异常侦测" :is-call-back="true" @call-back="onBack">
-      <span class="header-save" @click="onSave">保存</span>
+    <nav-header-banner :title="$t('音频异常侦测')" :is-call-back="true" @call-back="onBack">
+      <span class="header-save" @click="onSave">{{ $t('保存') }}</span>
     </nav-header-banner>
 
     <div class="audio-content">
@@ -41,11 +41,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
 import AiAbnormalDetect from './AiAbnormalDetect.vue'
 import AiDefenseTime from './AiDefenseTime.vue'
 import AiLinkageMode from './AiLinkageMode.vue'
+
+const { t } = useI18n()
 
 const emit = defineEmits(['close'])
 
@@ -53,11 +56,11 @@ const props = defineProps<{
   deviceId?: string | number
 }>()
 
-const tabs = [
-  { label: '异常检测', value: 'detect' },
-  { label: '布防时间', value: 'time' },
-  { label: '联动方式', value: 'linkage' }
-]
+const tabs = computed(() => [
+  { label: t('异常检测'), value: 'detect' },
+  { label: t('布防时间'), value: 'time' },
+  { label: t('联动方式'), value: 'linkage' }
+])
 
 const activeTab = ref('detect')
 

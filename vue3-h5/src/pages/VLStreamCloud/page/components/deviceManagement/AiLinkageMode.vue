@@ -4,16 +4,16 @@
     <div class="linkage-section">
       <div class="linkage-section-header">
         <van-checkbox v-model="normalParentChecked" shape="square" class="parent-checkbox">
-          常规联动
+          {{ $t('常规联动') }}
         </van-checkbox>
       </div>
       <div class="card-container">
         <van-checkbox-group v-model="normalList" shape="square" class="checkbox-group">
           <van-checkbox name="email">
-            邮件联动
+            {{ $t('邮件联动') }}
           </van-checkbox>
           <van-checkbox name="upload">
-            上传中心
+            {{ $t('上传中心') }}
           </van-checkbox>
         </van-checkbox-group>
       </div>
@@ -23,7 +23,7 @@
     <div class="linkage-section">
       <div class="linkage-section-header">
         <van-checkbox v-model="alarmParentChecked" shape="square" class="parent-checkbox">
-          联动报警输出
+          {{ $t('联动报警输出') }}
         </van-checkbox>
       </div>
       <div class="card-container">
@@ -39,7 +39,7 @@
     <div class="linkage-section">
       <div class="linkage-section-header">
         <van-checkbox v-model="recordParentChecked" shape="square" class="parent-checkbox">
-          录像联动
+          {{ $t('录像联动') }}
         </van-checkbox>
       </div>
       <div class="card-container">

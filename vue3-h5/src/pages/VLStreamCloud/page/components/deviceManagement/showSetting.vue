@@ -2,10 +2,10 @@
   <div class="camera-settings">
     <!-- 场景 -->
     <van-field
-      v-model="sceneValue"
+      :model-value="$t(sceneValue)"
       is-link
       readonly
-      label="场景"
+      :label="$t('场景')"
       class="settings-field"
       @click="showScenePicker = true"
     />
@@ -19,26 +19,26 @@
 
     <!-- 图像调节 -->
     <div class="section-title">
-      图像调节
+      {{ $t('图像调节') }}
     </div>
     <div class="slider-group">
       <div class="slider-item">
-        <span class="slider-label">亮度</span>
+        <span class="slider-label">{{ $t('亮度') }}</span>
         <van-slider v-model="brightness" :max="100" />
         <span class="slider-value">{{ brightness }}</span>
       </div>
       <div class="slider-item">
-        <span class="slider-label">对比度</span>
+        <span class="slider-label">{{ $t('对比度') }}</span>
         <van-slider v-model="contrast" :max="100" />
         <span class="slider-value">{{ contrast }}</span>
       </div>
       <div class="slider-item">
-        <span class="slider-label">饱和度</span>
+        <span class="slider-label">{{ $t('饱和度') }}</span>
         <van-slider v-model="saturation" :max="100" />
         <span class="slider-value">{{ saturation }}</span>
       </div>
       <div class="slider-item">
-        <span class="slider-label">锐度</span>
+        <span class="slider-label">{{ $t('锐度') }}</span>
         <van-slider v-model="sharpness" :max="100" />
         <span class="slider-value">{{ sharpness }}</span>
       </div>
@@ -46,15 +46,15 @@
 
     <!-- 曝光 -->
     <div class="section-title">
-      曝光
+      {{ $t('曝光') }}
     </div>
     <div class="field-group">
       <!-- 曝光模式 -->
       <van-field
-        v-model="exposureModeValue"
+        :model-value="$t(exposureModeValue)"
         is-link
         readonly
-        label="曝光模式"
+        :label="$t('曝光模式')"
         class="settings-field"
         @click="showExposureModePicker = true"
       />
@@ -71,7 +71,7 @@
         v-model="maxShutterValue"
         is-link
         readonly
-        label="最大快门限制"
+        :label="$t('最大快门限制')"
         class="settings-field"
         @click="showMaxShutterPicker = true"
       />
@@ -88,7 +88,7 @@
         v-model="minShutterValue"
         is-link
         readonly
-        label="最小快门限制"
+        :label="$t('最小快门限制')"
         class="settings-field"
         @click="showMinShutterPicker = true"
       />
@@ -102,17 +102,17 @@
 
       <!-- 增益限制 -->
       <div class="slider-item">
-        <span class="slider-label">增益限制</span>
+        <span class="slider-label">{{ $t('增益限制') }}</span>
         <van-slider v-model="gainLimit" :max="100" />
         <span class="slider-value">{{ gainLimit }}</span>
       </div>
 
       <!-- 低照度电子快门 -->
       <van-field
-        v-model="lowLightShutterValue"
+        :model-value="$t(lowLightShutterValue)"
         is-link
         readonly
-        label="低照度电子快门"
+        :label="$t('低照度电子快门')"
         class="settings-field"
         @click="showLowLightShutterPicker = true"
       />
@@ -127,15 +127,15 @@
 
     <!-- 聚焦 -->
     <div class="section-title">
-      聚焦
+      {{ $t('聚焦') }}
     </div>
     <div class="field-group">
       <!-- 聚焦模式 -->
       <van-field
-        v-model="focusModeValue"
+        :model-value="$t(focusModeValue)"
         is-link
         readonly
-        label="聚焦模式"
+        :label="$t('聚焦模式')"
         class="settings-field"
         @click="showFocusModePicker = true"
       />
@@ -152,7 +152,7 @@
         v-model="minFocusValue"
         is-link
         readonly
-        label="最小聚焦距离"
+        :label="$t('最小聚焦距离')"
         class="settings-field"
         @click="showMinFocusPicker = true"
       />
@@ -167,15 +167,15 @@
 
     <!-- 日夜转换 -->
     <div class="section-title">
-      日夜转换
+      {{ $t('日夜转换') }}
     </div>
     <div class="field-group">
       <!-- 日夜转换 -->
       <van-field
-        v-model="dayNightValue"
+        :model-value="$t(dayNightValue)"
         is-link
         readonly
-        label="日夜转换"
+        :label="$t('日夜转换')"
         class="settings-field"
         @click="showDayNightPicker = true"
       />
@@ -192,7 +192,7 @@
         v-model="sensitivityValue"
         is-link
         readonly
-        label="灵敏度"
+        :label="$t('灵敏度')"
         class="settings-field"
         @click="showSensitivityPicker = true"
       />
@@ -206,10 +206,10 @@
 
       <!-- 防补光过曝 -->
       <van-field
-        v-model="antiOverexposeValue"
+        :model-value="$t(antiOverexposeValue)"
         is-link
         readonly
-        label="防补光过曝"
+        :label="$t('防补光过曝')"
         class="settings-field"
         @click="showAntiOverexposePicker = true"
       />
@@ -223,10 +223,10 @@
 
       <!-- 红外灯模式 -->
       <van-field
-        v-model="irModeValue"
+        :model-value="$t(irModeValue)"
         is-link
         readonly
-        label="红外灯模式"
+        :label="$t('红外灯模式')"
         class="settings-field"
         @click="showIrModePicker = true"
       />
@@ -240,7 +240,7 @@
 
       <!-- 亮度限制 -->
       <div class="slider-item">
-        <span class="slider-label">亮度限制</span>
+        <span class="slider-label">{{ $t('亮度限制') }}</span>
         <van-slider v-model="brightnessLimit" :max="100" />
         <span class="slider-value">{{ brightnessLimit }}</span>
       </div>
@@ -248,15 +248,15 @@
 
     <!-- 背光 -->
     <div class="section-title">
-      背光
+      {{ $t('背光') }}
     </div>
     <div class="field-group">
       <!-- 背光补偿 -->
       <van-field
-        v-model="backlightCompValue"
+        :model-value="$t(backlightCompValue)"
         is-link
         readonly
-        label="背光补偿"
+        :label="$t('背光补偿')"
         class="settings-field"
         @click="showBacklightCompPicker = true"
       />
@@ -270,10 +270,10 @@
 
       <!-- 宽动态 -->
       <van-field
-        v-model="wideDynamicValue"
+        :model-value="$t(wideDynamicValue)"
         is-link
         readonly
-        label="宽动态"
+        :label="$t('宽动态')"
         class="settings-field"
         @click="showWideDynamicPicker = true"
       />
@@ -287,10 +287,10 @@
 
       <!-- 强光抑制 -->
       <van-field
-        v-model="strongLightValue"
+        :model-value="$t(strongLightValue)"
         is-link
         readonly
-        label="强光抑制"
+        :label="$t('强光抑制')"
         class="settings-field"
         @click="showStrongLightPicker = true"
       />
@@ -305,15 +305,15 @@
 
     <!-- 白平衡 -->
     <div class="section-title">
-      白平衡
+      {{ $t('白平衡') }}
     </div>
     <div class="field-group">
       <!-- 白平衡 -->
       <van-field
-        v-model="whiteBalanceValue"
+        :model-value="$t(whiteBalanceValue)"
         is-link
         readonly
-        label="白平衡"
+        :label="$t('白平衡')"
         class="settings-field"
         @click="showWhiteBalancePicker = true"
       />
@@ -328,15 +328,15 @@
 
     <!-- 图像增强 -->
     <div class="section-title">
-      图像增强
+      {{ $t('图像增强') }}
     </div>
     <div class="field-group">
       <!-- 数字降噪 -->
       <van-field
-        v-model="digitalNoiseReductionValue"
+        :model-value="$t(digitalNoiseReductionValue)"
         is-link
         readonly
-        label="数字降噪"
+        :label="$t('数字降噪')"
         class="settings-field"
         @click="showDigitalNoiseReductionPicker = true"
       />
@@ -350,17 +350,17 @@
 
       <!-- 降噪等级 -->
       <div class="slider-item">
-        <span class="slider-label">降噪等级</span>
+        <span class="slider-label">{{ $t('降噪等级') }}</span>
         <van-slider v-model="noiseReductionLevel" :max="100" />
         <span class="slider-value">{{ noiseReductionLevel }}</span>
       </div>
 
       <!-- 透雾模式 -->
       <van-field
-        v-model="dehazeModeValue"
+        :model-value="$t(dehazeModeValue)"
         is-link
         readonly
-        label="透雾模式"
+        :label="$t('透雾模式')"
         class="settings-field"
         @click="showDehazeModePicker = true"
       />
@@ -374,10 +374,10 @@
 
       <!-- 电子防抖 -->
       <van-field
-        v-model="electronicStabilizationValue"
+        :model-value="$t(electronicStabilizationValue)"
         is-link
         readonly
-        label="电子防抖"
+        :label="$t('电子防抖')"
         class="settings-field"
         @click="showElectronicStabilizationPicker = true"
       />
@@ -392,15 +392,15 @@
 
     <!-- 视频调整 -->
     <div class="section-title">
-      视频调整
+      {{ $t('视频调整') }}
     </div>
     <div class="field-group">
       <!-- 镜像 -->
       <van-field
-        v-model="mirrorValue"
+        :model-value="$t(mirrorValue)"
         is-link
         readonly
-        label="镜像"
+        :label="$t('镜像')"
         class="settings-field"
         @click="showMirrorPicker = true"
       />
@@ -414,10 +414,10 @@
 
       <!-- PAL(50HZ) -->
       <van-field
-        v-model="pal50hzValue"
+        :model-value="$t(pal50hzValue)"
         is-link
         readonly
-        label="PAL（50HZ）"
+        :label="$t('PAL（50HZ）')"
         class="settings-field"
         @click="showPal50hzPicker = true"
       />
@@ -432,15 +432,15 @@
 
     <!-- 其他 -->
     <div class="section-title">
-      其他
+      {{ $t('其他') }}
     </div>
     <div class="field-group">
       <!-- 镜头初始化 -->
       <van-field
-        v-model="lensInitializationValue"
+        :model-value="$t(lensInitializationValue)"
         is-link
         readonly
-        label="镜头初始化"
+        :label="$t('镜头初始化')"
         class="settings-field"
         @click="showLensInitializationPicker = true"
       />
@@ -457,7 +457,7 @@
         v-model="zoomLimitValue"
         is-link
         readonly
-        label="变倍限制"
+        :label="$t('变倍限制')"
         class="settings-field"
         @click="showZoomLimitPicker = true"
       />
@@ -474,9 +474,12 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getVlsCameraDisplaySetting, updateVlsCameraDisplaySetting, restoreDefaultVlsCameraDisplaySetting } from '@/api/VLStreamCloud/device'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import { useUserStore } from '@/store/modules/useraPaas'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   deviceId?: string | number
@@ -496,12 +499,12 @@ const safeNum = (v: any, fallback = 0) => {
 // 场景
 const showScenePicker = ref(false)
 const sceneValue = ref('室内')
-const sceneColumns = ref([
-  { text: '室内', value: '室内' },
-  { text: '室外', value: '室外' }
+const sceneColumns = computed(() => [
+  { text: t('室内'), value: '室内' },
+  { text: t('室外'), value: '室外' }
 ])
 const onSceneConfirm = ({ selectedOptions }: any) => {
-  sceneValue.value = selectedOptions[0].text
+  sceneValue.value = selectedOptions[0].value
   showScenePicker.value = false
   updateDisplaySetting()
 }
@@ -515,12 +518,12 @@ const sharpness = ref(50)
 // 曝光模式
 const showExposureModePicker = ref(false)
 const exposureModeValue = ref('自动')
-const exposureModeColumns = ref([
-  { text: '自动', value: '自动' },
-  { text: '手动', value: '手动' }
+const exposureModeColumns = computed(() => [
+  { text: t('自动'), value: '自动' },
+  { text: t('手动'), value: '手动' }
 ])
 const onExposureModeConfirm = ({ selectedOptions }: any) => {
-  exposureModeValue.value = selectedOptions[0].text
+  exposureModeValue.value = selectedOptions[0].value
   showExposureModePicker.value = false
   updateDisplaySetting()
 }
@@ -561,13 +564,13 @@ const gainLimit = ref(50)
 // 低照度电子快门
 const showLowLightShutterPicker = ref(false)
 const lowLightShutterValue = ref('关闭')
-const lowLightShutterColumns = ref([
-  { text: '关闭', value: '关闭' },
-  { text: '开启', value: '开启' },
-  { text: '自动', value: '自动' }
+const lowLightShutterColumns = computed(() => [
+  { text: t('关闭'), value: '关闭' },
+  { text: t('开启'), value: '开启' },
+  { text: t('自动'), value: '自动' }
 ])
 const onLowLightShutterConfirm = ({ selectedOptions }: any) => {
-  lowLightShutterValue.value = selectedOptions[0].text
+  lowLightShutterValue.value = selectedOptions[0].value
   showLowLightShutterPicker.value = false
   updateDisplaySetting()
 }
@@ -575,14 +578,14 @@ const onLowLightShutterConfirm = ({ selectedOptions }: any) => {
 // 聚焦模式
 const showFocusModePicker = ref(false)
 const focusModeValue = ref('半自动')
-const focusModeColumns = ref([
-  { text: '半自动', value: '半自动' },
-  { text: '自动', value: '自动' },
-  { text: '手动', value: '手动' },
-  { text: '连续自动', value: '连续自动' }
+const focusModeColumns = computed(() => [
+  { text: t('半自动'), value: '半自动' },
+  { text: t('自动'), value: '自动' },
+  { text: t('手动'), value: '手动' },
+  { text: t('连续自动'), value: '连续自动' }
 ])
 const onFocusModeConfirm = ({ selectedOptions }: any) => {
-  focusModeValue.value = selectedOptions[0].text
+  focusModeValue.value = selectedOptions[0].value
   showFocusModePicker.value = false
   updateDisplaySetting()
 }
@@ -605,14 +608,14 @@ const onMinFocusConfirm = ({ selectedOptions }: any) => {
 // 日夜转换
 const showDayNightPicker = ref(false)
 const dayNightValue = ref('自动')
-const dayNightColumns = ref([
-  { text: '自动', value: '自动' },
-  { text: '白天', value: '白天' },
-  { text: '夜晚', value: '夜晚' },
-  { text: '定时', value: '定时' }
+const dayNightColumns = computed(() => [
+  { text: t('自动'), value: '自动' },
+  { text: t('白天'), value: '白天' },
+  { text: t('夜晚'), value: '夜晚' },
+  { text: t('定时'), value: '定时' }
 ])
 const onDayNightConfirm = ({ selectedOptions }: any) => {
-  dayNightValue.value = selectedOptions[0].text
+  dayNightValue.value = selectedOptions[0].value
   showDayNightPicker.value = false
   updateDisplaySetting()
 }
@@ -635,12 +638,12 @@ const onSensitivityConfirm = ({ selectedOptions }: any) => {
 // 防补光过曝
 const showAntiOverexposePicker = ref(false)
 const antiOverexposeValue = ref('关闭')
-const antiOverexposeColumns = ref([
-  { text: '关闭', value: '关闭' },
-  { text: '开启', value: '开启' }
+const antiOverexposeColumns = computed(() => [
+  { text: t('关闭'), value: '关闭' },
+  { text: t('开启'), value: '开启' }
 ])
 const onAntiOverexposeConfirm = ({ selectedOptions }: any) => {
-  antiOverexposeValue.value = selectedOptions[0].text
+  antiOverexposeValue.value = selectedOptions[0].value
   showAntiOverexposePicker.value = false
   updateDisplaySetting()
 }
@@ -648,13 +651,13 @@ const onAntiOverexposeConfirm = ({ selectedOptions }: any) => {
 // 红外灯模式
 const showIrModePicker = ref(false)
 const irModeValue = ref('自动')
-const irModeColumns = ref([
-  { text: '自动', value: '自动' },
-  { text: '开启', value: '开启' },
-  { text: '关闭', value: '关闭' }
+const irModeColumns = computed(() => [
+  { text: t('自动'), value: '自动' },
+  { text: t('开启'), value: '开启' },
+  { text: t('关闭'), value: '关闭' }
 ])
 const onIrModeConfirm = ({ selectedOptions }: any) => {
-  irModeValue.value = selectedOptions[0].text
+  irModeValue.value = selectedOptions[0].value
   showIrModePicker.value = false
   updateDisplaySetting()
 }
@@ -665,13 +668,13 @@ const brightnessLimit = ref(50)
 // 背光补偿
 const showBacklightCompPicker = ref(false)
 const backlightCompValue = ref('关闭')
-const backlightCompColumns = ref([
-  { text: '关闭', value: '关闭' },
-  { text: '开启', value: '开启' },
-  { text: '自动', value: '自动' }
+const backlightCompColumns = computed(() => [
+  { text: t('关闭'), value: '关闭' },
+  { text: t('开启'), value: '开启' },
+  { text: t('自动'), value: '自动' }
 ])
 const onBacklightCompConfirm = ({ selectedOptions }: any) => {
-  backlightCompValue.value = selectedOptions[0].text
+  backlightCompValue.value = selectedOptions[0].value
   showBacklightCompPicker.value = false
   updateDisplaySetting()
 }
@@ -679,13 +682,13 @@ const onBacklightCompConfirm = ({ selectedOptions }: any) => {
 // 宽动态
 const showWideDynamicPicker = ref(false)
 const wideDynamicValue = ref('关闭')
-const wideDynamicColumns = ref([
-  { text: '关闭', value: '关闭' },
-  { text: '开启', value: '开启' },
-  { text: '自动', value: '自动' }
+const wideDynamicColumns = computed(() => [
+  { text: t('关闭'), value: '关闭' },
+  { text: t('开启'), value: '开启' },
+  { text: t('自动'), value: '自动' }
 ])
 const onWideDynamicConfirm = ({ selectedOptions }: any) => {
-  wideDynamicValue.value = selectedOptions[0].text
+  wideDynamicValue.value = selectedOptions[0].value
   showWideDynamicPicker.value = false
   updateDisplaySetting()
 }
@@ -693,13 +696,13 @@ const onWideDynamicConfirm = ({ selectedOptions }: any) => {
 // 强光抑制
 const showStrongLightPicker = ref(false)
 const strongLightValue = ref('关闭')
-const strongLightColumns = ref([
-  { text: '关闭', value: '关闭' },
-  { text: '开启', value: '开启' },
-  { text: '自动', value: '自动' }
+const strongLightColumns = computed(() => [
+  { text: t('关闭'), value: '关闭' },
+  { text: t('开启'), value: '开启' },
+  { text: t('自动'), value: '自动' }
 ])
 const onStrongLightConfirm = ({ selectedOptions }: any) => {
-  strongLightValue.value = selectedOptions[0].text
+  strongLightValue.value = selectedOptions[0].value
   showStrongLightPicker.value = false
   updateDisplaySetting()
 }
@@ -707,15 +710,15 @@ const onStrongLightConfirm = ({ selectedOptions }: any) => {
 // 白平衡
 const showWhiteBalancePicker = ref(false)
 const whiteBalanceValue = ref('自动白平衡')
-const whiteBalanceColumns = ref([
-  { text: '自动白平衡', value: '自动白平衡' },
-  { text: '晴天', value: '晴天' },
-  { text: '阴天', value: '阴天' },
-  { text: '白炽灯', value: '白炽灯' },
-  { text: '荧光灯', value: '荧光灯' }
+const whiteBalanceColumns = computed(() => [
+  { text: t('自动白平衡'), value: '自动白平衡' },
+  { text: t('晴天'), value: '晴天' },
+  { text: t('阴天'), value: '阴天' },
+  { text: t('白炽灯'), value: '白炽灯' },
+  { text: t('荧光灯'), value: '荧光灯' }
 ])
 const onWhiteBalanceConfirm = ({ selectedOptions }: any) => {
-  whiteBalanceValue.value = selectedOptions[0].text
+  whiteBalanceValue.value = selectedOptions[0].value
   showWhiteBalancePicker.value = false
   updateDisplaySetting()
 }
@@ -723,13 +726,13 @@ const onWhiteBalanceConfirm = ({ selectedOptions }: any) => {
 // 数字降噪
 const showDigitalNoiseReductionPicker = ref(false)
 const digitalNoiseReductionValue = ref('普通模式')
-const digitalNoiseReductionColumns = ref([
-  { text: '普通模式', value: '普通模式' },
-  { text: '增强模式', value: '增强模式' },
-  { text: '关闭', value: '关闭' }
+const digitalNoiseReductionColumns = computed(() => [
+  { text: t('普通模式'), value: '普通模式' },
+  { text: t('增强模式'), value: '增强模式' },
+  { text: t('关闭'), value: '关闭' }
 ])
 const onDigitalNoiseReductionConfirm = ({ selectedOptions }: any) => {
-  digitalNoiseReductionValue.value = selectedOptions[0].text
+  digitalNoiseReductionValue.value = selectedOptions[0].value
   showDigitalNoiseReductionPicker.value = false
   updateDisplaySetting()
 }
@@ -740,13 +743,13 @@ const noiseReductionLevel = ref(50)
 // 透雾模式
 const showDehazeModePicker = ref(false)
 const dehazeModeValue = ref('关闭')
-const dehazeModeColumns = ref([
-  { text: '关闭', value: '关闭' },
-  { text: '自动', value: '自动' },
-  { text: '手动', value: '手动' }
+const dehazeModeColumns = computed(() => [
+  { text: t('关闭'), value: '关闭' },
+  { text: t('自动'), value: '自动' },
+  { text: t('手动'), value: '手动' }
 ])
 const onDehazeModeConfirm = ({ selectedOptions }: any) => {
-  dehazeModeValue.value = selectedOptions[0].text
+  dehazeModeValue.value = selectedOptions[0].value
   showDehazeModePicker.value = false
   updateDisplaySetting()
 }
@@ -754,12 +757,12 @@ const onDehazeModeConfirm = ({ selectedOptions }: any) => {
 // 电子防抖
 const showElectronicStabilizationPicker = ref(false)
 const electronicStabilizationValue = ref('关闭')
-const electronicStabilizationColumns = ref([
-  { text: '关闭', value: '关闭' },
-  { text: '开启', value: '开启' }
+const electronicStabilizationColumns = computed(() => [
+  { text: t('关闭'), value: '关闭' },
+  { text: t('开启'), value: '开启' }
 ])
 const onElectronicStabilizationConfirm = ({ selectedOptions }: any) => {
-  electronicStabilizationValue.value = selectedOptions[0].text
+  electronicStabilizationValue.value = selectedOptions[0].value
   showElectronicStabilizationPicker.value = false
   updateDisplaySetting()
 }
@@ -767,13 +770,13 @@ const onElectronicStabilizationConfirm = ({ selectedOptions }: any) => {
 // 镜像
 const showMirrorPicker = ref(false)
 const mirrorValue = ref('关闭')
-const mirrorColumns = ref([
-  { text: '关闭', value: '关闭' },
-  { text: '水平镜像', value: '水平镜像' },
-  { text: '垂直镜像', value: '垂直镜像' }
+const mirrorColumns = computed(() => [
+  { text: t('关闭'), value: '关闭' },
+  { text: t('水平镜像'), value: '水平镜像' },
+  { text: t('垂直镜像'), value: '垂直镜像' }
 ])
 const onMirrorConfirm = ({ selectedOptions }: any) => {
-  mirrorValue.value = selectedOptions[0].text
+  mirrorValue.value = selectedOptions[0].value
   showMirrorPicker.value = false
   updateDisplaySetting()
 }
@@ -781,12 +784,12 @@ const onMirrorConfirm = ({ selectedOptions }: any) => {
 // PAL(50HZ)
 const showPal50hzPicker = ref(false)
 const pal50hzValue = ref('关闭')
-const pal50hzColumns = ref([
-  { text: '关闭', value: '关闭' },
-  { text: '开启', value: '开启' }
+const pal50hzColumns = computed(() => [
+  { text: t('关闭'), value: '关闭' },
+  { text: t('开启'), value: '开启' }
 ])
 const onPal50hzConfirm = ({ selectedOptions }: any) => {
-  pal50hzValue.value = selectedOptions[0].text
+  pal50hzValue.value = selectedOptions[0].value
   showPal50hzPicker.value = false
   updateDisplaySetting()
 }
@@ -794,12 +797,12 @@ const onPal50hzConfirm = ({ selectedOptions }: any) => {
 // 镜头初始化
 const showLensInitializationPicker = ref(false)
 const lensInitializationValue = ref('关闭')
-const lensInitializationColumns = ref([
-  { text: '关闭', value: '关闭' },
-  { text: '开启', value: '开启' }
+const lensInitializationColumns = computed(() => [
+  { text: t('关闭'), value: '关闭' },
+  { text: t('开启'), value: '开启' }
 ])
 const onLensInitializationConfirm = ({ selectedOptions }: any) => {
-  lensInitializationValue.value = selectedOptions[0].text
+  lensInitializationValue.value = selectedOptions[0].value
   showLensInitializationPicker.value = false
   updateDisplaySetting()
 }

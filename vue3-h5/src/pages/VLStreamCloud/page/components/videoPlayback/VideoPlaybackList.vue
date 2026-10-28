@@ -2,14 +2,14 @@
   <div class="playback-list">
     <van-pull-refresh
       v-model="refreshing"
-      success-text="刷新成功"
+      :success-text="$t('刷新成功')"
       @refresh="onRefresh"
     >
       <van-list
         v-if="showDevices.length"
         v-model:loading="loading"
         :finished="finished"
-        finished-text="没有更多了"
+        :finished-text="$t('没有更多了')"
         @load="onLoad"
       >
         <div
@@ -28,7 +28,7 @@
             <div class="info-row" style="width: 90%">
               <img src="@/assets/img/VLStreamCloud/spgc/sbId.png" alt="" />
               <div class="label">
-                设备ID
+                {{ $t('设备ID') }}
               </div>
               <div class="value">
                 {{ item.deviceId }}
@@ -37,7 +37,7 @@
             <div class="info-row">
               <img src="@/assets/img/VLStreamCloud/spgc/sbwz.png" alt="" />
               <div class="label">
-                设备位置
+                {{ $t('设备位置') }}
               </div>
               <div class="value">
                 {{ item.address }}
@@ -47,7 +47,7 @@
             <div class="card-footer">
               <div class="chips">
                 <div class="chip" :class="{ offline: item.status != '1' }">
-                  {{ item.status == '1' ? '在线' : '离线' }}
+                  {{ item.status == '1' ? $t('在线') : $t('离线') }}
                 </div>
                 <div v-if="item.deviceType" class="chip">
                   {{ item.deviceType }}
@@ -68,7 +68,7 @@
       <!-- 空态 -->
       <div v-else class="no_data">
         <img src="@/assets/img/daily_activity/no_data.png" />
-        <span>暂无数据</span>
+        <span>{{ $t('暂无数据') }}</span>
       </div>
     </van-pull-refresh>
     <oort-popup v-model="showDetail" position="right" style="width: 100%;height: 100%;" teleport="body">

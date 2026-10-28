@@ -1,6 +1,6 @@
 <template>
   <div class="view-video">
-    <nav-header-banner title="查看视频" :is-call-back="true" @call-back="onBack" />
+    <nav-header-banner :title="$t('查看视频')" :is-call-back="true" @call-back="onBack" />
 
     <div class="view-body">
       <!-- 顶部大图 -->
@@ -18,7 +18,7 @@
         <div class="info-row">
           <div class="label">
             <img :src="sbId" alt="" class="info-icon" />
-            <span>设备ID</span>
+            <span>{{ $t('设备ID') }}</span>
           </div>
           <div class="value">
             {{ device.deviceId }}
@@ -28,7 +28,7 @@
         <div class="info-row">
           <div class="label">
             <img :src="sblx" alt="" class="info-icon" />
-            <span>设备类型</span>
+            <span>{{ $t('设备类型') }}</span>
           </div>
           <div class="value">
             {{ device.deviceType || '--' }}
@@ -38,7 +38,7 @@
         <div class="info-row">
           <div class="label">
             <img :src="yysf" alt="" class="info-icon" />
-            <span>拥有算法</span>
+            <span>{{ $t('拥有算法') }}</span>
           </div>
           <div class="value">
             {{ device.algorithmName || device.algorithmId || '--' }}
@@ -48,7 +48,7 @@
         <div class="info-row">
           <div class="label">
             <img :src="sbbq" alt="" class="info-icon" />
-            <span>设备标签</span>
+            <span>{{ $t('设备标签') }}</span>
           </div>
           <div class="value">
             {{ tagsText }}
@@ -58,7 +58,7 @@
         <div class="info-row">
           <div class="label">
             <img :src="sbwz" alt="" class="info-icon" />
-            <span>设备位置</span>
+            <span>{{ $t('设备位置') }}</span>
           </div>
           <div class="value">
             {{ device.address || '--' }}
@@ -70,7 +70,7 @@
     <!-- 底部按钮 -->
     <div class="footer-bar">
       <van-button type="primary" block round class="apply-btn" @click="onApply">
-        申请使用
+        {{ $t('申请使用') }}
       </van-button>
     </div>
 
@@ -84,6 +84,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
 import VideoApplyForm from './VideoApplyForm.vue'
 import sbId from '@/assets/img/VLStreamCloud/spgc/sbId.png'
@@ -114,13 +115,15 @@ const props = defineProps<{
 
 const emit = defineEmits(['apply', 'close'])
 
+const { t } = useI18n()
+
 const heroImg = computed(() => props.device.imagePath || '')
 
 const privacyText = computed(() => {
   const d = props.device || {}
   // wvp 推送设备没有公私域字段，缺省时不展示标签
   if (d.isPublic === undefined || d.isPublic === null) return ''
-  return d.isPublic === 1 ? '公开' : '私有'
+  return d.isPublic === 1 ? t('公开') : t('私有')
 })
 
 const tagsText = computed(() => {

@@ -5,8 +5,8 @@
 -->
 <template>
   <div class="camera-detail">
-    <nav-header-banner title="摄像头详情" :is-call-back="true" @call-back="onBack">
-      <span class="header-action" @click="showApply = true">申请使用</span>
+    <nav-header-banner :title="$t('摄像头详情')" :is-call-back="true" @call-back="onBack">
+      <span class="header-action" @click="showApply = true">{{ $t('申请使用') }}</span>
     </nav-header-banner>
 
     <div class="detail-body">
@@ -29,7 +29,7 @@
             class="retry-btn"
             @click="startPlayback"
           >
-            重新播放
+            {{ $t('重新播放') }}
           </van-button>
         </div>
       </div>
@@ -40,7 +40,7 @@
           :class="{ active: activeTab === 'info' }"
           @click="activeTab = 'info'"
         >
-          设备信息
+          {{ $t('设备信息') }}
           <div v-if="activeTab === 'info'" class="tab-underline" />
         </div>
         <div
@@ -68,6 +68,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
 import VideoApplyForm from '@/pages/VLStreamCloud/page/components/videoPlaza/VideoApplyForm.vue'
 import CameraInfoPanel from '@/pages/VLStreamCloud/page/components/deviceManagement/CameraInfoPanel.vue'
@@ -88,6 +89,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close'])
+
+const { t } = useI18n()
 
 const activeTab = ref('info')
 const showApply = ref(false)
@@ -130,10 +133,10 @@ const startPlayback = async() => {
   detail.value = null
   streams.value = []
   playbackState.value = 'loading'
-  playbackMessage.value = '正在加载视频…'
+  playbackMessage.value = t('正在加载视频…')
   const row = props.camera || {}
   if (!row.id) {
-    failPlayback('缺少摄像头信息')
+    failPlayback(t('缺少摄像头信息'))
     return
   }
   try {
@@ -142,7 +145,7 @@ const startPlayback = async() => {
     detail.value = detailRes?.data || null
     if (detail.value?.device?.online !== true) {
       playbackState.value = 'offline'
-      playbackMessage.value = '设备离线，无法播放'
+      playbackMessage.value = t('设备离线，无法播放')
       return
     }
     const streamsRes = await getWvpVlsDeviceStreams(row.id)
@@ -151,7 +154,7 @@ const startPlayback = async() => {
     streams.value = list
     const stream = list.find(item => item.defaultStream) || list[0]
     if (!stream) {
-      failPlayback('设备没有上报可用视频流')
+      failPlayback(t('设备没有上报可用视频流'))
       return
     }
     const previewRes = await createWvpVlsDevicePreview(row.id, stream.id)
@@ -159,7 +162,7 @@ const startPlayback = async() => {
     const preview = previewRes?.data || {}
     const target = preview.playMode === 'cameraRTC' && preview.url ? parseCameraRtcTarget(preview.url) : null
     if (!target) {
-      failPlayback('WVP 未返回可用播放地址')
+      failPlayback(t('WVP 未返回可用播放地址'))
       return
     }
     await nextTick()
@@ -176,7 +179,7 @@ const startPlayback = async() => {
           return
         }
         if (status.state === 'failed') {
-          failPlayback(status.message || '播放失败')
+          failPlayback(status.message || t('播放失败'))
           return
         }
         playbackState.value = 'loading'
@@ -186,7 +189,7 @@ const startPlayback = async() => {
     player.start()
   } catch (e) {
     if (current !== generation) return
-    failPlayback(e?.response?.data?.msg || e?.message || '创建预览失败')
+    failPlayback(e?.response?.data?.msg || e?.message || t('创建预览失败'))
   }
 }
 

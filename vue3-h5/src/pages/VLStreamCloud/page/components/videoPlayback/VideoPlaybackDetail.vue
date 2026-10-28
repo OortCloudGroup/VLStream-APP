@@ -1,20 +1,20 @@
 <template>
   <div class="playback-detail">
-    <nav-header-banner title="查看回放" :is-call-back="true" @call-back="onBack" />
+    <nav-header-banner :title="$t('查看回放')" :is-call-back="true" @call-back="onBack" />
 
     <div class="detail-body">
       <!-- 日期选择 -->
       <div class="date-row">
         <div class="date-item" @click="onPick('year')">
-          {{ currentYear }}年
+          {{ $t('{year}年', { year: currentYear }) }}
           <van-icon name="arrow-down" />
         </div>
         <div class="date-item" @click="onPick('month')">
-          {{ currentMonth }}月
+          {{ $t('{month}月', { month: currentMonth }) }}
           <van-icon name="arrow-down" />
         </div>
         <div class="date-item" @click="onPick('day')">
-          {{ currentDay }}日
+          {{ $t('{day}日', { day: currentDay }) }}
           <van-icon name="arrow-down" />
         </div>
       </div>
@@ -49,7 +49,7 @@
 
       <!-- 视频列表 -->
       <div class="list-title">
-        视频列表
+        {{ $t('视频列表') }}
       </div>
       <div class="clip-list">
         <div
@@ -81,7 +81,7 @@
               class="playing-tag"
             >
               <img src="@/assets/img/VLStreamCloud/bfz.png" alt="" class="playing-tag-icon" />
-              <span>播放中</span>
+              <span>{{ $t('播放中') }}</span>
             </div>
           </div>
         </div>

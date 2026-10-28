@@ -30,7 +30,7 @@
             class="playing-tag"
           >
             <img src="@/assets/img/VLStreamCloud/bfz.png" alt="" class="playing-tag-icon" />
-            <span>播放中</span>
+            <span>{{ $t('播放中') }}</span>
           </div>
         </div>
       </div>

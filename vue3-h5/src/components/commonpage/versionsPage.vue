@@ -8,12 +8,12 @@
 !-->
 <template>
   <div class="page_container">
-    <nav-header-banner title="文档说明" />
+    <nav-header-banner :title="$t('文档说明')" />
     <div class="edition_home_body">
       <div style="width: 84.4%;margin: 0px 7.8%;">
         <div v-for="(item, index) in list" :key="index">
           <div style="display: flex;flex-direction: column;justify-content: center;justify-content: space-around;">
-            <span style="font-size: 18px;height: 50px;display: flex;align-items: center;">{{ item?.version }}版本介绍</span>
+            <span style="font-size: 18px;height: 50px;display: flex;align-items: center;">{{ item?.version }}{{ $t('版本介绍') }}</span>
             <div style="display: flex;flex-direction: column;height: 50px;justify-content: space-around;">
               <span style="font-size: 12px;color: #666666;">- {{ item?.ver_description }}</span>
             </div>

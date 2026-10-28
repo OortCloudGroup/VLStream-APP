@@ -5,7 +5,7 @@
         v-if="allTasks.length !== 0"
         v-model="loading"
         :finished="finished"
-        finished-text="没有更多了"
+        :finished-text="$t('没有更多了')"
         @load="onLoad"
       >
         <div
@@ -49,7 +49,7 @@
       <!-- 空态 -->
       <div v-if="allTasks.length === 0" class="no_data">
         <img src="@/assets/img/daily_activity/no_data.png" />
-        <span>暂无数据</span>
+        <span>{{ $t('暂无数据') }}</span>
       </div>
     </div>
     <oort-image-preview v-model:show="showImagePreview" :start-position="imgIndex" :images="previewImage" />

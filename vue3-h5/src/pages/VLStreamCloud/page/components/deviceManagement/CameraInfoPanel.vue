@@ -2,7 +2,7 @@
   <div class="camera-info">
     <div class="title-row">
       <span class="device-name">{{ device.deviceName || '--' }}</span>
-      <span class="status-tag" :class="{ offline: !device.online }">{{ device.online ? '在线' : '离线' }}</span>
+      <span class="status-tag" :class="{ offline: !device.online }">{{ device.online ? $t('在线') : $t('离线') }}</span>
     </div>
 
     <div class="info-card">
@@ -18,7 +18,7 @@
     </div>
 
     <div class="section-heading">
-      设备运行模型
+      {{ $t('设备运行模型') }}
     </div>
     <div class="table-card">
       <div v-if="models.length" class="table-body">
@@ -34,12 +34,12 @@
         </div>
       </div>
       <div v-else class="empty-text">
-        {{ device.modelsJson == null ? '设备尚未上报模型信息' : '设备上报的模型列表为空' }}
+        {{ device.modelsJson == null ? $t('设备尚未上报模型信息') : $t('设备上报的模型列表为空') }}
       </div>
     </div>
 
     <div class="section-heading">
-      视频源
+      {{ $t('视频源') }}
     </div>
     <div class="table-card">
       <div v-if="streamRows.length" class="table-body">
@@ -48,22 +48,22 @@
             <span class="stream-channel">{{ stream.channelId || stream.streamName || '--' }}</span>
             <span class="stream-tag">{{ stream.streamType || '--' }}</span>
             <span class="stream-tag">{{ stream.protocol || '--' }}</span>
-            <span v-if="stream.defaultStream" class="stream-tag primary">默认流</span>
-            <span v-if="stream.available === false" class="stream-tag warning">不可用</span>
+            <span v-if="stream.defaultStream" class="stream-tag primary">{{ $t('默认流') }}</span>
+            <span v-if="stream.available === false" class="stream-tag warning">{{ $t('不可用') }}</span>
           </div>
           <div class="stream-url">
-            {{ stream.sourceUrl || stream.url || '未上报' }}
+            {{ stream.sourceUrl || stream.url || $t('未上报') }}
           </div>
         </div>
       </div>
       <div v-else class="empty-text">
-        设备没有上报视频源
+        {{ $t('设备没有上报视频源') }}
       </div>
     </div>
 
     <template v-if="upgrades.length">
       <div class="section-heading">
-        可用固件升级
+        {{ $t('可用固件升级') }}
       </div>
       <div class="table-card">
         <div v-for="item in upgrades" :key="item.firmwareId" class="upgrade-row">
@@ -77,6 +77,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import sbid from '@/assets/img/VLStreamCloud/sbgl/sbid.png'
 import sbbq from '@/assets/img/VLStreamCloud/sbgl/sbbq.png'
 import sbwz from '@/assets/img/VLStreamCloud/sbgl/sbwz.png'
@@ -92,6 +93,8 @@ import {
   modelStatusText,
   parseSnapshot
 } from '@/utils/deviceState'
+
+const { t } = useI18n()
 
 const props = defineProps({
   device: {
@@ -121,21 +124,21 @@ const upgrades = computed(() => Array.isArray(props.detail?.availableUpgrades) ?
 const firmwareValue = computed(() => {
   const current = props.device?.firmwareVersion || '--'
   const latest = upgrades.value[0]?.latestVersion
-  return latest ? `${current}（可升级至 ${latest}）` : current
+  return latest ? `${current}（${t('可升级至 {version}', { version: latest })}）` : current
 })
 
 const infoList = computed(() => [
-  { label: '设备名称', value: props.device?.deviceName || '--', icon: sbbq },
-  { label: '设备ID', value: props.device?.deviceId || '--', icon: sbid },
-  { label: '设备型号', value: props.device?.deviceModel || '--', icon: sbbq },
-  { label: '在线状态', value: props.device?.online ? '在线' : '离线', icon: sbid },
-  { label: 'IP 地址', value: props.device?.ipAddr || '--', icon: sbwz },
-  { label: 'RootFS 版本', value: firmwareValue.value, icon: yysf, warning: upgrades.value.length > 0 },
-  { label: '开机时间', value: deviceBootTimeText(props.device), icon: cjsj },
-  { label: '在线时长', value: deviceOnlineDurationText(props.device, now.value), icon: cjsj },
-  { label: '最后心跳', value: formatDeviceTime(props.device?.lastHeartbeatTime), icon: cjsj },
-  { label: '设备能力', value: capabilityText(props.device?.capabilitiesJson), icon: sbbq },
-  { label: '位置坐标', value: deviceLocationText(props.device), icon: sbzb }
+  { label: t('设备名称'), value: props.device?.deviceName || '--', icon: sbbq },
+  { label: t('设备ID'), value: props.device?.deviceId || '--', icon: sbid },
+  { label: t('设备型号'), value: props.device?.deviceModel || '--', icon: sbbq },
+  { label: t('在线状态'), value: props.device?.online ? t('在线') : t('离线'), icon: sbid },
+  { label: t('IP 地址'), value: props.device?.ipAddr || '--', icon: sbwz },
+  { label: t('RootFS 版本'), value: firmwareValue.value, icon: yysf, warning: upgrades.value.length > 0 },
+  { label: t('开机时间'), value: deviceBootTimeText(props.device), icon: cjsj },
+  { label: t('在线时长'), value: deviceOnlineDurationText(props.device, now.value), icon: cjsj },
+  { label: t('最后心跳'), value: formatDeviceTime(props.device?.lastHeartbeatTime), icon: cjsj },
+  { label: t('设备能力'), value: capabilityText(props.device?.capabilitiesJson), icon: sbbq },
+  { label: t('位置坐标'), value: deviceLocationText(props.device), icon: sbzb }
 ])
 </script>
 

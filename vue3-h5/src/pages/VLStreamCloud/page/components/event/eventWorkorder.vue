@@ -6,37 +6,37 @@
         v-if="showSearch"
         v-model="searchValue"
         show-action
-        placeholder="请输入搜索关键词"
+        :placeholder="$t('请输入搜索关键词')"
         @search="handleSearch"
         @cancel="handleCancel"
       />
       <!-- 任务状态切换tab：全部、进行中、已完成 -->
       <div class="order-tab-header">
         <div :class="['order-tab-item', { active: !workorderStatus }]" @click="taskStatusFn(undefined)">
-          全部
+          {{ $t('全部') }}
         </div>
         <div :class="['order-tab-item', { active: workorderStatus === 'processing' }]" @click="taskStatusFn('processing')">
-          待完成
+          {{ $t('待完成') }}
         </div>
         <div
           :class="['order-tab-item', { active: workorderStatus === 'completed' }]"
           @click="taskStatusFn('completed')"
         >
-          已完成
+          {{ $t('已完成') }}
         </div>
       </div>
       <!-- 任务列表 -->
       <div class="work-list">
         <van-pull-refresh
           v-model="refreshing"
-          success-text="刷新成功"
+          :success-text="$t('刷新成功')"
           @refresh="onRefresh"
         >
           <van-list
             v-if="tableData.length !== 0"
             v-model="loading"
             :finished="finished"
-            finished-text="没有更多了"
+            :finished-text="$t('没有更多了')"
             @load="onLoad"
           >
             <div v-for="(order, index) in tableData" :key="index" class="order-item" @click="handleTaskClick(order)">
@@ -49,7 +49,7 @@
                 <div class="order-desc fl">
                   <div class="info-lable flexRowAC">
                     <img src="@/assets/img/eventMana/order_no.png" alt="" />
-                    工单编号：
+                    {{ $t('工单编号：') }}
                   </div>
                   <div class="info-content">
                     {{ order.workorderNumber }}
@@ -58,7 +58,7 @@
                 <div class="order-desc fl">
                   <div class="info-lable flexRowAC">
                     <img src="@/assets/img/eventMana/order_source.png" alt="" />
-                    工单来源：
+                    {{ $t('工单来源：') }}
                   </div>
                   <div class="info-content">
                     {{ order.source || '-' }}
@@ -67,7 +67,7 @@
                 <div class="order-desc fl">
                   <div class="info-lable flexRowAC">
                     <img src="@/assets/img/eventMana/event_time.png" alt="" />
-                    提交时间：
+                    {{ $t('提交时间：') }}
                   </div>
                   <div class="info-content">
                     {{ order.createTime }}
@@ -83,7 +83,7 @@
           <!-- 空态 -->
           <div v-if="tableData.length === 0" class="no_data">
             <img src="@/assets/img/daily_activity/no_data.png" />
-            <span>暂无数据</span>
+            <span>{{ $t('暂无数据') }}</span>
           </div>
         </van-pull-refresh>
       </div>

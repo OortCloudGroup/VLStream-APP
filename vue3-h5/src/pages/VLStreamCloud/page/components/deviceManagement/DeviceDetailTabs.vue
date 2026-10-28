@@ -1,9 +1,9 @@
 <template>
   <div class="device-detail">
-    <nav-header-banner title="设备详情" :is-call-back="true" @call-back="onBack">
+    <nav-header-banner :title="$t('设备详情')" :is-call-back="true" @call-back="onBack">
       <div class="header-actions">
-        <span class="action edit" @click="onEdit">编辑</span>
-        <span class="action delete" @click="onDelete">删除</span>
+        <span class="action edit" @click="onEdit">{{ $t('编辑') }}</span>
+        <span class="action delete" @click="onDelete">{{ $t('删除') }}</span>
       </div>
     </nav-header-banner>
 
@@ -25,7 +25,7 @@
           :class="{ active: activeTab === 'info' }"
           @click="activeTab = 'info'"
         >
-          设备信息
+          {{ $t('设备信息') }}
           <div v-if="activeTab === 'info'" class="tab-underline" />
         </div>
       </div>
@@ -49,6 +49,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { showConfirmDialog, showToast } from 'vant'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
@@ -66,6 +67,8 @@ const props = defineProps({
 })
 
 const store = useUserStore()
+
+const { t } = useI18n()
 const activeTab = ref('ptz')
 const showEdit = ref(false)
 const device = ref({})
@@ -88,10 +91,10 @@ const onBack = () => {
 
 const onDelete = () => {
   showConfirmDialog({
-    title: '删除设备',
-    message: '确定要删除该设备吗？',
-    confirmButtonText: '删除',
-    cancelButtonText: '取消'
+    title: t('删除设备'),
+    message: t('确定要删除该设备吗？'),
+    confirmButtonText: t('删除'),
+    cancelButtonText: t('取消')
   })
     .then(async() => {
       // 后端 /vlsDeviceInfo/remove 收的是 @RequestParam String ids（逗号串），
@@ -102,7 +105,7 @@ const onDelete = () => {
       }
       const res = await removeDevice(params)
       if (res.code === 200) {
-        showToast('删除成功')
+        showToast(t('删除成功'))
         emit('deleted')
         emit('close')
       }

@@ -3,14 +3,14 @@
     <div class="card-list">
       <van-pull-refresh
         v-model="refreshing"
-        success-text="刷新成功"
+        :success-text="$t('刷新成功')"
         @refresh="onRefresh"
       >
         <van-list
           v-if="list.length"
           v-model:loading="loading"
           :finished="finished"
-          finished-text="没有更多了"
+          :finished-text="$t('没有更多了')"
           class="scene-list"
           @load="onLoad"
         >
@@ -24,7 +24,7 @@
             <div class="info-row">
               <div class="label">
                 <img :src="aisf" alt="" class="info-icon" />
-                <span>AI算法</span>
+                <span>{{ $t('AI算法') }}</span>
               </div>
               <div class="value">
                 {{ item.algorithmNames || '-' }}
@@ -34,7 +34,7 @@
             <div class="info-row">
               <div class="label">
                 <img :src="fxql" alt="" class="info-icon" />
-                <span>分析区域</span>
+                <span>{{ $t('分析区域') }}</span>
               </div>
               <div class="value">
                 {{ item.locationIds || '-' }}
@@ -44,7 +44,7 @@
             <div class="info-row">
               <div class="label">
                 <img :src="sxt" alt="" class="info-icon" />
-                <span>摄像头</span>
+                <span>{{ $t('摄像头') }}</span>
               </div>
               <div class="value multi-line">
                 {{ item.cameraNames || '-' }}
@@ -54,7 +54,7 @@
             <div class="info-row">
               <div class="label">
                 <img :src="zlsj" alt="" class="info-icon" />
-                <span>治理时间</span>
+                <span>{{ $t('治理时间') }}</span>
               </div>
               <div class="value">
                 {{ item.startTime && item.endTime ? `${item.startTime} ~ ${item.endTime}` : '-' }}
@@ -66,7 +66,7 @@
         <!-- 空态 -->
         <div v-else class="no_data">
           <img src="@/assets/img/daily_activity/no_data.png" />
-          <span>暂无数据</span>
+          <span>{{ $t('暂无数据') }}</span>
         </div>
       </van-pull-refresh>
     </div>

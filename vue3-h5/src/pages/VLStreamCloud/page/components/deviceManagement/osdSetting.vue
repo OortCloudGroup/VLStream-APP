@@ -3,17 +3,17 @@
     <!-- 显示设置（复选框组 - 方形） -->
     <div class="show-setting">
       <div class="section-title">
-        显示设置
+        {{ $t('显示设置') }}
       </div>
       <van-checkbox-group v-model="showChecked" shape="square" class="checkbox-group">
         <van-checkbox name="showDate">
-          显示日期
+          {{ $t('显示日期') }}
         </van-checkbox>
         <van-checkbox name="showName">
-          显示名称
+          {{ $t('显示名称') }}
         </van-checkbox>
         <van-checkbox name="showWeek">
-          显示星期
+          {{ $t('显示星期') }}
         </van-checkbox>
       </van-checkbox-group>
     </div>
@@ -21,17 +21,17 @@
     <!-- 通道名称 -->
     <van-field
       v-model="channelName"
-      label="通道名称"
-      placeholder="请输入通道名称"
+      :label="$t('通道名称')"
+      :placeholder="$t('请输入通道名称')"
       class="settings-field"
     />
 
     <!-- 时间格式 - 下拉选择 -->
     <van-field
-      v-model="timeFormatValue"
+      :model-value="$t(timeFormatValue)"
       is-link
       readonly
-      label="时间格式"
+      :label="$t('时间格式')"
       class="settings-field"
       @click="showTimeFormatPicker = true"
     />
@@ -45,10 +45,10 @@
 
     <!-- 日期格式 - 下拉选择 -->
     <van-field
-      v-model="dateFormatValue"
+      :model-value="$t(dateFormatValue)"
       is-link
       readonly
-      label="日期格式"
+      :label="$t('日期格式')"
       class="settings-field"
       @click="showDateFormatPicker = true"
     />
@@ -63,7 +63,7 @@
     <!-- 字符叠加（复选框组+输入框 - 方形） -->
     <div class="zfdj">
       <div class="section-title">
-        字符叠加
+        {{ $t('字符叠加') }}
       </div>
       <div class="osd-overlay-group">
         <van-checkbox-group v-model="overlayChecked" shape="square" class="overlay-checkbox-group">
@@ -72,7 +72,7 @@
             <span class="overlay-label">{{ idx+1 }}</span>
             <van-field
               v-model="overlayText[`text${idx+1}`]"
-              placeholder="请输入"
+              :placeholder="$t('请输入')"
               class="overlay-input"
             />
           </div>
@@ -82,10 +82,10 @@
 
     <!-- OSD属性 - 下拉选择 -->
     <van-field
-      v-model="osdAttrValue"
+      :model-value="$t(osdAttrValue)"
       is-link
       readonly
-      label="OSD属性"
+      :label="$t('OSD属性')"
       class="settings-field"
       @click="showOsdAttrPicker = true"
     />
@@ -99,10 +99,10 @@
 
     <!-- OSD字体 - 下拉选择 -->
     <van-field
-      v-model="osdFontValue"
+      :model-value="$t(osdFontValue)"
       is-link
       readonly
-      label="OSD字体"
+      :label="$t('OSD字体')"
       class="settings-field"
       @click="showOsdFontPicker = true"
     />
@@ -116,10 +116,10 @@
 
     <!-- OSD颜色 - 下拉选择 -->
     <van-field
-      v-model="osdColorValue"
+      :model-value="$t(osdColorValue)"
       is-link
       readonly
-      label="OSD颜色"
+      :label="$t('OSD颜色')"
       class="settings-field"
       @click="showOsdColorPicker = true"
     />
@@ -133,10 +133,10 @@
 
     <!-- 对齐方式 - 下拉选择 -->
     <van-field
-      v-model="alignValue"
+      :model-value="$t(alignValue)"
       is-link
       readonly
-      label="对齐方式"
+      :label="$t('对齐方式')"
       class="settings-field"
       @click="showAlignPicker = true"
     />
@@ -151,10 +151,13 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getVlsCameraOsdSetting, updateVlsCameraOsdSetting, restoreDefaultVlsCameraOsdSetting } from '@/api/VLStreamCloud/device'
 import { useUserStore } from '@/store/modules/useraPaas'
 import OortPopup from '@/components/popup/oort_popup.vue'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   deviceId?: string | number
@@ -176,12 +179,12 @@ const channelName = ref('')
 // ********** 时间格式 - 下拉选择 **********
 const showTimeFormatPicker = ref(false)
 const timeFormatValue = ref('')
-const timeFormatColumns = ref([
-  { text: '24小时制', value: '24小时制' },
-  { text: '12小时制', value: '12小时制' }
+const timeFormatColumns = computed(() => [
+  { text: t('24小时制'), value: '24小时制' },
+  { text: t('12小时制'), value: '12小时制' }
 ])
 const onTimeFormatConfirm = ({ selectedOptions }: { selectedOptions: any[] }) => {
-  timeFormatValue.value = selectedOptions[0]?.text || selectedOptions[0]?.value || ''
+  timeFormatValue.value = selectedOptions[0]?.value || selectedOptions[0]?.text || ''
   showTimeFormatPicker.value = false
   updateOsdSetting()
 }
@@ -189,13 +192,13 @@ const onTimeFormatConfirm = ({ selectedOptions }: { selectedOptions: any[] }) =>
 // ********** 日期格式 - 下拉选择 **********
 const showDateFormatPicker = ref(false)
 const dateFormatValue = ref('')
-const dateFormatColumns = ref([
-  { text: 'XXXX年XX月XX日', value: 'XXXX年XX月XX日' },
+const dateFormatColumns = computed(() => [
+  { text: t('XXXX年XX月XX日'), value: 'XXXX年XX月XX日' },
   { text: 'XXXX-XX-XX', value: 'XXXX-XX-XX' },
   { text: 'XX/XX/XXXX', value: 'XX/XX/XXXX' }
 ])
 const onDateFormatConfirm = ({ selectedOptions }: { selectedOptions: any[] }) => {
-  dateFormatValue.value = selectedOptions[0]?.text || selectedOptions[0]?.value || ''
+  dateFormatValue.value = selectedOptions[0]?.value || selectedOptions[0]?.text || ''
   showDateFormatPicker.value = false
   updateOsdSetting()
 }
@@ -211,14 +214,14 @@ const overlayText = ref({
 // ********** OSD属性 - 下拉选择 **********
 const showOsdAttrPicker = ref(false)
 const osdAttrValue = ref('')
-const osdAttrColumns = ref([
-  { text: '不透明、不闪烁', value: '不透明、不闪烁' },
-  { text: '透明、不闪烁', value: '透明、不闪烁' },
-  { text: '不透明、闪烁', value: '不透明、闪烁' },
-  { text: '透明、闪烁', value: '透明、闪烁' }
+const osdAttrColumns = computed(() => [
+  { text: t('不透明、不闪烁'), value: '不透明、不闪烁' },
+  { text: t('透明、不闪烁'), value: '透明、不闪烁' },
+  { text: t('不透明、闪烁'), value: '不透明、闪烁' },
+  { text: t('透明、闪烁'), value: '透明、闪烁' }
 ])
 const onOsdAttrConfirm = ({ selectedOptions }: { selectedOptions: any[] }) => {
-  osdAttrValue.value = selectedOptions[0]?.text || selectedOptions[0]?.value || ''
+  osdAttrValue.value = selectedOptions[0]?.value || selectedOptions[0]?.text || ''
   showOsdAttrPicker.value = false
   updateOsdSetting()
 }
@@ -226,13 +229,13 @@ const onOsdAttrConfirm = ({ selectedOptions }: { selectedOptions: any[] }) => {
 // ********** OSD字体 - 下拉选择 **********
 const showOsdFontPicker = ref(false)
 const osdFontValue = ref('')
-const osdFontColumns = ref([
-  { text: '自适应', value: '自适应' },
-  { text: '宋体', value: '宋体' },
-  { text: '黑体', value: '黑体' }
+const osdFontColumns = computed(() => [
+  { text: t('自适应'), value: '自适应' },
+  { text: t('宋体'), value: '宋体' },
+  { text: t('黑体'), value: '黑体' }
 ])
 const onOsdFontConfirm = ({ selectedOptions }: { selectedOptions: any[] }) => {
-  osdFontValue.value = selectedOptions[0]?.text || selectedOptions[0]?.value || ''
+  osdFontValue.value = selectedOptions[0]?.value || selectedOptions[0]?.text || ''
   showOsdFontPicker.value = false
   updateOsdSetting()
 }
@@ -240,13 +243,13 @@ const onOsdFontConfirm = ({ selectedOptions }: { selectedOptions: any[] }) => {
 // ********** OSD颜色 - 下拉选择 **********
 const showOsdColorPicker = ref(false)
 const osdColorValue = ref('')
-const osdColorColumns = ref([
-  { text: '黑白自动', value: '黑白自动' },
-  { text: '白色', value: '白色' },
-  { text: '黑色', value: '黑色' }
+const osdColorColumns = computed(() => [
+  { text: t('黑白自动'), value: '黑白自动' },
+  { text: t('白色'), value: '白色' },
+  { text: t('黑色'), value: '黑色' }
 ])
 const onOsdColorConfirm = ({ selectedOptions }: { selectedOptions: any[] }) => {
-  osdColorValue.value = selectedOptions[0]?.text || selectedOptions[0]?.value || ''
+  osdColorValue.value = selectedOptions[0]?.value || selectedOptions[0]?.text || ''
   showOsdColorPicker.value = false
   updateOsdSetting()
 }
@@ -254,14 +257,14 @@ const onOsdColorConfirm = ({ selectedOptions }: { selectedOptions: any[] }) => {
 // ********** 对齐方式 - 下拉选择 **********
 const showAlignPicker = ref(false)
 const alignValue = ref('')
-const alignColumns = ref([
-  { text: '自适应', value: '自适应' },
-  { text: '左对齐', value: '左对齐' },
-  { text: '右对齐', value: '右对齐' },
-  { text: '居中', value: '居中' }
+const alignColumns = computed(() => [
+  { text: t('自适应'), value: '自适应' },
+  { text: t('左对齐'), value: '左对齐' },
+  { text: t('右对齐'), value: '右对齐' },
+  { text: t('居中'), value: '居中' }
 ])
 const onAlignConfirm = ({ selectedOptions }: { selectedOptions: any[] }) => {
-  alignValue.value = selectedOptions[0]?.text || selectedOptions[0]?.value || ''
+  alignValue.value = selectedOptions[0]?.value || selectedOptions[0]?.text || ''
   showAlignPicker.value = false
   updateOsdSetting()
 }

@@ -3,13 +3,13 @@
     <div class="table-card">
       <div class="table-head">
         <div class="col name">
-          设备名称
+          {{ $t('设备名称') }}
         </div>
         <div class="col id">
-          设备ID
+          {{ $t('设备ID') }}
         </div>
         <div class="col status">
-          状态
+          {{ $t('状态') }}
         </div>
       </div>
 
@@ -33,10 +33,10 @@
               plain
               class="status-tag online"
             >
-              在线
+              {{ $t('在线') }}
             </van-tag>
             <van-tag v-else type="default" plain class="status-tag offline">
-              离线
+              {{ $t('离线') }}
             </van-tag>
           </div>
         </div>
@@ -66,21 +66,24 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import EditDevice from './EditDevice.vue'
 import ConfigRecord from './ConfigRecord.vue'
 import DeviceDetailTabs from './DeviceDetailTabs.vue'
 
-const rows = ref([
-  { id: 1, name: '海康云台', deviceId: '1354841', status: 'online' },
-  { id: 2, name: '海康云台', deviceId: '1354841', status: 'offline' },
-  { id: 3, name: '海康云台', deviceId: '1354841', status: 'online' },
-  { id: 4, name: '海康云台', deviceId: '1354841', status: 'online' },
-  { id: 5, name: '海康云台', deviceId: '1354841', status: 'online' },
-  { id: 6, name: '海康云台', deviceId: '1354841', status: 'online' },
-  { id: 7, name: '海康云台', deviceId: '1354841', status: 'online' },
-  { id: 8, name: '海康云台', deviceId: '1354841', status: 'online' }
+const { t } = useI18n()
+
+const rows = computed(() => [
+  { id: 1, name: t('海康云台'), deviceId: '1354841', status: 'online' },
+  { id: 2, name: t('海康云台'), deviceId: '1354841', status: 'offline' },
+  { id: 3, name: t('海康云台'), deviceId: '1354841', status: 'online' },
+  { id: 4, name: t('海康云台'), deviceId: '1354841', status: 'online' },
+  { id: 5, name: t('海康云台'), deviceId: '1354841', status: 'online' },
+  { id: 6, name: t('海康云台'), deviceId: '1354841', status: 'online' },
+  { id: 7, name: t('海康云台'), deviceId: '1354841', status: 'online' },
+  { id: 8, name: t('海康云台'), deviceId: '1354841', status: 'online' }
 ])
 
 const showDetail = ref(false)

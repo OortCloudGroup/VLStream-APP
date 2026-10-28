@@ -3,11 +3,11 @@
     <div class="btn_op_box flexRowAC">
       <div class="btn_op_item ic i1 flexRowAC" @click="groupChat">
         <img class="btn_op_img" src="@/assets/img/process-flow/group.png" alt="" />
-        发起群聊
+        {{ $t('发起群聊') }}
       </div>
       <div class="btn_op_item ic i2 flexRowAC" @click.stop="uniPopupRef=true">
         <img class="btn_op_img" src="@/assets/img/process-flow/more.png" alt="" />
-        更多
+        {{ $t('更多') }}
       </div>
       <div
         v-if="oprArrTemp.includes('4')"
@@ -15,7 +15,7 @@
         @click="showSub=true,approveStatus='4'"
       >
         <img class="btn_op_img" src="@/assets/img//process-flow/btn1.png" alt="" />
-        拒绝
+        {{ $t('拒绝') }}
       </div>
       <div
         v-if="oprArrTemp.includes('0')"
@@ -23,40 +23,40 @@
         @click="showSub=true,approveStatus='0'"
       >
         <img class="btn_op_img" src="@/assets/img/process-flow/btn2.png" alt="" />
-        同意
+        {{ $t('同意') }}
       </div>
     </div>
     <!-- 其他流程 -->
     <van-popup v-model:show="uniPopupRef" position="bottom" style="z-index: 2003">
       <div class="otherBtnsBox">
         <div v-if="oprArrTemp.includes('2')" class="btn" @click="turnTo">
-          转办
+          {{ $t('转办') }}
         </div>
         <div v-if="oprArrTemp.includes('1')" class="btn" @click="delegate">
-          委派
+          {{ $t('委派') }}
         </div>
         <div v-if="oprArrTemp.includes('3')" class="btn" @click="toSpecifiedNode">
-          退回节点
+          {{ $t('退回节点') }}
         </div>
         <!--  已处理    -->
         <template v-if="route.query.act==='finish'">
           <div class="btn fin" @click="handleCallBack">
-            撤回
+            {{ $t('撤回') }}
           </div>
         </template>
         <!-- 已发起的流程 -->
         <template v-if="route.query.act==='own'">
           <!-- 完成时间为空-强制关闭 -->
           <div v-if="route.query.status !== 'canceled' && !route.query.FT" class="btn ora" @click="handleCancel()">
-            强制关闭
+            {{ $t('强制关闭') }}
           </div>
           <!-- 重新发起 -->
           <div v-else class="btn ora" @click="handleReStart()">
-            重新发起
+            {{ $t('重新发起') }}
           </div>
           <!-- 完成时间-删除 -->
           <div v-if="route.query.FT" class="btn red" @click="handleDelete">
-            删除
+            {{ $t('删除') }}
           </div>
         </template>
       </div>
@@ -76,6 +76,7 @@
 
 <script setup>
 import { onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { showConfirmDialog, showFailToast, showSuccessToast, showToast } from 'vant'
 import {
   claimTask,
@@ -94,6 +95,7 @@ import { getUserList } from '@/api/login/indexapaas'
 import { useUserStore } from '@/store/modules/useraPaas'
 
 const store = useUserStore()
+const { t } = useI18n()
 let props = defineProps(['startFlow', 'oprArr', 'procInsId', 'taskId', 'work_order_data'])
 const emits = defineEmits(['handle'])
 const route = useRoute()
@@ -141,7 +143,7 @@ const groupChat = () => {
   let val = props.work_order_data
   // 新原生壳（AgentWeb）首期未集成 IM SDK，群聊能力降级
   if (window.global && window.global.is_native_shell) {
-    import('vant').then(({ showToast }) => showToast('当前版本暂不支持发起群聊'))
+    import('vant').then(({ showToast }) => showToast(t('当前版本暂不支持发起群聊')))
     return
   }
   window.cordova.exec(
@@ -225,8 +227,8 @@ const getReturnList = async() => {
 // 撤回流程
 const handleCallBack = () => {
   showConfirmDialog({
-    title: '提示',
-    message: '确认撤回此流程吗?'
+    title: t('提示'),
+    message: t('确认撤回此流程吗？')
   }).then(async() => {
     let data = {
       procInsId: route.query.pid || props.procInsId,
@@ -235,7 +237,7 @@ const handleCallBack = () => {
     let res = await revokeProcess(data)
     if (res.code === 200) {
       // 返回
-      showSuccessToast('流程撤回成功')
+      showSuccessToast(t('流程撤回成功'))
       emits('handle')
     } else {
       showFailToast(res.msg)
@@ -248,8 +250,8 @@ const handleCallBack = () => {
 // 强制关闭
 const handleCancel = () => {
   showConfirmDialog({
-    title: '提示',
-    message: '确认强制关闭此流程吗?'
+    title: t('提示'),
+    message: t('确认强制关闭此流程吗？')
   }).then(async() => {
     let data = {
       procInsId: route.query.pid || props.procInsId
@@ -257,7 +259,7 @@ const handleCancel = () => {
     let res = await stopProcess(data)
     if (res.code === 200) {
       // 返回
-      showSuccessToast('流程关闭成功')
+      showSuccessToast(t('流程关闭成功'))
       emits('handle')
     } else {
       showFailToast(res.msg)
@@ -284,8 +286,8 @@ const handleReStart = () => {
 // 删除流程
 const handleDelete = () => {
   showConfirmDialog({
-    title: '提示',
-    message: '确认删除此流程吗?'
+    title: t('提示'),
+    message: t('确认删除此流程吗？')
   }).then(async() => {
     let data = {
       procInsId: route.query.pid || props.procInsId
@@ -293,7 +295,7 @@ const handleDelete = () => {
     let res = await deleteProcess(data)
     if (res.code === 200) {
       // 返回
-      showSuccessToast('流程删除成功')
+      showSuccessToast(t('流程删除成功'))
       emits('handle')
     } else {
       showFailToast(res.msg)
@@ -341,19 +343,19 @@ const submitTask = async(data) => {
   }
   // 委派
   if (flag === '1') {
-    if (!personList || !personList.length) return showToast('请选择委派人')
+    if (!personList || !personList.length) return showToast(t('请选择委派人'))
     params.userId = personList.map(item => item.user_id).join(',')
     res = await delegateTask(params)
   }
   // 转办
   if (flag === '2') {
-    if (!personList || !personList.length) return showToast('请选择转办人')
+    if (!personList || !personList.length) return showToast(t('请选择转办人'))
     params.userId = personList.map(item => item.user_id).join(',')
     res = await transferTask(params)
   }
   // 退回节点
   if (flag === '3') {
-    if (!targetKey) return showToast('请选择可退回的节点')
+    if (!targetKey) return showToast(t('请选择可退回的节点'))
     params['targetKey'] = targetKey
     res = await returnTask(params)
   }
@@ -370,7 +372,7 @@ const submitTask = async(data) => {
     res = await unClaimTask(params)
   }
   if (flag && parseInt(flag) < 8 && res.code === 200) {
-    showSuccessToast('操作成功')
+    showSuccessToast(t('操作成功'))
     showSub.value = false
     emits('handle')
   }

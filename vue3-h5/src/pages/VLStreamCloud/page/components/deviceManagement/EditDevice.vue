@@ -1,26 +1,26 @@
 <template>
   <div class="edit-device">
-    <nav-header-banner :title="isCreate ? '新增设备' : '编辑设备'" :is-call-back="true" @call-back="onBack">
-      <span class="header-save" @click="onSave">保存</span>
+    <nav-header-banner :title="isCreate ? $t('新增设备') : $t('编辑设备')" :is-call-back="true" @call-back="onBack">
+      <span class="header-save" @click="onSave">{{ $t('保存') }}</span>
     </nav-header-banner>
     <div class="edit_content">
       <van-form class="form">
         <!-- 基本信息 -->
         <div class="block-title">
-          基本信息
+          {{ $t('基本信息') }}
         </div>
 
         <!-- 设备名称 -->
         <van-field
           v-model="form.name"
-          placeholder="请输入设备名称"
+          :placeholder="$t('请输入设备名称')"
           label-align="top"
           class="field-item"
         >
           <template #label>
             <div class="field-label">
-              <img :src="fxmc" alt="必填" class="required-icon" />
-              <span>设备名称</span>
+              <img :src="fxmc" :alt="$t('必填')" class="required-icon" />
+              <span>{{ $t('设备名称') }}</span>
             </div>
           </template>
         </van-field>
@@ -28,14 +28,14 @@
         <!-- 视频流路径（必填） -->
         <van-field
           v-model="form.streamUrl"
-          placeholder="请输入视频流路径"
+          :placeholder="$t('请输入视频流路径')"
           label-align="top"
           class="field-item"
         >
           <template #label>
             <div class="field-label">
-              <img :src="lj" alt="必填" class="required-icon" />
-              <span>视频流路径</span>
+              <img :src="lj" :alt="$t('必填')" class="required-icon" />
+              <span>{{ $t('视频流路径') }}</span>
             </div>
           </template>
         </van-field>
@@ -45,8 +45,8 @@
           <template #label>
             <div class="section-header">
               <div class="field-label">
-                <img :src="sbbq" alt="必填" class="required-icon" />
-                <span>设备标签</span>
+                <img :src="sbbq" :alt="$t('必填')" class="required-icon" />
+                <span>{{ $t('设备标签') }}</span>
               </div>
               <img :src="add" class="section-add" alt="" @click="openTagPopup" />
             </div>
@@ -74,36 +74,36 @@
         <van-field label-align="top" class="field-item" readonly>
           <template #label>
             <div class="field-label">
-              <img :src="sbbq" alt="必填" class="required-icon" />
-              <span>是否公开</span>
+              <img :src="sbbq" :alt="$t('必填')" class="required-icon" />
+              <span>{{ $t('是否公开') }}</span>
             </div>
           </template>
           <template #input>
             <div class="switch-value">
-              <span :class="{ active: !form.isPublic }">不公开</span>
+              <span :class="{ active: !form.isPublic }">{{ $t('不公开') }}</span>
               <van-switch v-model="form.isPublic" size="20" />
-              <span :class="{ active: form.isPublic }">公开</span>
+              <span :class="{ active: form.isPublic }">{{ $t('公开') }}</span>
             </div>
           </template>
         </van-field>
 
         <!-- 更多信息 -->
         <div class="block-title more-title">
-          更多信息
+          {{ $t('更多信息') }}
         </div>
 
         <!-- 设备ID -->
         <van-field
           v-model="form.deviceId"
-          placeholder="请输入设备ID"
+          :placeholder="$t('请输入设备ID')"
           label-align="top"
           class="field-item"
           :readonly="!isCreate"
         >
           <template #label>
             <div class="field-label">
-              <img :src="sbid" alt="必填" class="required-icon" />
-              <span>设备ID</span>
+              <img :src="sbid" :alt="$t('必填')" class="required-icon" />
+              <span>{{ $t('设备ID') }}</span>
             </div>
           </template>
         </van-field>
@@ -112,18 +112,18 @@
         <div class="section image-section">
           <div class="image-header flexRowAC">
             <img :src="fxtp" alt="" class="image-title-icon" />
-            <span class="image-title">图片路径</span>
+            <span class="image-title">{{ $t('图片路径') }}</span>
           </div>
           <div class="image-cover flexRowAC">
             <div v-if="!isLocalAuth" class="uploadBox flexRowAC" @click="showUploader = true">
               <img :src="sctp" alt="" />
-              上传图片
+              {{ $t('上传图片') }}
             </div>
             <input
               v-else
               v-model="form.imageUrl"
               class="url-input"
-              placeholder="请输入图片地址"
+              :placeholder="$t('请输入图片地址')"
               @blur="onImageUrlBlur"
             />
             <template v-if="imgArr && imgArr.length">
@@ -143,8 +143,8 @@
         <van-field label-align="top" class="field-item">
           <template #label>
             <div class="field-label">
-              <img :src="sbzb" alt="必填" class="required-icon" />
-              <span>经纬度坐标</span>
+              <img :src="sbzb" :alt="$t('必填')" class="required-icon" />
+              <span>{{ $t('经纬度坐标') }}</span>
             </div>
           </template>
           <template #input>
@@ -153,20 +153,20 @@
                 v-model="form.longitude"
                 class="coord-input"
                 type="digit"
-                placeholder="输入经度"
+                :placeholder="$t('输入经度')"
               />
               <span class="coord-split">-</span>
               <input
                 v-model="form.latitude"
                 class="coord-input"
                 type="digit"
-                placeholder="输入纬度"
+                :placeholder="$t('输入纬度')"
               />
             </div>
             <div v-else class="coord-row" @click="openSelectPoint">
-              <span class="coord-text">{{ form.longitude || '输入经度' }}</span>
+              <span class="coord-text">{{ form.longitude || $t('输入经度') }}</span>
               <span class="coord-split">-</span>
-              <span class="coord-text">{{ form.latitude || '输入纬度' }}</span>
+              <span class="coord-text">{{ form.latitude || $t('输入纬度') }}</span>
             </div>
           </template>
         </van-field>
@@ -176,8 +176,8 @@
           <template #label>
             <div class="section-header">
               <div class="field-label">
-                <img :src="sbqh" alt="必填" class="required-icon" />
-                <span>区划选择</span>
+                <img :src="sbqh" :alt="$t('必填')" class="required-icon" />
+                <span>{{ $t('区划选择') }}</span>
               </div>
               <van-icon name="arrow" class="section-arrow" />
             </div>
@@ -204,14 +204,14 @@
         <!-- 详细地址 -->
         <van-field
           v-model="form.address"
-          placeholder="请输入详细地址"
+          :placeholder="$t('请输入详细地址')"
           label-align="top"
           class="field-item"
         >
           <template #label>
             <div class="field-label">
-              <img :src="sbwz" alt="必填" class="required-icon" />
-              <span>详细地址</span>
+              <img :src="sbwz" :alt="$t('必填')" class="required-icon" />
+              <span>{{ $t('详细地址') }}</span>
             </div>
           </template>
         </van-field>
@@ -220,7 +220,7 @@
         <van-field
           v-model="form.remark"
           type="textarea"
-          placeholder="请输入备注"
+          :placeholder="$t('请输入备注')"
           rows="4"
           class="field-item"
         />
@@ -236,7 +236,7 @@
       style="width: 100%;height: 80%;"
       position="bottom"
       round
-      title="选择位置"
+      :title="$t('选择位置')"
     >
       <SelectPointFormMap
         v-if="showSelectPoint"
@@ -253,9 +253,9 @@
     >
       <div class="tag-picker-wrapper">
         <div class="tag-picker-header">
-          <span class="tag-picker-cancel" @click="onTagCancel">取消</span>
-          <span class="tag-picker-title">选择设备标签</span>
-          <span class="tag-picker-confirm" @click="onTagConfirm">确定</span>
+          <span class="tag-picker-cancel" @click="onTagCancel">{{ $t('取消') }}</span>
+          <span class="tag-picker-title">{{ $t('选择设备标签') }}</span>
+          <span class="tag-picker-confirm" @click="onTagConfirm">{{ $t('确定') }}</span>
         </div>
         <div class="tag-popup-content">
           <div class="tag-list">
@@ -277,7 +277,7 @@
     <van-popup v-model:show="showRegionPicker" round position="bottom">
       <van-cascader
         v-model="regionCascaderValue"
-        title="请选择所在地区"
+        :title="$t('请选择所在地区')"
         :options="regionOptions"
         @close="showRegionPicker = false"
         @finish="onRegionFinish"
@@ -297,6 +297,7 @@
 
 <script setup>
 import { reactive, onMounted, ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useCascaderAreaData } from '@vant/area-data'
 import { showToast } from 'vant'
 import CommonExpressions from '@/components/commonExpressions.vue'
@@ -331,6 +332,9 @@ const props = defineProps({
 })
 
 const store = useUserStore()
+
+const { t: tt } = useI18n()
+
 const emit = defineEmits(['close', 'saved'])
 
 // 单租户集群没有 apaas-map-server / apaas-fastdfsservice，选点与上传都不可用
@@ -480,12 +484,12 @@ const onSave = async() => {
 
   if (!id) {
     // 新增：POST /vlsDeviceInfo 由服务端生成主键，设备编号需手工填写
-    if (!form.name) return showToast('请输入设备名称')
-    if (!form.deviceId) return showToast('请输入设备ID')
-    if (!form.streamUrl) return showToast('请输入视频流路径')
+    if (!form.name) return showToast(tt('请输入设备名称'))
+    if (!form.deviceId) return showToast(tt('请输入设备ID'))
+    if (!form.streamUrl) return showToast(tt('请输入视频流路径'))
     const res = await createDevice({ ...commonFields, deviceId: form.deviceId, selectedTags: form.tags })
     if (res.code === 200) {
-      showToast('新增成功')
+      showToast(tt('新增成功'))
       emit('saved')
       emit('close')
     }

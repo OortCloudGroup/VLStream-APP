@@ -1,6 +1,6 @@
 <template>
   <div class="device-detail">
-    <nav-header-banner title="查看视频" :is-call-back="true" @call-back="onBack" />
+    <nav-header-banner :title="$t('查看视频')" :is-call-back="true" @call-back="onBack" />
 
     <div class="detail-body">
       <img class="hero" src="@/assets/img/VLStreamCloud/fj.png" alt="" />

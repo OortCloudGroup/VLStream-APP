@@ -6,16 +6,16 @@
 <template>
   <div class="camera-list">
     <div v-if="loading" class="list-state">
-      正在加载摄像头…
+      {{ $t('正在加载摄像头…') }}
     </div>
     <div v-else-if="loadError" class="list-state">
       <span>{{ loadError }}</span>
       <van-button size="mini" plain type="primary" @click="fetchCameras">
-        重新加载
+        {{ $t('重新加载') }}
       </van-button>
     </div>
     <div v-else-if="!devices.length" class="list-state">
-      暂无摄像头
+      {{ $t('暂无摄像头') }}
     </div>
 
     <div v-for="item in devices" :key="item.id" class="device-card" @click="openDetail(item)">
@@ -28,7 +28,7 @@
       <div class="info-row">
         <img src="@/assets/img/VLStreamCloud/spgc/sbId.png" alt="" />
         <div class="label">
-          设备ID
+          {{ $t('设备ID') }}
         </div>
         <div class="value">
           {{ item.deviceId }}
@@ -37,7 +37,7 @@
       <div class="info-row">
         <img src="@/assets/img/VLStreamCloud/spgc/sbwz.png" alt="" />
         <div class="label">
-          设备位置
+          {{ $t('设备位置') }}
         </div>
         <div class="value">
           {{ item.address }}
@@ -47,7 +47,7 @@
       <div class="card-footer">
         <div class="chips">
           <div class="chip" :class="{ offline: item.online !== true }">
-            {{ item.online === true ? '在线' : '离线' }}
+            {{ item.online === true ? $t('在线') : $t('离线') }}
           </div>
           <div v-if="item.deviceType" class="chip">
             {{ item.deviceType }}
@@ -72,6 +72,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import CameraDetail from './CameraDetail.vue'
 import { getWvpVlsDeviceList } from '@/api/VLStreamCloud/wvp'
@@ -82,6 +83,8 @@ const props = defineProps({
     default: ''
   }
 })
+
+const { t } = useI18n()
 
 const rows = ref([])
 const loading = ref(false)
@@ -105,7 +108,7 @@ const fetchCameras = async() => {
   try {
     const res = await getWvpVlsDeviceList({ pageNum: 1, pageSize: 200 })
     if (res.code !== 200 || !Array.isArray(res.rows)) {
-      loadError.value = res.msg || '摄像头列表加载失败'
+      loadError.value = res.msg || t('摄像头列表加载失败')
       rows.value = []
       return
     }
@@ -115,7 +118,7 @@ const fetchCameras = async() => {
       address: item.address || item.ipAddr
     }))
   } catch (e) {
-    loadError.value = e?.response?.data?.msg || e?.message || '摄像头列表加载失败'
+    loadError.value = e?.response?.data?.msg || e?.message || t('摄像头列表加载失败')
     rows.value = []
   } finally {
     loading.value = false

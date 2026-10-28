@@ -7,36 +7,36 @@
   >
     <div class="apply-dialog">
       <div class="dialog-title">
-        申请使用
+        {{ $t('申请使用') }}
       </div>
 
       <div class="form-content">
         <div class="form-item">
-          <label class="form-label">申请人</label>
+          <label class="form-label">{{ $t('申请人') }}</label>
           <van-field
             v-model="form.applyUserName"
-            placeholder="请输入"
+            :placeholder="$t('请输入')"
             class="form-input"
           />
         </div>
 
         <div class="form-item">
-          <label class="form-label">申请原因</label>
+          <label class="form-label">{{ $t('申请原因') }}</label>
           <van-field
             v-model="form.applyReason"
-            placeholder="请输入"
+            :placeholder="$t('请输入')"
             class="form-input"
           />
         </div>
 
         <div class="form-item">
-          <label class="form-label">申请备注</label>
+          <label class="form-label">{{ $t('申请备注') }}</label>
           <van-field
             v-model="form.applyRemark"
             type="textarea"
             rows="3"
             autosize
-            placeholder="请输入"
+            :placeholder="$t('请输入')"
             class="form-textarea"
           />
         </div>
@@ -47,14 +47,14 @@
           class="btn cancel"
           @click="onCancel"
         >
-          取消
+          {{ $t('取消') }}
         </van-button>
         <div class="divider" />
         <van-button
           class="btn confirm"
           @click="onSubmit"
         >
-          申请
+          {{ $t('申请') }}
         </van-button>
       </div>
     </div>
@@ -63,6 +63,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { vlsCameraApply } from '@/api/VLStreamCloud/device'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import { showToast } from 'vant'
@@ -73,6 +74,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['update:show', 'submit', 'cancel'])
+
+const { t } = useI18n()
 
 const innerShow = ref(props.show)
 
@@ -100,11 +103,11 @@ const onCancel = () => {
 
 const onSubmit = async() => {
   if (!props.deviceInfoId) {
-    showToast({ type: 'fail', message: '缺少设备ID' })
+    showToast({ type: 'fail', message: t('缺少设备ID') })
     return
   }
   if (!form.value.applyUserName) {
-    showToast({ type: 'fail', message: '请填写申请人' })
+    showToast({ type: 'fail', message: t('请填写申请人') })
     return
   }
 
@@ -117,7 +120,7 @@ const onSubmit = async() => {
 
   const res: any = await vlsCameraApply(props.deviceInfoId, payload)
   if (res && res.code === 200) {
-    showToast({ type: 'success', message: res?.msg || '申请成功' })
+    showToast({ type: 'success', message: res?.msg || t('申请成功') })
     emit('submit', payload)
     innerShow.value = false
   }

@@ -6,45 +6,45 @@
         v-if="showSearch"
         v-model="searchValue"
         show-action
-        placeholder="请输入搜索关键词"
+        :placeholder="$t('请输入搜索关键词')"
         @search="handleSearch"
         @cancel="handleCancel"
       />
       <!-- 任务状态切换tab：全部、进行中、已完成 -->
       <div v-if="mod_type===1 && !showSearch" class="task-tab-header">
         <div :class="['task-tab-item', { active: taskStatus === 0 }]" @click="taskStatusFn(0,'status')">
-          全部
+          {{ $t('全部') }}
         </div>
         <div :class="['task-tab-item', { active: taskStatus === 2 }]" @click="taskStatusFn(2,'status')">
-          待完成
+          {{ $t('待完成') }}
         </div>
         <div :class="['task-tab-item', { active: taskStatus === 1 }]" @click="taskStatusFn(1,'status')">
-          已完成
+          {{ $t('已完成') }}
         </div>
       </div>
       <div v-else-if="!showSearch" class="task-tab-header">
         <div :class="['task-tab-item', { active: mod_status === 0 }]" @click="taskStatusFn(0,'mod_status')">
-          全部
+          {{ $t('全部') }}
         </div>
         <div :class="['task-tab-item', { active: mod_status === 1 }]" @click="taskStatusFn(1,'mod_status')">
-          待确认
+          {{ $t('待确认') }}
         </div>
         <div :class="['task-tab-item', { active: mod_status === 2 }]" @click="taskStatusFn(2,'mod_status')">
-          已完成
+          {{ $t('已完成') }}
         </div>
       </div>
       <!-- 任务列表 -->
       <div class="task-list" :class="{add:mod_type===1}">
         <van-pull-refresh
           v-model="refreshing"
-          success-text="刷新成功"
+          :success-text="$t('刷新成功')"
           @refresh="onRefresh"
         >
           <van-list
             v-if="allTasks.length !== 0"
             v-model="loading"
             :finished="finished"
-            finished-text="没有更多了"
+            :finished-text="$t('没有更多了')"
             @load="onLoad"
           >
             <div v-for="(task, index) in allTasks" :key="index" class="task-item" @click="handleTaskClick(task)">
@@ -58,7 +58,7 @@
                   <div class="task-desc fl">
                     <div class="info-lable flexRowAC">
                       <img src="@/assets/img/eventMana/event_user.png" alt="" />
-                      上报人员：
+                      {{ $t('上报人员：') }}
                     </div>
                     <div class="info-content flexRowAC">
                       <i-d2-head-pic-mobile :id="task.uuid" class="info-content-avatar" round />
@@ -68,7 +68,7 @@
                   <div class="task-desc fl">
                     <div class="info-lable flexRowAC">
                       <img src="@/assets/img/eventMana/event_location1.png" alt="" />
-                      任务位置：
+                      {{ $t('任务位置：') }}
                     </div>
                     <div class="info-content">
                       {{ eventLocationText(task.point) }}
@@ -83,7 +83,7 @@
                   <div class="task-desc fl">
                     <div class="info-lable flexRowAC">
                       <img src="@/assets/img/eventMana/event_time.png" alt="" />
-                      上报时间：
+                      {{ $t('上报时间：') }}
                     </div>
                     <div class="info-content">
                       {{ task.created_at }}
@@ -92,7 +92,7 @@
                   <div class="task-desc fl">
                     <div class="info-lable flexRowAC">
                       <img src="@/assets/img/eventMana/event_desc.png" alt="" />
-                      事件描述：
+                      {{ $t('事件描述：') }}
                     </div>
                     <div class="info-content">
                       {{ task.describe }}
@@ -108,7 +108,7 @@
                   <div class="task-desc fl">
                     <div class="info-lable flexRowAC">
                       <img src="@/assets/img/eventMana/event_location1.png" alt="" />
-                      事件位置：
+                      {{ $t('事件位置：') }}
                     </div>
                     <div class="info-content">
                       {{ eventLocationText(task.point) }}
@@ -123,7 +123,7 @@
                   <div class="task-desc fl">
                     <div class="info-lable flexRowAC">
                       <img src="@/assets/img/eventMana/service_name.png" alt="" />
-                      设备名称：
+                      {{ $t('设备名称：') }}
                     </div>
                     <div class="info-content">
                       {{ task.device_name }}
@@ -133,7 +133,7 @@
                   <div class="task-desc fl">
                     <div class="info-lable flexRowAC">
                       <img src="@/assets/img/eventMana/service_id.png" alt="" />
-                      设备ID：
+                      {{ $t('设备ID：') }}
                     </div>
                     <div class="info-content">
                       {{ task.device_id }}
@@ -142,7 +142,7 @@
                   <div class="task-desc fl">
                     <div class="info-lable flexRowAC">
                       <img src="@/assets/img/eventMana/event_time.png" alt="" />
-                      事件时间：
+                      {{ $t('事件时间：') }}
                     </div>
                     <div class="info-content">
                       {{ task.created_at }}
@@ -159,7 +159,7 @@
           <!-- 空态 -->
           <div v-if="allTasks.length === 0" class="no_data">
             <img src="@/assets/img/daily_activity/no_data.png" />
-            <span>暂无数据</span>
+            <span>{{ $t('暂无数据') }}</span>
           </div>
         </van-pull-refresh>
       </div>

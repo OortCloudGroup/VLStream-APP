@@ -29,13 +29,13 @@
               <template v-if="!item.activityName">
                 <!--结束-->
                 <div v-if="item.activityType === 'endEvent'" class="nodeDesc">
-                  {{ item.assigneeName ? '结束' : '系统' }}
+                  {{ item.assigneeName ? $t('结束') : $t('系统') }}
                 </div>
                 <div v-else-if="item.activityType === 'startEvent'" class="nodeDesc">
-                  开始
+                  {{ $t('开始') }}
                 </div>
                 <div v-else class="nodeDesc">
-                  {{ item.activityName ? '' : '系统节点' }}
+                  {{ item.activityName ? '' : $t('系统节点') }}
                 </div>
               </template>
             </div>
@@ -48,18 +48,18 @@
                   <span class="node_descpit">{{ item.createTime }}</span>
                 </div>
                 <div v-if="item.activityType==='endEvent'" class="process">
-                  结束
+                  {{ $t('结束') }}
                 </div>
                 <!--候选办理-->
                 <div v-if="item.candidate" class="process">
-                  {{ '候选办理：' + item.candidate }}
+                  {{ $t('候选办理：') + item.candidate }}
                 </div>
                 <!--抄送人-->
                 <div
                   v-if="item.wfCopyUser && item.wfCopyUser.length > 0"
                   class="copy_user"
                 >
-                  抄送人：
+                  {{ $t('抄送人：') }}
                   <span
                     v-for="(imt, innde) in item.wfCopyUser"
                     :key="innde"
@@ -68,13 +68,13 @@
                 <!--流程状态-->
                 <div v-if="item.commentList&&item.commentList.length > 0" class="i_g_s_style">
                   <div v-for="(itd, ind) in item.commentList.slice().reverse()" :key="ind">
-                    <span v-if="itd.type === '1'" class="s_s span_status_1">{{ displayStatus(itd.type) }}</span>
-                    <span v-if="itd.type === '2'" class="s_s span_status_2">{{ displayStatus(itd.type) }}</span>
-                    <span v-if="itd.type === '3'" class="s_s span_status_3">{{ displayStatus(itd.type) }}</span>
-                    <span v-if="itd.type === '4'" class="s_s span_status_4">{{ displayStatus(itd.type) }}</span>
-                    <span v-if="itd.type === '5'" class="s_s span_status_5">{{ displayStatus(itd.type) }}</span>
-                    <span v-if="itd.type === '6'" class="s_s span_status_6">{{ displayStatus(itd.type) }}</span>
-                    <span v-if="itd.type === '7'" class="s_s span_status_7">{{ displayStatus(itd.type) }}</span>
+                    <span v-if="itd.type === '1'" class="s_s span_status_1">{{ $t(displayStatus(itd.type)) }}</span>
+                    <span v-if="itd.type === '2'" class="s_s span_status_2">{{ $t(displayStatus(itd.type)) }}</span>
+                    <span v-if="itd.type === '3'" class="s_s span_status_3">{{ $t(displayStatus(itd.type)) }}</span>
+                    <span v-if="itd.type === '4'" class="s_s span_status_4">{{ $t(displayStatus(itd.type)) }}</span>
+                    <span v-if="itd.type === '5'" class="s_s span_status_5">{{ $t(displayStatus(itd.type)) }}</span>
+                    <span v-if="itd.type === '6'" class="s_s span_status_6">{{ $t(displayStatus(itd.type)) }}</span>
+                    <span v-if="itd.type === '7'" class="s_s span_status_7">{{ $t(displayStatus(itd.type)) }}</span>
                     <span class="s_s_time">{{ itd.time }}</span>
                     <div class="s_s_mess">
                       {{ itd.fullMessage }}

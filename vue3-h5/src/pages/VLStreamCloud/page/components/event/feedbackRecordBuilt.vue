@@ -8,23 +8,23 @@
 !-->
 <template>
   <div class="eventBuilt_page">
-    <nav-header-banner title="添加反馈" />
+    <nav-header-banner :title="$t('添加反馈')" />
     <div class="eventBox">
       <div v-if="queryTemp&&queryTemp.mod_type==='2'" class="eventItem">
         <div class="eventItem_c flexRowAC">
           <img class="e_img" src="@/assets/img/eventMana/theme.png" alt="" />
-          <span class="title">告警事件</span>
+          <span class="title">{{ $t('告警事件') }}</span>
         </div>
         <div class="e_r locationBox user_box flexRowAC">
           <van-radio-group v-model="form.mod_status" direction="horizontal">
             <van-radio :name="1">
-              真实告警
+              {{ $t('真实告警') }}
             </van-radio>
             <!--            <van-radio :name="2">-->
             <!--              维保-->
             <!--            </van-radio>-->
             <van-radio :name="3">
-              误报
+              {{ $t('误报') }}
             </van-radio>
           </van-radio-group>
         </div>
@@ -32,7 +32,7 @@
       <div class="eventItem">
         <div class="eventItem_c flexRowAC">
           <img src="@/assets/img/eventMana/work1.png" alt="" />
-          <span class="title">是否转工单</span>
+          <span class="title">{{ $t('是否转工单') }}</span>
         </div>
         <div class="e_r locationBox user_box flexRowAC">
           <van-switch
@@ -54,16 +54,16 @@
       <div v-if="!isLocalAuth" class="eventItem">
         <div class="eventItem_c flexRowAC">
           <img src="@/assets/img/eventMana/photo1.png" alt="" />
-          <span class="title">反馈照片（{{ imgArr.length }}/5）</span>
+          <span class="title">{{ $t('反馈照片') }}（{{ imgArr.length }}/5）</span>
         </div>
         <div class="e_r locationBox flexRowAC coverBox">
           <div v-if="imgArr.length>=5" class="uploadBox flexRowAC">
             <img src="@/assets/img/eventMana/photo.png" alt="" />
-            拍照/上传
+            {{ $t('拍照/上传') }}
           </div>
           <div v-else class="uploadBox flexRowAC" @click="showUploader=true">
             <img src="@/assets/img/eventMana/photo.png" alt="" />
-            拍照/上传
+            {{ $t('拍照/上传') }}
           </div>
           <!-- imgArr-->
           <template v-if="imgArr&&imgArr.length">
@@ -78,7 +78,7 @@
       <div class="eventItem">
         <div class="eventItem_c flexRowAC" @click="!isLocalAuth && (selectLocationVisible = true)">
           <img src="@/assets/img/eventMana/event_location.png" alt="" />
-          <span class="title">事件反馈位置</span>
+          <span class="title">{{ $t('事件反馈位置') }}</span>
           <img v-if="!isLocalAuth" class="arrow-icon" src="@/assets/img/ancientTrees/biaodan-icon-tiaozhuan.png" alt="跳转" />
         </div>
         <div class="e_r locationBox flexRowAC">
@@ -89,7 +89,7 @@
             autosize
             :readonly="!isLocalAuth"
             clearable
-            :placeholder="isLocalAuth ? '请输入反馈位置' : '请选择区域'"
+            :placeholder="isLocalAuth ? $t('请输入反馈位置') : $t('请选择区域')"
           />
         </div>
         <div class="e_r locationBox flexRowAC">
@@ -101,14 +101,14 @@
             rows="4"
             autosize
             clearable
-            placeholder="请输入反馈描述"
+            :placeholder="$t('请输入反馈描述')"
           />
         </div>
         <div class="e_r locationBox">
           <div class="addBtnBox flexRowAC">
             <div class="addBtn flexRowAC">
               <van-icon name="plus" />
-              添加为常用语
+              {{ $t('添加为常用语') }}
             </div>
             <div
               v-for="(item,i) in listData"
@@ -124,14 +124,14 @@
       <!--是否完成养护-->
       <div class="eventItem Top">
         <div class="eventItem_c flexRowAC">
-          <span class="title">是否完成养护</span>
+          <span class="title">{{ $t('是否完成养护') }}</span>
           <div class="eventItem_c_right flexRowAC">
             <van-radio-group v-model="form.status" direction="horizontal">
               <van-radio :name="1">
-                已完成
+                {{ $t('已完成') }}
               </van-radio>
               <van-radio :name="2">
-                未完成
+                {{ $t('未完成') }}
               </van-radio>
             </van-radio-group>
           </div>
@@ -140,7 +140,7 @@
       <div class="eventItem primaryBox flexRowAC">
         <!-- 工单 -->
         <van-button type="primary" @click="submit">
-          提交
+          {{ $t('提交') }}
         </van-button>
       </div>
       <!--      -->
@@ -159,7 +159,7 @@
       style="width: 100%;height: 80%;"
       position="bottom"
       round
-      title="选择位置"
+      :title="$t('选择位置')"
     >
       <select-point-form-map
         v-if="selectLocationVisible"
@@ -173,6 +173,7 @@
 
 <script setup>
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
+import { useI18n } from 'vue-i18n'
 import { event_back_add, event_info } from '@/api/eventManagement'
 import config from '@/config'
 import { useUserStore } from '@/store/modules/useraPaas'
@@ -188,6 +189,7 @@ import { startProcess, stopProcess } from '@/api/processui'
 import FlowForm from '@/pages/VLStreamCloud/page/components/event/flowForm.vue'
 
 const store = useUserStore()
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 let queryTemp = ref(route.query)
@@ -266,7 +268,7 @@ const closeWorkorderFn = async() => {
   }
   let res = await stopProcess(data)
   if (res.code === 200) {
-    showSuccessToast('关闭工单成功')
+    showSuccessToast(t('关闭工单成功'))
   }
 }
 
@@ -284,9 +286,9 @@ const addWorkorderFn = async() => {
     if (oldOrder.processStatus !== 'canceled' && !oldOrder.finishTime) {
       try {
         await showConfirmDialog({
-          title: '取消工单',
+          title: t('取消工单'),
           message:
-            '选择的工单跟历史工单不一致，是否继续取消'
+            t('选择的工单跟历史工单不一致，是否继续取消')
         }).then(() => {
         })
           .catch(() => {
@@ -301,7 +303,7 @@ const addWorkorderFn = async() => {
   }
   // 2️⃣ 表单校验
   const processDefId = flowFormRef.value?.selectedOptions_1?.definitionId
-  if (!processDefId) return showToast('请选择工单')
+  if (!processDefId) return showToast(t('请选择工单'))
   let appObj = flowFormRef.value?.appObj
   // 3️⃣ 参数构建
   const data = {
@@ -347,10 +349,10 @@ const submit = async() => {
   const processKey = flowFormRef.value?.form.processKey
   // 没有可用的流程模型（单租户集群未部署工单流程）时不能强求选择工单，否则提交永远被拦住
   const hasFlowModels = !!flowFormRef.value?.options?.length
-  if (form.work_order_status === 1 && hasFlowModels && !processKey) return showToast('请选择工单')
-  if (queryTemp.value.mod_type === '2' && !form.mod_status) return showToast('告警事件未选择')
-  if (isLocalAuth ? !form.point.address : !form.point?.lat) return showToast('位置为空')
-  if (!form.describe) return showToast('请输入事件描述')
+  if (form.work_order_status === 1 && hasFlowModels && !processKey) return showToast(t('请选择工单'))
+  if (queryTemp.value.mod_type === '2' && !form.mod_status) return showToast(t('告警事件未选择'))
+  if (isLocalAuth ? !form.point.address : !form.point?.lat) return showToast(t('位置为空'))
+  if (!form.describe) return showToast(t('请输入事件描述'))
   // 是否转工单 1:是 0:否(默认) 工单关联的是事件,一个事件只能关联1个工单  已关联的不允许再关联
   if (form.work_order_status === 1 && hasFlowModels) {
     let val = await addWorkorderFn()
@@ -365,7 +367,7 @@ const submit = async() => {
   }
   let res = await event_back_add(data)
   if (res.code === 200) {
-    showSuccessToast('操作成功')
+    showSuccessToast(t('操作成功'))
     router.back()
   }
 }

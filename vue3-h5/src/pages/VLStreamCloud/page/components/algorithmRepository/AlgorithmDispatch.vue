@@ -1,6 +1,6 @@
 <template>
   <div class="algo-dispatch">
-    <nav-header-banner title="算法下发" :is-call-back="true" @call-back="onBack" />
+    <nav-header-banner :title="$t('算法下发')" :is-call-back="true" @call-back="onBack" />
 
     <div class="dispatch-content">
       <!-- 顶部筛选条 -->
@@ -11,17 +11,17 @@
           class="filter-item"
           @click="onFilter(item.value as FilterType)"
         >
-          {{ item.label }}
+          {{ $t(item.label) }}
           <van-icon name="arrow-down" />
         </div>
       </div>
 
       <!-- 列表标题 -->
       <div class="list-header-bar">
-        <span class="list-title">设备列表</span>
+        <span class="list-title">{{ $t('设备列表') }}</span>
         <div class="list-actions">
           <img src="@/assets/img/VLStreamCloud/xf.png" alt="" />
-          <span class="all-push" @click="onDispatchAll">全部下发</span>
+          <span class="all-push" @click="onDispatchAll">{{ $t('全部下发') }}</span>
         </div>
       </div>
 
@@ -31,13 +31,13 @@
           <van-checkbox :model-value="isAllChecked" shape="square" @click.stop="toggleAll" />
         </div>
         <div class="col">
-          设备名称
+          {{ $t('设备名称') }}
         </div>
         <div class="col">
-          设备ID
+          {{ $t('设备ID') }}
         </div>
         <div class="col">
-          状态
+          {{ $t('状态') }}
         </div>
       </div>
 
@@ -62,7 +62,7 @@
               :class="(dev.status === 1 || dev.status === '1') ? 'success' : 'default'"
               class="status-tag"
             >
-              {{ (dev.status === 1 || dev.status === '1') ? '在线' : '离线' }}
+              {{ (dev.status === 1 || dev.status === '1') ? $t('在线') : $t('离线') }}
             </div>
           </div>
         </div>
@@ -79,7 +79,7 @@
     <!-- 底部按钮 -->
     <div class="footer-bar">
       <van-button type="primary" block round class="push-btn" @click="onDispatch">
-        下发
+        {{ $t('下发') }}
       </van-button>
     </div>
   </div>
@@ -88,6 +88,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { showToast } from 'vant'
+import { useI18n } from 'vue-i18n'
 import { getDeviceList } from '@/api/VLStreamCloud/device'
 import { dispatchAlgorithmToDevices } from '@/api/VLStreamCloud/algorithm'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
@@ -95,6 +96,8 @@ import VideoFilterPanel from '../Filter/VideoFilterPanel.vue'
 import { useUserStore } from '@/store/modules/useraPaas'
 
 const emit = defineEmits(['close'])
+
+const { t } = useI18n()
 
 // 可选算法ID
 const props = defineProps<{
@@ -178,7 +181,7 @@ const toggleAll = () => {
 // 全部下发
 const onDispatchAll = async() => {
   if (!devices.value.length) {
-    showToast({ type: 'fail', message: '暂无可下发设备' })
+    showToast({ type: 'fail', message: t('暂无可下发设备') })
     return
   }
   checkedIds.value = devices.value.map(d => d.id)
@@ -188,11 +191,11 @@ const onDispatchAll = async() => {
 // 下发算法到选中的设备
 const onDispatch = async() => {
   if (!props.algorithmId) {
-    showToast({ type: 'fail', message: '缺少算法ID' })
+    showToast({ type: 'fail', message: t('缺少算法ID') })
     return
   }
   if (!checkedIds.value.length) {
-    showToast({ type: 'fail', message: '请先选择设备' })
+    showToast({ type: 'fail', message: t('请先选择设备') })
     return
   }
 

@@ -1,6 +1,6 @@
 <template>
   <div class="mymaintenance-page">
-    <nav-header-banner exit title="我的工单" class="header-banner">
+    <nav-header-banner exit :title="$t('我的工单')" class="header-banner">
       <van-icon name="search" size="24" color="#ffffff" style="margin-right: 8px;" @click="toggleSearch" />
     </nav-header-banner>
     <div class="content">
