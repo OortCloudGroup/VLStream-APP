@@ -28,3 +28,6 @@ entry/src/main/resources/rawfile/www/
 # DevEco 本地 IDE 配置
 .clang-tidy
 .clangd
+
+# 本地缓存（hvgor tsbuildinfo、CDP 走查截图等，勿提交）
+/.cache/

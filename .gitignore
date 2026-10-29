@@ -1,6 +1,12 @@
 # oh-my-claudecode 运行时状态（会话工具产物，勿提交）
 .omc/
 
+# oortcodex 会话运行时状态（勿提交）
+.oortcodex/
+
+# ESLint 缓存
+.eslintcache
+
 # 本地备份/归档（旧 AgentWeb 壳 tar 等，本地留存）
 .archive/
 
