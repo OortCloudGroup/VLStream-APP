@@ -192,6 +192,7 @@ export default {
   '摄像头列表加载失败': 'Failed to load camera list',
   '该设备未接入视频平台': 'This device is not connected to the video platform',
   '正在打开设备详情…': 'Opening device details…',
+  '打开设备详情失败，请稍后重试': 'Failed to open device details. Please try again later',
   '地图模式': 'Map Mode',
   '列表模式': 'List Mode',
   '卡片模式': 'Card Mode',

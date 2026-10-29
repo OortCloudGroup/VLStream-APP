@@ -25,9 +25,11 @@ const fetchRows = (): Promise<WvpRow[]> => {
     cachedAt = now
     rowsPromise = getWvpVlsDeviceList({ pageNum: 1, pageSize: 200 })
       .then((res: any) => (res && res.code === 200 && Array.isArray(res.rows) ? res.rows : []))
-      .catch(() => {
+      .catch((error: unknown) => {
+        // 请求失败不缓存，让下一次点击重试；向上抛出以便调用方区分「网络失败」与「未接入」
         rowsPromise = null
-        return [] as WvpRow[]
+        cachedAt = 0
+        throw error
       })
   }
   return rowsPromise

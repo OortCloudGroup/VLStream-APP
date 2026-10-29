@@ -64,7 +64,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { showToast } from 'vant'
+import { closeToast, showToast } from 'vant'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import CameraDetail from '@/pages/VLStreamCloud/page/components/cameraDetail/CameraDetail.vue'
 import EditDevice from '../deviceManagement/EditDevice.vue'
@@ -134,8 +134,20 @@ const currentRow = ref(null)
 // 点击设备打开摄像头详情：先按设备序列号找到 WVP 设备行
 const openDetail = async(row) => {
   showToast({ message: t('正在打开设备详情…'), duration: 0, forbidClick: true })
-  const wvpRow = await resolveWvpDeviceRow(row.deviceId)
-  showToast.clear()
+  let wvpRow = null
+  let failed = false
+  try {
+    wvpRow = await resolveWvpDeviceRow(row.deviceId)
+  } catch (e) {
+    failed = true
+  } finally {
+    // 不管成功失败都要关掉 forbidClick 的加载 toast，避免界面被永久遮罩卡死
+    closeToast()
+  }
+  if (failed) {
+    showToast(t('打开设备详情失败，请稍后重试'))
+    return
+  }
   if (!wvpRow) {
     showToast(t('该设备未接入视频平台'))
     return
