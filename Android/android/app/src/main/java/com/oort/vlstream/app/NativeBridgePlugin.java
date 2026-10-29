@@ -1,7 +1,12 @@
 package com.oort.vlstream.app;
 
+import android.app.Activity;
+import android.graphics.Color;
+import android.view.Window;
 import android.webkit.WebView;
 
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
@@ -21,6 +26,8 @@ import java.util.Collections;
  *   <li>{@link #getGateway} —— 返回后端网关地址。</li>
  *   <li>{@link #getAppInfo} —— 返回应用信息（包名/appId/secret/版本）。</li>
  *   <li>{@link #tokenOverdue} —— 清 H5 会话并 reload 重登。</li>
+ *   <li>{@link #setStatusBar} —— 动态设置状态栏背景/前景色（H5 按页面内容联动）。</li>
+ *   <li>{@link #setImmersiveMode} —— 全屏视频沉浸式：隐藏/恢复系统状态栏与导航栏。</li>
  * </ul>
  * 通用能力（拍照/相册、退出 App、定位）由官方插件提供：
  * @capacitor/camera、@capacitor/app、@capacitor/geolocation。
@@ -40,6 +47,9 @@ public class NativeBridgePlugin extends Plugin {
     private static final String JS_STATIC_VAR = "__VL_STATIC__";
     /** Capacitor 默认 androidScheme=https，应用 origin 为 https://localhost */
     private static final String LOCAL_ORIGIN = "https://localhost";
+
+    /** Whether an immersive fullscreen video is currently active (set by setImmersiveMode) */
+    private boolean immersiveActive = false;
 
     @Override
     public void load() {
@@ -145,21 +155,137 @@ public class NativeBridgePlugin extends Plugin {
      */
     @PluginMethod
     public void tokenOverdue(PluginCall call) {
+        evalJs(
+                "javascript:(function(){try{"
+                + "sessionStorage.removeItem('token');"
+                + "sessionStorage.removeItem('tempObj');"
+                + "sessionStorage.removeItem('tenantId');"
+                + "sessionStorage.removeItem('autoLogin');"
+                + "}catch(e){}"
+                + "window.location.hash='';"
+                + "location.replace(location.href.split('#')[0]);"
+                + "})();");
+        call.resolve();
+    }
+
+    /**
+     * 动态设置状态栏背景/前景色，使状态栏与紧邻其下的 H5 内容颜色一致。
+     * 参数：color（背景，默认 #F9FAFF）、contentColor（图标/文字，默认 #000000）。
+     * <p>
+     * targetSdk 35+ 强制 edge-to-edge，{@code setStatusBarColor} 被系统忽略
+     * （背景实际由延伸到状态栏下方的 H5 内容透出），仅图标明暗
+     * （{@code setAppearanceLightStatusBars}）继续生效；低版本两者均生效。
+     */
+    @PluginMethod
+    public void setStatusBar(PluginCall call) {
+        String color = call.getString("color", "#F9FAFF");
+        String contentColor = call.getString("contentColor", "#000000");
+        Activity activity = getActivity();
+        if (activity == null) {
+            call.reject("no-activity");
+            return;
+        }
+        Window window = activity.getWindow();
+        int background = parseColorSafely(color, Color.TRANSPARENT);
+        // Ignored on API 35+ (edge-to-edge enforced, H5 content shows through);
+        // still effective on lower versions.
+        window.setStatusBarColor(background);
+        WindowInsetsControllerCompat controller =
+                new WindowInsetsControllerCompat(window, window.getDecorView());
+        // Light content color (e.g. white icons on a dark bar) → dark system icons are wrong;
+        // appearance flag is the inverse of the content color luminance.
+        controller.setAppearanceLightStatusBars(isLightColor(contentColor));
+        call.resolve();
+    }
+
+    /**
+     * 全屏视频沉浸式开关。
+     * enabled=true：隐藏系统状态栏/导航栏（滑动手势可短暂呼出）；
+     * enabled=false：恢复系统栏显示。
+     */
+    @PluginMethod
+    public void setImmersiveMode(PluginCall call) {
+        Boolean enabledObj = call.getBoolean("enabled", false);
+        boolean enabled = enabledObj != null && enabledObj;
+        Activity activity = getActivity();
+        if (activity == null) {
+            call.reject("no-activity");
+            return;
+        }
+        Window window = activity.getWindow();
+        WindowInsetsControllerCompat controller =
+                new WindowInsetsControllerCompat(window, window.getDecorView());
+        controller.setSystemBarsBehavior(
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+        if (enabled) {
+            controller.hide(WindowInsetsCompat.Type.systemBars());
+        } else {
+            controller.show(WindowInsetsCompat.Type.systemBars());
+        }
+        immersiveActive = enabled;
+        call.resolve();
+    }
+
+    /** Whether an immersive fullscreen video is currently active. */
+    public boolean isImmersiveActive() {
+        return immersiveActive;
+    }
+
+    /**
+     * 返回手势落在沉浸式全屏视频上时：恢复系统栏，并通知 H5 退出全屏
+     * （document.exitFullscreen + vl-exit-fullscreen 事件，覆盖 API 全屏与 CSS 兜底全屏）。
+     */
+    public void exitImmersiveAndNotifyH5() {
+        immersiveActive = false;
+        Activity activity = getActivity();
+        if (activity != null) {
+            Window window = activity.getWindow();
+            WindowInsetsControllerCompat controller =
+                    new WindowInsetsControllerCompat(window, window.getDecorView());
+            controller.show(WindowInsetsCompat.Type.systemBars());
+        }
+        evalJs(
+                "javascript:(function(){try{"
+                + "if(document.fullscreenElement&&document.exitFullscreen){document.exitFullscreen();}"
+                + "document.dispatchEvent(new Event(\"vl-exit-fullscreen\"));"
+                + "}catch(e){}})();");
+    }
+
+    /**
+     * 主页双击返回退出提示：仅派发 vl-exit-hint 事件，toast 文案由 H5 按当前语言渲染
+     * （原生不持有文案，保证中英文体验一致）。
+     */
+    public void notifyExitHint() {
+        evalJs(
+                "javascript:(function(){try{"
+                + "document.dispatchEvent(new Event(\"vl-exit-hint\"));"
+                + "}catch(e){}})();");
+    }
+
+    /** 在 WebView 里执行 JS（插件方法均在主线程被调用，可直接 evaluateJavascript）。 */
+    private void evalJs(String script) {
         WebView webView = getBridge() != null ? getBridge().getWebView() : null;
         if (webView != null) {
-            webView.evaluateJavascript(
-                    "javascript:(function(){try{"
-                    + "sessionStorage.removeItem('token');"
-                    + "sessionStorage.removeItem('tempObj');"
-                    + "sessionStorage.removeItem('tenantId');"
-                    + "sessionStorage.removeItem('autoLogin');"
-                    + "}catch(e){}"
-                    + "window.location.hash='';"
-                    + "location.replace(location.href.split('#')[0]);"
-                    + "})();",
-                    null);
+            webView.evaluateJavascript(script, null);
         }
-        call.resolve();
+    }
+
+    /** 解析 #RRGGBB / #AARRGGBB 颜色，非法输入返回兜底色。 */
+    private static int parseColorSafely(String hex, int fallback) {
+        try {
+            return Color.parseColor(hex);
+        } catch (Throwable t) {
+            return fallback;
+        }
+    }
+
+    /** 相对亮度（0..1）：>0.5 视为浅色。 */
+    private static boolean isLightColor(String hex) {
+        int color = parseColorSafely(hex, Color.BLACK);
+        double luminance = (0.299 * Color.red(color)
+                + 0.587 * Color.green(color)
+                + 0.114 * Color.blue(color)) / 255.0;
+        return luminance > 0.5;
     }
 }
 
