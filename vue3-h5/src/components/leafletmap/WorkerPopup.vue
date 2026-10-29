@@ -4,13 +4,13 @@
       <div class="info_item">
         <img src="@/assets/img/maintenanceManagement/arrow1.png" class="icon" />
         <div class="info_item_text">
-          {{ props.marker?.address || '暂无地址信息' }}
+          {{ props.marker?.address || $t('暂无地址信息') }}
         </div>
       </div>
       <div class="info_item">
         <img src="@/assets/img/maintenanceManagement/noto.png" class="icon" />
         <div class="info_item_text">
-          到达时间： {{ props.marker?.report_at || '暂无时间信息' }}
+          {{ $t('到达时间：') }} {{ props.marker?.report_at || $t('暂无时间信息') }}
         </div>
       </div>
     </div>

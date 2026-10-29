@@ -10,7 +10,7 @@
           :class="{ act: formValue.repeat === item.value }"
           @click="updateRepeat(item.value)"
         >
-          {{ item.label }}
+          {{ $t(item.label) }}
         </div>
       </div>
     </div>
@@ -19,14 +19,14 @@
     <div v-if="formValue.repeat === 'next'" class="interval_row">
       <van-field
         v-model="intervalValue"
-        label="每隔"
+        :label="$t('每隔')"
         type="number"
-        placeholder="请输入"
+        :placeholder="$t('请输入')"
         class="interval_input"
         @update:model-value="updateInterval"
       >
         <template #right-icon>
-          <span class="interval_suffix">天</span>
+          <span class="interval_suffix">{{ $t('天') }}</span>
         </template>
       </van-field>
     </div>
@@ -39,18 +39,18 @@
           :class="{ selected: selectedDayKey === day.key }"
           @click="handleRowLabelClick(day.key)"
         >
-          {{ day.label }}
+          {{ $t(day.label) }}
         </div>
         <div class="row_track_wrap">
           <div class="row_ticks">
             <div
-              v-for="(t, index) in ticks"
-              :key="t"
+              v-for="(tick, index) in ticks"
+              :key="tick"
               class="row_tick"
               :style="tickStyle(index)"
             >
               <div class="row_tick_num">
-                {{ t }}
+                {{ tick }}
               </div>
               <div class="row_tick_line" />
             </div>
@@ -110,13 +110,13 @@
     >
       <div class="edit_pop_content">
         <div class="edit_pop_title">
-          编辑时间段
+          {{ $t('编辑时间段') }}
         </div>
 
         <div class="edit_time_row">
           <div class="edit_time_item">
             <div class="edit_time_label">
-              开始时间
+              {{ $t('开始时间') }}
             </div>
             <van-time-picker
               v-model="editPop.startTime"
@@ -130,7 +130,7 @@
           </div>
           <div class="edit_time_item">
             <div class="edit_time_label">
-              结束时间
+              {{ $t('结束时间') }}
             </div>
             <van-time-picker
               v-model="editPop.endTime"
@@ -143,10 +143,10 @@
 
         <div class="edit_actions">
           <van-button class="edit_delete_btn" @click="handleEditDelete">
-            删除
+            {{ $t('删除') }}
           </van-button>
           <van-button type="primary" class="edit_save_btn" @click="handleEditSave">
-            保存
+            {{ $t('保存') }}
           </van-button>
         </div>
       </div>
@@ -163,7 +163,7 @@
     >
       <div class="copy_pop_content">
         <div class="copy_pop_title">
-          复制到…
+          {{ $t('复制到…') }}
         </div>
 
         <div class="copy_days">
@@ -174,7 +174,7 @@
               class="copy_day_item"
             >
               <van-checkbox :name="d.value">
-                {{ d.label }}
+                {{ $t(d.label) }}
               </van-checkbox>
             </div>
           </van-checkbox-group>
@@ -182,10 +182,10 @@
 
         <div class="copy_actions">
           <van-button class="copy_cancel_btn" @click="copyVisible = false">
-            取消
+            {{ $t('取消') }}
           </van-button>
           <van-button type="primary" class="copy_ok_btn" @click="handleCopyConfirm">
-            确定
+            {{ $t('确定') }}
           </van-button>
         </div>
       </div>
@@ -195,8 +195,11 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref, watch, onBeforeUnmount } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { TimePicker as VanTimePicker, Button as VanButton, CheckboxGroup as VanCheckboxGroup, Checkbox as VanCheckbox, Icon as VanIcon, Field as VanField, showToast } from 'vant'
 import OortPopup from '@/components/popup/oort_popup.vue'
+
+const { t } = useI18n()
 
 interface Seg {
   id: string
@@ -1038,15 +1041,15 @@ const handleEditSave = () => {
   const start = timeToHours(startTimeStr)
   const end = timeToHours(endTimeStr)
   if (!(start >= 0 && start <= 24 && end >= 0 && end <= 24)) {
-    showToast('时间范围不合法')
+    showToast(t('时间范围不合法'))
     return
   }
   if (end <= start) {
-    showToast('结束时间必须大于开始时间')
+    showToast(t('结束时间必须大于开始时间'))
     return
   }
   if (checkOverlap(editPop.dayKey, start, end, editPop.segId)) {
-    showToast('时间段重叠，请调整时间')
+    showToast(t('时间段重叠，请调整时间'))
     return
   }
 

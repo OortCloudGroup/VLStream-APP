@@ -18,6 +18,10 @@ import EN_BATCH_B from './pages/batchB.js'
 import EN_BATCH_C from './pages/batchC.js'
 import EN_BATCH_D from './pages/batchD.js'
 import EN_BATCH_E from './pages/batchE.js'
+import EN_BATCH_F from './pages/batchF.js'
+import EN_BATCH_G from './pages/batchG.js'
+import EN_BATCH_H from './pages/batchH.js'
+import EN_BATCH_I from './pages/batchI.js'
 
 const EN_PAGE_MESSAGES = {
   ...EN_PAGES,
@@ -25,7 +29,11 @@ const EN_PAGE_MESSAGES = {
   ...EN_BATCH_B,
   ...EN_BATCH_C,
   ...EN_BATCH_D,
-  ...EN_BATCH_E
+  ...EN_BATCH_E,
+  ...EN_BATCH_F,
+  ...EN_BATCH_G,
+  ...EN_BATCH_H,
+  ...EN_BATCH_I
 }
 
 const LOCALE_KEY = 'vl_locale'

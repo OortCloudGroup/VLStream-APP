@@ -13,7 +13,7 @@
       <div class="div_overlay">
         <template v-if="isInCordovaEnv">
           <div class="div_overlay_option" @click="takePhoto(2)">
-            <span>选择文件</span>
+            <span>{{ $t('选择文件') }}</span>
           </div>
         </template>
         <div v-else class="div_overlay_option">
@@ -23,7 +23,7 @@
             :after-read="photoAlbumMethod"
             :preview-image="false"
           >
-            <span>选择文件</span>
+            <span>{{ $t('选择文件') }}</span>
           </van-uploader>
         </div>
       </div>
@@ -33,7 +33,7 @@
 <script>
 import { uploadFile } from '@/api/fastdfs'
 import config from '@/config/index.js'
-import { showLoadingToast } from 'vant'
+import { showLoadingToast, closeToast } from 'vant'
 import bus from '@/utils/bus'
 import { getToken } from '@/utils/cache'
 export default {
@@ -132,7 +132,7 @@ export default {
             tempPromiseArr.push(this.uploadImage(item.filePath.split('?')[0]))
           })
           const toastIns = showLoadingToast({
-            message: '文件上传中,请耐心等待...',
+            message: this.$t('文件上传中,请耐心等待...'),
             forbidClick: true,
             overlay: true,
             duration: 0
@@ -171,11 +171,11 @@ export default {
                 console.log(res)
               }
             } catch (e) {
-              alert('上传失败 uploadFile')
+              alert(this.$t('上传失败 uploadFile'))
             }
           },
           () => {
-            Toast.clear()
+            closeToast()
             // console.log(err)
           },
           options

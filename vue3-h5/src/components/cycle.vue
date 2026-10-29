@@ -10,50 +10,50 @@
   <div class="d_page">
     <van-form ref="formRef" class="formBox" :model="form" :rules="rules">
       <van-cell-group>
-        <van-field label="紧急程度" readonly>
+        <van-field :label="$t('紧急程度')" readonly>
           <template #input>
             <van-radio-group v-model="form.priority" direction="horizontal">
               <van-radio name="normal" class="radio-item">
-                一般
+                {{ $t('一般') }}
               </van-radio>
               <van-radio name="urgent" class="radio-item">
-                紧急
+                {{ $t('紧急') }}
               </van-radio>
               <van-radio name="critical" class="radio-item">
-                严重
+                {{ $t('严重') }}
               </van-radio>
             </van-radio-group>
           </template>
         </van-field>
 
-        <van-field label="工单循环" readonly>
+        <van-field :label="$t('工单循环')" readonly>
           <template #input>
             <van-radio-group v-model="form.cycle" direction="horizontal">
               <van-radio :name="false" class="radio-item">
-                即时
+                {{ $t('即时') }}
               </van-radio>
               <van-radio :name="true" class="radio-item">
-                循环
+                {{ $t('循环') }}
               </van-radio>
             </van-radio-group>
           </template>
         </van-field>
 
         <div v-if="form.cycle" class="cy_every">
-          <van-field label="循环类型" readonly>
+          <van-field :label="$t('循环类型')" readonly>
             <template #input>
               <van-radio-group v-model="form.every" direction="horizontal">
                 <van-radio name="every" class="radio-item">
-                  每天
+                  {{ $t('每天') }}
                 </van-radio>
                 <van-radio name="next" class="radio-item">
-                  隔天
+                  {{ $t('隔天') }}
                 </van-radio>
                 <van-radio name="week" class="radio-item">
-                  每周
+                  {{ $t('每周') }}
                 </van-radio>
                 <van-radio name="month" class="radio-item">
-                  每月
+                  {{ $t('每月') }}
                 </van-radio>
               </van-radio-group>
             </template>
@@ -61,20 +61,20 @@
         </div>
       </van-cell-group>
 
-      <van-cell-group v-if="form.cycle" title="循环设置">
+      <van-cell-group v-if="form.cycle" :title="$t('循环设置')">
         <div class="time2SelBox">
           <van-field
             v-model="form.start_t"
-            label="开始时间"
+            :label="$t('开始时间')"
             readonly
-            placeholder="选择时间"
+            :placeholder="$t('选择时间')"
             @click="showStartPicker = true"
           />
           <van-popup v-model:show="showStartPicker" position="bottom">
             <van-datetime-picker
               v-model="startDate"
               type="datetime"
-              title="选择开始时间"
+              :title="$t('选择开始时间')"
               @confirm="onStartConfirm"
               @cancel="showStartPicker = false"
             />
@@ -82,7 +82,7 @@
 
           <van-field
             v-model="form.time"
-            label="触发时间"
+            :label="$t('触发时间')"
             readonly
             placeholder="00:00:00"
             @click="showTimePicker = true"
@@ -90,55 +90,55 @@
           <van-popup v-model:show="showTimePicker" position="bottom">
             <van-time-picker
               v-model="timeValue"
-              title="选择触发时间"
+              :title="$t('选择触发时间')"
               @confirm="onTimeConfirm"
               @cancel="showTimePicker = false"
             />
           </van-popup>
 
-          <van-field v-if="form.every==='next'" label="每隔">
+          <van-field v-if="form.every==='next'" :label="$t('每隔')">
             <template #input>
               <van-stepper v-model="form.next" :min="1" :max="99" />
-              <span class="unit-text">天</span>
+              <span class="unit-text">{{ $t('天') }}</span>
             </template>
           </van-field>
 
-          <van-field v-if="form.every==='week'" label="触发日期" readonly>
+          <van-field v-if="form.every==='week'" :label="$t('触发日期')" readonly>
             <template #input>
               <van-checkbox-group v-model="form.week" direction="horizontal">
                 <van-checkbox name="1" class="checkbox-item">
-                  星期一
+                  {{ $t('星期一') }}
                 </van-checkbox>
                 <van-checkbox name="2" class="checkbox-item">
-                  星期二
+                  {{ $t('星期二') }}
                 </van-checkbox>
                 <van-checkbox name="3" class="checkbox-item">
-                  星期三
+                  {{ $t('星期三') }}
                 </van-checkbox>
                 <van-checkbox name="4" class="checkbox-item">
-                  星期四
+                  {{ $t('星期四') }}
                 </van-checkbox>
                 <van-checkbox name="5" class="checkbox-item">
-                  星期五
+                  {{ $t('星期五') }}
                 </van-checkbox>
                 <van-checkbox name="6" class="checkbox-item">
-                  星期六
+                  {{ $t('星期六') }}
                 </van-checkbox>
                 <van-checkbox name="7" class="checkbox-item">
-                  星期日
+                  {{ $t('星期日') }}
                 </van-checkbox>
               </van-checkbox-group>
             </template>
           </van-field>
 
-          <van-field v-if="form.every==='week'" label="每隔">
+          <van-field v-if="form.every==='week'" :label="$t('每隔')">
             <template #input>
               <van-stepper v-model="form.next" :min="0" :max="99" />
-              <span class="unit-text">周</span>
+              <span class="unit-text">{{ $t('周') }}</span>
             </template>
           </van-field>
 
-          <van-field v-if="form.every==='month'" label="触发日期" readonly>
+          <van-field v-if="form.every==='month'" :label="$t('触发日期')" readonly>
             <template #input>
               <div class="month-checkboxes">
                 <van-checkbox-group v-model="form.month">
@@ -151,7 +151,7 @@
                     {{ item > 9 ? '' + item : '0' + item }}
                   </van-checkbox>
                   <van-checkbox name="L" class="month-checkbox">
-                    最后一天
+                    {{ $t('最后一天') }}
                   </van-checkbox>
                 </van-checkbox-group>
               </div>
@@ -160,16 +160,16 @@
 
           <van-field
             v-model="form.end_t"
-            label="结束时间"
+            :label="$t('结束时间')"
             readonly
-            placeholder="选择时间"
+            :placeholder="$t('选择时间')"
             @click="showEndPicker = true"
           />
           <van-popup v-model:show="showEndPicker" position="bottom">
             <van-datetime-picker
               v-model="endDate"
               type="datetime"
-              title="选择结束时间"
+              :title="$t('选择结束时间')"
               @confirm="onEndConfirm"
               @cancel="showEndPicker = false"
             />
@@ -177,10 +177,10 @@
 
           <div class="tipBox">
             <van-icon name="warning-o" />
-            <span v-if="form.every==='every'">在开始时间点触发后，在一天内按设置的时间点触发工单，直到截至时间（截止时间无法一直执行）</span>
-            <span v-if="form.every==='next'">在开始时间点触发后，在设置时间间隔天数后的当天内按设置的时间点触发工单，直到截止时间（截止时间无法一直执行）</span>
-            <span v-if="form.every==='week'">在开始时间点触发后，在一周按设置的时间点触发工单，直到截止时间（截止时间无法一直执行）</span>
-            <span v-if="form.every==='month'">在开始时间点后，在一月内按设置的时间点触发任务，直到截至时间</span>
+            <span v-if="form.every==='every'">{{ $t('在开始时间点触发后，在一天内按设置的时间点触发工单，直到截至时间（截止时间无法一直执行）') }}</span>
+            <span v-if="form.every==='next'">{{ $t('在开始时间点触发后，在设置时间间隔天数后的当天内按设置的时间点触发工单，直到截止时间（截止时间无法一直执行）') }}</span>
+            <span v-if="form.every==='week'">{{ $t('在开始时间点触发后，在一周按设置的时间点触发工单，直到截止时间（截止时间无法一直执行）') }}</span>
+            <span v-if="form.every==='month'">{{ $t('在开始时间点后，在一月内按设置的时间点触发任务，直到截至时间') }}</span>
           </div>
         </div>
       </van-cell-group>
@@ -188,10 +188,10 @@
 
     <div class="button-group">
       <van-button class="cancel-btn" @click="emits('close')">
-        取消
+        {{ $t('取消') }}
       </van-button>
       <van-button type="primary" class="save-btn" @click="save(formRef)">
-        保存
+        {{ $t('保存') }}
       </van-button>
     </div>
   </div>
@@ -200,7 +200,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { showToast } from 'vant'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const emits: any = defineEmits(['handle', 'close'])
 const props:any = defineProps(['item'])
 const formRef = ref('') // form Ref
@@ -228,13 +230,13 @@ const form = reactive({
 
 const rules = reactive({
   time: [
-    { required: true, message: '请选择触发时间' }
+    { required: true, message: t('请选择触发时间') }
   ],
   start_t: [
-    { required: true, message: '请选择开始时间' }
+    { required: true, message: t('请选择开始时间') }
   ],
   end_t: [
-    { required: true, message: '请选择结束时间' }
+    { required: true, message: t('请选择结束时间') }
   ]
 })
 
@@ -273,15 +275,15 @@ const save = async(formEl: any) => {
 
   // 验证必填字段
   if (!form.time) {
-    showToast('请选择触发时间')
+    showToast(t('请选择触发时间'))
     return
   }
   if (!form.start_t) {
-    showToast('请选择开始时间')
+    showToast(t('请选择开始时间'))
     return
   }
   if (!form.end_t) {
-    showToast('请选择结束时间')
+    showToast(t('请选择结束时间'))
     return
   }
 
@@ -309,7 +311,7 @@ const save = async(formEl: any) => {
     data.run = form.month
     data['trg_time'] = form.time // 每周月定时类型触发的时分秒时间
   }
-  showToast('保存成功')
+  showToast(t('保存成功'))
   emits('close')
   emits('handle', data)
 }

@@ -12,7 +12,7 @@
         <!-- 简单popup：只显示地址 -->
         <div v-if="popupType === 'simple'" class="simple-popup">
           <div class="popup-address">
-            {{ worker.address || worker.name || '暂无地址信息' }}
+            {{ worker.address || worker.name || $t('暂无地址信息') }}
           </div>
         </div>
         <!-- 工人信息popup：显示详细信息 -->

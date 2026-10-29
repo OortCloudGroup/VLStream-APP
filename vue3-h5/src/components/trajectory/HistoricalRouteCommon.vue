@@ -1,7 +1,7 @@
 <template>
   <div class="track-list-container">
     <div class="time-box">
-      <van-cell v-model:show="show" title="请选择日期" :value="date" @click="show = true" />
+      <van-cell v-model:show="show" :title="$t('请选择日期')" :value="date" @click="show = true" />
       <van-calendar v-model:show="show" :type="props.type" :min-date="minDate" @confirm="onConfirm" />
     </div>
     <div class="map-box">
@@ -17,21 +17,21 @@
       />
       <div v-if="isPlay" class="replay-btn" @click="startTrack">
         <img class="play" src="@/assets/img/commandDispatch/paly_guiji.png" />
-        轨迹回放
+        {{ $t('轨迹回放') }}
       </div>
 
       <div v-else class="replay-btn" @click="pauseTrack">
         <img class="play" src="@/assets/img/commandDispatch/pause_guiji.png" />
-        暂停
+        {{ $t('暂停') }}
       </div>
       <div class="clockIn">
         <div>
           <img src="@/assets/img/maintenanceManagement/blue2.png" class="clockInImg" />
-          已打卡
+          {{ $t('已打卡') }}
         </div>
         <div>
           <img src="@/assets/img/maintenanceManagement/red2.png" class="clockInImg" />
-          未打卡
+          {{ $t('未打卡') }}
         </div>
       </div>
     </div>
@@ -47,7 +47,7 @@
               {{ item.address }}
             </div> -->
             <div class="arrive-time">
-              到达时间：{{ formatDateToHM(item.report_at * 1000) }}
+              {{ $t('到达时间：') }}{{ formatDateToHM(item.report_at * 1000) }}
             </div>
             <!-- <div v-if="item.stayTime" class="stay-time">
               停留时间：{{ item.stayTime }}
@@ -75,8 +75,8 @@
         </template>
       </van-slider>
       <div class="timeline-labels">
-        <span>起点</span>
-        <span>终点</span>
+        <span>{{ $t('起点') }}</span>
+        <span>{{ $t('终点') }}</span>
       </div>
     </div>
   </div>
@@ -84,6 +84,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import MapComponent from '@/components/trajectory/MapComponent.vue'
 import bus from '@/utils/bus'
 import { formatDateToHM } from '@/utils/time'
@@ -98,6 +99,8 @@ const props = defineProps({
     default: () => []
   }
 })
+
+const { t } = useI18n()
 
 const emit = defineEmits(['dateChange'])
 const currentIndex = ref(0)
@@ -159,7 +162,7 @@ const onConfirm = (selectedDates) => {
   if (props.type === 'range') {
     startDate.value = formatDate(selectedDates[0])
     endDate.value = formatDate(selectedDates[1])
-    date.value = `${startDate.value} 至 ${endDate.value}`
+    date.value = `${startDate.value} ${t('至')} ${endDate.value}`
     emit('dateChange', {
       startDate: startDate.value,
       endDate: endDate.value,
@@ -206,7 +209,7 @@ onMounted(() => {
     // 日期范围选择
     startDate.value = today
     endDate.value = today
-    date.value = `${startDate.value} 至 ${endDate.value}`
+    date.value = `${startDate.value} ${t('至')} ${endDate.value}`
   } else {
     // 单选日期
     selectedDate.value = today

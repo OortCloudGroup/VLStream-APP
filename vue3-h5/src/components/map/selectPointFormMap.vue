@@ -2,14 +2,14 @@
   <div class="select-point-form-map">
     <!-- 普通模式头部 -->
     <div v-if="!isAroundSearch" class="map-header">
-      <span>点击地图选择位置</span>
+      <span>{{ $t('点击地图选择位置') }}</span>
     </div>
 
     <!-- 周边搜索模式头部 -->
     <div v-if="isAroundSearch" class="around-search-header">
       <div class="search-title">
         <div class="title-line" />
-        <span>地图选点</span>
+        <span>{{ $t('地图选点') }}</span>
       </div>
       <div class="search-bar">
         <div class="search-input-wrapper">
@@ -17,7 +17,7 @@
           <input
             v-model="searchKeyword"
             type="text"
-            placeholder="搜索位置"
+            :placeholder="$t('搜索位置')"
             class="search-input"
             @input="handleSearchInput"
             @focus="onSearchFocus"
@@ -41,14 +41,14 @@
         @mapMove="onMapMove"
       />
       <div v-if="mapUnavailable" class="map-unavailable">
-        地图服务不可用，请改为手工填写位置
+        {{ $t('地图服务不可用，请改为手工填写位置') }}
       </div>
     </div>
 
     <!-- 周边搜索结果列表 -->
     <div v-if="isAroundSearch && showSearchResults" class="search-results-panel">
       <div class="results-title">
-        搜索结果
+        {{ $t('搜索结果') }}
       </div>
       <div class="results-list">
         <div
@@ -70,17 +70,17 @@
           </div>
         </div>
         <div v-if="searchResults.length === 0 && !isSearching" class="no-results">
-          暂无搜索结果
+          {{ $t('暂无搜索结果') }}
         </div>
         <div v-if="isSearching" class="loading">
-          搜索中...
+          {{ $t('搜索中...') }}
         </div>
       </div>
     </div>
 
     <div class="bottom_btn">
       <button class="complete-button" @click="handleComplete">
-        确定选择
+        {{ $t('确定选择') }}
       </button>
     </div>
   </div>

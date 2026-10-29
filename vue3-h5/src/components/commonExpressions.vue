@@ -2,7 +2,7 @@
   <div class="common_wrapper">
     <div class="add_common_btn" @click="addCommonOpinion">
       <van-icon name="plus" class="add_common_btn_icon" />
-      添加为常用语
+      {{ $t('添加为常用语') }}
     </div>
     <div class="common_btn_list">
       <div v-for="(item,index) in listData" :key="index" class="common_content">

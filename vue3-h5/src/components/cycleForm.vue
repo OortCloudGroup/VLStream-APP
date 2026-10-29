@@ -1,25 +1,25 @@
 <template>
   <div class="cycle-form-wrapper">
     <!-- 工单循环 -->
-    <van-field readonly label="巡查时间" label-align="top">
+    <van-field readonly :label="$t('巡查时间')" label-align="top">
       <template #left-icon>
-        <img class="label-icon" src="@/assets/img/maintenanceManagement/itmeIcon.png" alt="时间图标" />
+        <img class="label-icon" src="@/assets/img/maintenanceManagement/itmeIcon.png" :alt="$t('时间图标')" />
         <span class="custom-required">*</span>
       </template>
       <template #input>
         <div class="maintainTime">
           <div class="timeButBox">
             <div class="timeBut" :class="{ butActive: localEvery === 'every' }" @click="updateEvery('every')">
-              每天
+              {{ $t('每天') }}
             </div>
             <div class="timeBut" :class="{ butActive: localEvery === 'next' }" @click="updateEvery('next')">
-              隔天
+              {{ $t('隔天') }}
             </div>
             <div class="timeBut" :class="{ butActive: localEvery === 'week' }" @click="updateEvery('week')">
-              每周
+              {{ $t('每周') }}
             </div>
             <div class="timeBut" :class="{ butActive: localEvery === 'month' }" @click="updateEvery('month')">
-              每月
+              {{ $t('每月') }}
             </div>
           </div>
         </div>
@@ -31,8 +31,8 @@
         <van-field
           v-model="localStartTime"
           readonly
-          label="开始时间"
-          placeholder="选择时间"
+          :label="$t('开始时间')"
+          :placeholder="$t('选择时间')"
           @click="showStartTimePicker = true"
         />
 
@@ -40,60 +40,60 @@
         <van-field
           v-model="localTime"
           readonly
-          label="触发时间"
+          :label="$t('触发时间')"
           placeholder="00:00:00"
           @click="showTimePicker = true"
         />
-        <van-field v-if="localEvery==='next'" v-model="localStartTime" label-width="80px" type="number" label="每隔" class="custom-input">
+        <van-field v-if="localEvery==='next'" v-model="localStartTime" label-width="80px" type="number" :label="$t('每隔')" class="custom-input">
           <template #right-icon>
-            <span class="timeUnit">天</span>
+            <span class="timeUnit">{{ $t('天') }}</span>
           </template>
         </van-field>
 
         <!-- 每周 -->
-        <van-cell v-if="localEvery==='week'" title="触发日期">
+        <van-cell v-if="localEvery==='week'" :title="$t('触发日期')">
           <van-checkbox-group v-model="localWeek" @change="update('week', $event)">
             <van-checkbox name="1">
-              星期一
+              {{ $t('星期一') }}
             </van-checkbox>
             <van-checkbox name="2">
-              星期二
+              {{ $t('星期二') }}
             </van-checkbox>
             <van-checkbox name="3">
-              星期三
+              {{ $t('星期三') }}
             </van-checkbox>
             <van-checkbox name="4">
-              星期四
+              {{ $t('星期四') }}
             </van-checkbox>
             <van-checkbox name="5">
-              星期五
+              {{ $t('星期五') }}
             </van-checkbox>
             <van-checkbox name="6">
-              星期六
+              {{ $t('星期六') }}
             </van-checkbox>
             <van-checkbox name="7">
-              星期日
+              {{ $t('星期日') }}
             </van-checkbox>
           </van-checkbox-group>
         </van-cell>
-        <van-cell v-if="localEvery==='week'" title="每隔">
+        <van-cell v-if="localEvery==='week'" :title="$t('每隔')">
           <van-stepper
             v-model="localNext"
             :min="0"
             :max="99"
             @change="update('next', $event)"
           />
-          <span style="margin-left: 8px;">周</span>
+          <span style="margin-left: 8px;">{{ $t('周') }}</span>
         </van-cell>
 
         <!-- 每月 -->
-        <van-cell v-if="localEvery==='month'" title="触发日期">
+        <van-cell v-if="localEvery==='month'" :title="$t('触发日期')">
           <van-checkbox-group v-model="localMonth" @change="update('month', $event)">
             <van-checkbox v-for="(item,i) in 31" :key="i" :name="''+item">
               {{ item > 9 ? '' + item : '0' + item }}
             </van-checkbox>
             <van-checkbox name="L">
-              最后一天
+              {{ $t('最后一天') }}
             </van-checkbox>
           </van-checkbox-group>
         </van-cell>
@@ -102,18 +102,18 @@
         <van-field
           v-model="localEndTime"
           readonly
-          label="结束时间"
-          placeholder="选择时间"
+          :label="$t('结束时间')"
+          :placeholder="$t('选择时间')"
           @click="showEndTimePicker = true"
         />
 
         <!-- 提示 -->
         <div class="tipBox">
           <van-icon name="warning-o" />
-          <span v-if="localEvery==='every'">每天按设置时间点触发，直到结束时间</span>
-          <span v-if="localEvery==='next'">隔天按设置间隔触发，直到结束时间</span>
-          <span v-if="localEvery==='week'">每周按设置日期和时间触发，直到结束时间</span>
-          <span v-if="localEvery==='month'">每月按设置日期和时间触发，直到结束时间</span>
+          <span v-if="localEvery==='every'">{{ $t('每天按设置时间点触发，直到结束时间') }}</span>
+          <span v-if="localEvery==='next'">{{ $t('隔天按设置间隔触发，直到结束时间') }}</span>
+          <span v-if="localEvery==='week'">{{ $t('每周按设置日期和时间触发，直到结束时间') }}</span>
+          <span v-if="localEvery==='month'">{{ $t('每月按设置日期和时间触发，直到结束时间') }}</span>
         </div>
       </div>
     </van-cell-group>
@@ -123,7 +123,7 @@
       <van-datetime-picker
         :model-value="startTimeDate"
         type="datetime"
-        title="选择开始时间"
+        :title="$t('选择开始时间')"
         @confirm="onStartTimeConfirm"
         @cancel="showStartTimePicker = false"
       />
@@ -134,7 +134,7 @@
       <van-datetime-picker
         :model-value="endTimeDate"
         type="datetime"
-        title="选择结束时间"
+        :title="$t('选择结束时间')"
         @confirm="onEndTimeConfirm"
         @cancel="showEndTimePicker = false"
       />
@@ -144,7 +144,7 @@
     <van-popup v-model:show="showTimePicker" position="bottom">
       <van-time-picker
         :model-value="timeDate"
-        title="选择时间"
+        :title="$t('选择时间')"
         @confirm="onTimeConfirm"
         @cancel="showTimePicker = false"
       />

@@ -12,13 +12,13 @@
       <div class="div_overlay">
         <template v-if="isInCordovaEnv">
           <div class="div_overlay_option" @click="takePhoto(1)">
-            <span v-if="mediaType === 0">拍照</span>
-            <span v-if="mediaType === 1">摄像</span>
-            <span v-if="mediaType === 2">拍摄</span>
+            <span v-if="mediaType === 0">{{ $t('拍照') }}</span>
+            <span v-if="mediaType === 1">{{ $t('摄像') }}</span>
+            <span v-if="mediaType === 2">{{ $t('拍摄') }}</span>
           </div>
           <van-divider />
           <div class="div_overlay_option" @click="takePhoto(2)">
-            <span>从相册选择</span>
+            <span>{{ $t('从相册选择') }}</span>
           </div>
           <van-divider />
         </template>
@@ -29,7 +29,7 @@
             :after-read="photoAlbumMethod"
             :preview-image="false"
           >
-            <span>从相册选择</span>
+            <span>{{ $t('从相册选择') }}</span>
           </van-uploader>
         </div>
       </div>
@@ -38,12 +38,15 @@
 </template>
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { uploadFile } from '@/api/fastdfs'
 import config from '@/config/index.js'
 import { showLoadingToast } from 'vant'
 import bus from '@/utils/bus'
 import getQueryUrlString from '@/utils/getQueryUrlString'
 import { getToken } from '@/utils/cache'
+
+const { t } = useI18n()
 
 const props = defineProps({
   accept: {
@@ -150,7 +153,7 @@ const takePhoto = async(srcType) => {
     let tempPromiseArr = []
     tempPromiseArr.push(uploadImage(res))
     const toastIns = showLoadingToast({
-      message: '文件上传中，请耐心等待...',
+      message: t('文件上传中，请耐心等待...'),
       forbidClick: true,
       overlay: true,
       duration: 0
@@ -167,7 +170,7 @@ const takePhoto = async(srcType) => {
         tempPromiseArr.push(uploadImage(item.filePath))
       })
       const toastIns = showLoadingToast({
-        message: '文件上传中，请耐心等待...',
+        message: t('文件上传中，请耐心等待...'),
         forbidClick: true,
         overlay: true,
         duration: 0
@@ -258,7 +261,7 @@ const uploadLocalFilePath = (localPath) => {
             resolve(res)
           }
         } catch (e) {
-          alert('上传失败 uploadFile')
+          alert(t('上传失败 uploadFile'))
         }
       },
       (e) => {

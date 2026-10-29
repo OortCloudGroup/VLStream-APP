@@ -7,7 +7,7 @@ Copyright 奥尔特云（深圳）智慧科技有限公司. All rights reserved.
     <div class="tag_box">
       <img v-if="isOpen" src="@/assets/img/contact/tag_open.png" />
       <img v-else src="@/assets/img/contact/tag_close.png" />
-      <span class="tag_title">{{ isOpen ? '公开标签' : '私有标签' }}</span>
+      <span class="tag_title">{{ $t(isOpen ? '公开标签' : '私有标签') }}</span>
     </div>
 
     <ContactTreeUserItem

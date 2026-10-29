@@ -20,12 +20,12 @@
       />
       <div v-if="isPlay" class="replay-btn" @click="startTrack">
         <img class="play" src="@/assets/img/commandDispatch/paly_guiji.png" />
-        轨迹回放
+        {{ $t('轨迹回放') }}
       </div>
 
       <div v-else class="replay-btn" @click="pauseTrack">
         <img class="play" src="@/assets/img/commandDispatch/pause_guiji.png" />
-        暂停
+        {{ $t('暂停') }}
       </div>
     </div>
     <div class="list-container">
@@ -40,13 +40,13 @@
               {{ item.address }}
             </div>
             <div class="arrive-time">
-              到达时间：{{ item.arriveTime }}
+              {{ $t('到达时间：') }}{{ item.arriveTime }}
             </div>
             <div v-if="item.stayTime" class="stay-time">
-              停留时间：{{ item.stayTime }}
+              {{ $t('停留时间：') }}{{ item.stayTime }}
             </div>
             <div v-if="item.noStay" class="no-stay">
-              未停留
+              {{ $t('未停留') }}
             </div>
           </div>
         </van-step>
@@ -67,8 +67,8 @@
         </template>
       </van-slider>
       <div class="timeline-labels">
-        <span>起点</span>
-        <span>终点</span>
+        <span>{{ $t('起点') }}</span>
+        <span>{{ $t('终点') }}</span>
       </div>
     </div>
 

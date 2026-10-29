@@ -12,7 +12,7 @@
       @mapReady="mapReady"
     />
     <div v-if="mapUnavailable" class="map-unavailable">
-      地图服务不可用，请检查平台底图服务配置
+      {{ $t('地图服务不可用，请检查平台底图服务配置') }}
     </div>
   </div>
 </template>

@@ -4,7 +4,7 @@ Copyright 奥尔特云（深圳）智慧科技有限公司. All rights reserved.
 */
 <template>
   <div class="always_body">
-    常用人员
+    {{ $t('常用人员') }}
   </div>
 </template>
 
