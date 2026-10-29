@@ -47,7 +47,9 @@ struct Index {
       ctx.moveAbilityToBackground();
     } else {
       this.lastBackPressTime = now;
-      this.getUIContext().getPromptAction().showToast({ message: '再按一次退出应用', duration: 2000 });
+      // Delegate the hint text to the H5 (vl-exit-hint event) so the toast
+      // follows the in-app language instead of a fixed native string.
+      this.nativeBridge.notifyExitHint();
     }
     return true;
   }

@@ -20,12 +20,12 @@
 
 <script setup>
 
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import Config, { applyVlEnv } from '@/config'
 import appConfig from '@/config/AppConfig'
-import { showLoadingToast, showFailToast } from 'vant'
+import { showLoadingToast, showFailToast, showToast } from 'vant'
 import { getAccessToken, getGateWay, getAppInfo, getAppInfoFromHttp } from '@/utils/cordovatUtils.js'
 import { pushStatusBar, popStatusBar } from '@/utils/shellStatusBar'
 import { useUserStore } from '@/store/modules/useraPaas'
@@ -126,7 +126,14 @@ const loginSuccess = async() => {
   }
 }
 
+// Native shell home-page double-back exit hint: the shell only dispatches a
+// vl-exit-hint event so the toast text stays localized here via i18n
+const onNativeExitHint = () => {
+  showToast({ message: t('再按一次退出应用'), duration: 2000 })
+}
+
 onMounted(() => {
+  document.addEventListener('vl-exit-hint', onNativeExitHint)
   if (window.global && window.global.is_native_shell) {
     // 新原生壳：直接初始化（无需 deviceready）
     init()
@@ -136,6 +143,10 @@ onMounted(() => {
   } else {
     init()
   }
+})
+
+onUnmounted(() => {
+  document.removeEventListener('vl-exit-hint', onNativeExitHint)
 })
 
 </script>

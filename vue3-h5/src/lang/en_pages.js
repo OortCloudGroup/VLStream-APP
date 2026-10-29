@@ -141,6 +141,7 @@ export default {
   '关于': 'About',
   '设置': 'Settings',
   '退出登录': 'Log Out',
+  '再按一次退出应用': 'Press back again to exit',
   '确认退出登录？': 'Log out?',
   '语言设置': 'Language',
   '联系我们': 'Contact Us',

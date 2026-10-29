@@ -207,4 +207,20 @@ export class NativeBridgePlugin extends CapacitorPlugin {
       return win.setWindowLayoutFullScreen(false);
     });
   }
+
+  /**
+   * 主页双击返回退出提示：仅派发 vl-exit-hint 事件，toast 文案由 H5 按当前语言渲染
+   * （原生不持有文案，保证中英文体验一致）。
+   */
+  notifyExitHint(): void {
+    const js: string =
+      '(function(){try{' +
+      'document.dispatchEvent(new Event("vl-exit-hint"));' +
+      '}catch(e){}})();';
+    try {
+      this.cordovaWebView?.getWebviewController().runJavaScript(js);
+    } catch (e) {
+      console.error('[NativeBridgePlugin] notifyExitHint failed: ' + (e as Error).message);
+    }
+  }
 }
