@@ -27,7 +27,7 @@
             </div>
             <div class="weather-info">
               <div class="greeting">
-                {{ userName }}，{{ greetingText }}!
+                {{ greetingWithUser }}
               </div>
             </div>
 
@@ -195,7 +195,7 @@ import sphf from '@/assets/img/VLStreamCloud/sphf.png'
 
 const router = useRouter()
 const store = useUserStore()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 // 热门设备的播放按钮打开设备详情
 const showVideoDetail = ref(false)
@@ -230,6 +230,10 @@ const pad2 = (value) => String(value).padStart(2, '0')
 
 const currentDate = computed(() => {
   const date = now.value
+  // en-US convention: "Oct 29, 2026"; cn keeps "2026-10-29"
+  if (locale.value === 'en') {
+    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date)
+  }
   return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`
 })
 
@@ -251,6 +255,11 @@ const greetingText = computed(() => {
   if (hour >= 18 && hour < 23) return t('晚上好')
   return t('夜深了')
 })
+
+// Word order differs per locale: "admin，早上好！" vs "Good morning, admin!"
+const greetingWithUser = computed(() => (locale.value === 'en'
+  ? `${greetingText.value}, ${userName.value}!`
+  : `${userName.value}，${greetingText.value}！`))
 
 const updateNow = () => {
   now.value = new Date()
