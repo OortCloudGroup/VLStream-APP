@@ -42,6 +42,9 @@ H5 侧统一封装在 `vue3-h5/public/androidFunUtils.js`（挂 `window.androidF
 | `takePhoto(params)` | 官方 `@capacitor/camera`（`getPhoto` / `pickImages`）| 同 |
 | `FileTransfer` 上传 | H5 侧 XHR+FormData polyfill（与原生解耦）| 同 |
 | `is_native_shell` 标志 | `NativeBridgePlugin` document-start 注入 | 同 |
+| 状态栏联动 `setStatusBar` | 自研 `NativeBridgePlugin`：`bridge.statusBarStyle` 控图标明暗（iOS 状态栏透明、背景由 H5 内容透出）| 同（`setAppearanceLightStatusBars`）|
+| 全屏沉浸 `setImmersiveMode` | 自研 `NativeBridgePlugin`：`bridge.statusBarVisible` 隐藏/恢复状态栏 | 同（`WindowInsetsControllerCompat`）|
+| 安全区 | `NativeBridgePlugin` document-start 注入 `window.__safeAreaTop`（CSS px，取 `statusBarManager.statusBarFrame`）| 同（`status_bar_height` 换算 CSS px）|
 
 ## 环境要求
 
@@ -93,7 +96,7 @@ xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/ipa
 
 ## JS 注入时序
 
-`NativeBridgePlugin.load()` 用 `WKUserScript(injectionTime: .atDocumentStart)` 在 **document start** 注入 `window.__VL_STATIC__` 与 `window.global.is_native_shell`，保证它们早于 `index.html` 里的业务脚本执行——从而 H5 的 `getGateway()` 能保持**同步**语义（`App.vue` 无需改 async）。与 Android 端的 `WebViewCompat.addDocumentStartJavaScript` 对齐。
+`NativeBridgePlugin.load()` 用 `WKUserScript(injectionTime: .atDocumentStart)` 在 **document start** 注入 `window.__VL_STATIC__`、`window.global.is_native_shell` 与 `window.__safeAreaTop`（状态栏高度，CSS px），保证它们早于 `index.html` 里的业务脚本执行——从而 H5 的 `getGateway()` 能保持**同步**语义（`App.vue` 无需改 async）。与 Android 端的 `WebViewCompat.addDocumentStartJavaScript` 对齐。
 
 ## 与 vue3-h5 的耦合点
 
