@@ -55,7 +55,17 @@ H5 侧统一封装在 `vue3-h5/public/androidFunUtils.js`（挂 `window.androidF
 | `FileTransfer` 上传 | H5 侧 XHR+FormData polyfill（与原生解耦，保留不变）|
 | `is_native_shell` 标志 | `NativeBridgePlugin` 启动期注入 `window.global.is_native_shell=true` |
 | 定位（二期）| 官方 `@capacitor/geolocation` |
-| 安全区（二期）| `@capacitor/status-bar` / safe-area-inset |
+| 状态栏联动 `setStatusBar` | 自研 `NativeBridgePlugin`：`setAppearanceLightStatusBars` 控图标明暗（targetSdk 35+ 强制 edge-to-edge，`setStatusBarColor` 被系统忽略、背景由 H5 内容透出）|
+| 全屏沉浸 `setImmersiveMode` | 自研 `NativeBridgePlugin`：`WindowInsetsControllerCompat` 隐藏/恢复系统栏 |
+| 安全区 | `NativeBridgePlugin` 启动期注入 `window.__safeAreaTop`（CSS px）|
+
+## 系统返回键（三层，与鸿蒙壳对齐）
+
+`MainActivity.onBackPressed`：
+
+1. 沉浸式全屏视频中 → `NativeBridgePlugin.exitImmersiveAndNotifyH5()`：恢复系统栏 + 通知 H5 退出全屏（`vl-exit-fullscreen` 事件）；
+2. WebView 有历史页 → `webView.goBack()`（H5 路由回退）；
+3. 历史栈底 → 2s 内第二次返回 `moveTaskToBack(true)` 退后台；第一次派发 `vl-exit-hint` 事件，toast 文案（「再按一次退出应用」）由 H5 按 i18n 渲染——原生不持有文案，三端体验一致。
 
 ## 构建
 
