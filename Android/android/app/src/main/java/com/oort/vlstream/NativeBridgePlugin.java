@@ -1,4 +1,4 @@
-package com.oort.vlstream.app;
+package com.oort.vlstream;
 
 import android.app.Activity;
 import android.graphics.Color;

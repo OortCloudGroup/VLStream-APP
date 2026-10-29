@@ -18,7 +18,7 @@ enum AppConfig {
     static let gateWayPrefix = "bus/"
 
     /// 应用包名（默认占位，运行期取 Bundle.main.bundleIdentifier）。
-    static let appPackage = "com.oort.vlstream.app"
+    static let appPackage = "com.oort.vlstream"
 
     static let appId = "747aa0fa18d047c8b526e242142e0a6c"
     static let appSecret = "3a97f4f65b204a3a96071746fa42936a"

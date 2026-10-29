@@ -29,7 +29,7 @@ const APP_SECRET: string = '3a97f4f65b204a3a96071746fa42936a';
 // App display label: consistent with the launcher label (AppScope string.json)
 const APP_LABEL: string = 'VLStream';
 const APP_VERSION: string = '1.0.0';
-const APP_PACKAGE: string = 'com.oort.vlstream.app';
+const APP_PACKAGE: string = 'com.oort.vlstream';
 
 export class NativeBridgePlugin extends CapacitorPlugin {
   // Whether an immersive fullscreen video is currently active (set by setImmersiveMode)

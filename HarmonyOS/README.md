@@ -102,7 +102,7 @@ cd HarmonyOS
 hvigorw assembleHap -p product=default --mode module -p module=entry@default
 # 产物 entry/build/default/outputs/default/entry-default-unsigned.hap
 hdc install entry/build/default/outputs/default/entry-default-unsigned.hap
-hdc shell aa start -a EntryAbility -b com.oort.vlstream.app
+hdc shell aa start -a EntryAbility -b com.oort.vlstream
 ```
 
 ### 3. 沉浸式状态栏

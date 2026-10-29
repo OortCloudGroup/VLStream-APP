@@ -82,7 +82,7 @@ xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -archiv
 xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/ipa -exportOptionsPlist ExportOptions.plist
 ```
 
-> 首次在 Xcode 打开需设置 **Signing & Capabilities**：选择你的 Apple 开发者 Team，Bundle Identifier `com.oort.vlstream.app`（如与已有 App 冲突需改名）。Debug 跑模拟器/真机直接 `Cmd+R`。
+> 首次在 Xcode 打开需设置 **Signing & Capabilities**：选择你的 Apple 开发者 Team，Bundle Identifier `com.oort.vlstream`（如与已有 App 冲突需改名）。Debug 跑模拟器/真机直接 `Cmd+R`。
 
 ## 开发期联调（连 dev server）
 

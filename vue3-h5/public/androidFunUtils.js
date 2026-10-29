@@ -229,7 +229,7 @@
 
   function defaultAppInfo() {
     return {
-      apppackage: 'com.oort.vlstream.app',
+      apppackage: 'com.oort.vlstream',
       app_id: '747aa0fa18d047c8b526e242142e0a6c',
       app_secret: '3a97f4f65b204a3a96071746fa42936a',
       applabel: 'VLStreamCloud',

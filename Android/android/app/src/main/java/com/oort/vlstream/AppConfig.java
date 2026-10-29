@@ -1,4 +1,4 @@
-package com.oort.vlstream.app;
+package com.oort.vlstream;
 
 /**
  * 网关 / 应用配置。

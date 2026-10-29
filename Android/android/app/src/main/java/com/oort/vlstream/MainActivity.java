@@ -1,4 +1,4 @@
-package com.oort.vlstream.app;
+package com.oort.vlstream;
 
 import android.os.Bundle;
 import android.os.SystemClock;
