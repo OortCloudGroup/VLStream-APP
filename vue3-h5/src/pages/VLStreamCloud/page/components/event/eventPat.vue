@@ -50,7 +50,10 @@
             <div v-for="(task, index) in allTasks" :key="index" class="task-item" @click="handleTaskClick(task)">
               <div class="task-info">
                 <div class="task-title fl flexRowAC">
-                  {{ task.name }}
+                  <div class="task-name-wrap fl flexRowAC">
+                    <span class="task-name-text">{{ eventTitle(task.name) }}</span>
+                    <span v-if="isUnseenEvent(task)" class="new-event-tag">{{ $t('新') }}</span>
+                  </div>
                   <van-icon name="arrow" />
                 </div>
                 <!-- 事件拍传 -->
@@ -173,12 +176,19 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/modules/useraPaas'
 import { event_list, myevent_list } from '@/api/eventManagement'
 import { eventLocationText, hasEventLocation } from '@/utils/eventDisplay'
+import { isUnseenEvent, markEventSeen } from './eventBadge'
 import ID2HeadPicMobile from '@/components/ID2HeadPic.vue'
 import ID2Name from '@/components/ID2Name.vue'
 import bus from '@/utils/bus'
 
+// 事件列表标题：去掉尾部 _detected 后缀
+const eventTitle = (name) => String(name || '').replace(/_detected$/, '')
+
 // 定义props
-const props = defineProps(['event', 'my'])
+const props = defineProps({
+  event: { type: [Number, String], default: null },
+  my: { type: Boolean, default: false }
+})
 const store = useUserStore()
 const router = useRouter()
 const refreshing = ref(false)
@@ -251,13 +261,13 @@ const event_listFn = async() => {
       }
       page.value += 1
     }
-  } else {
-    console.log(res)
   }
 }
 
 // 事件详情
 const handleTaskClick = (task) => {
+  // 查看详情后标记该条已读："新"标示消失、tab角标减一
+  markEventSeen(task)
   // 跳转到事件详情
   if (mod_type.value === 1) {
     router.push({
@@ -439,6 +449,32 @@ onUnmounted(() => {
   .van-icon-arrow {
     color: #999;
   }
+}
+
+.task-name-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+// 标题超长时单行省略号截断
+.task-name-text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// 未查看的新事件标示
+.new-event-tag {
+  flex-shrink: 0;
+  margin-left: 6px;
+  padding: 1px 6px;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 400;
+  color: #fff;
+  background: #F5222D;
+  border-radius: 8px;
 }
 
 .task-desc {

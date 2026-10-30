@@ -14,6 +14,7 @@ export default {
   '搜索': 'Search',
   '全部': 'All',
   '新建': 'New',
+  '新': 'New',
   '添加': 'Add',
   '提示': 'Notice',
   '时间': 'Time',

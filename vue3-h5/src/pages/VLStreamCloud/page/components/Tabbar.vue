@@ -20,7 +20,7 @@
         />
       </template>
     </van-tabbar-item>
-    <van-tabbar-item to="/event">
+    <van-tabbar-item to="/event" :badge="eventBadge">
       <span>{{ $t('事件') }}</span>
       <template #icon="props">
         <van-icon
@@ -44,11 +44,18 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { unreadEventCount, refreshUnreadEventCount } from './event/eventBadge'
 
 const route = useRoute()
 const active = ref(0)
+
+// 事件tab角标：全部新事件查看完（数量为0）才消失，超过99显示 99+
+const eventBadge = computed(() => {
+  if (unreadEventCount.value <= 0) return ''
+  return unreadEventCount.value > 99 ? '99+' : String(unreadEventCount.value)
+})
 
 // 根据路由更新激活状态
 const routeMap = {
@@ -67,6 +74,24 @@ watch(() => route.path, (path) => {
     active.value = 0
   }
 }, { immediate: true })
+
+// 轮询刷新未查看事件数（已读状态按事件粒度维护，详见 eventBadge.ts）
+let badgeTimer = null
+const syncEventBadge = () => {
+  if (document.hidden) return
+  refreshUnreadEventCount()
+}
+
+onMounted(() => {
+  syncEventBadge()
+  badgeTimer = setInterval(syncEventBadge, 60000)
+  document.addEventListener('visibilitychange', syncEventBadge)
+})
+
+onUnmounted(() => {
+  if (badgeTimer) clearInterval(badgeTimer)
+  document.removeEventListener('visibilitychange', syncEventBadge)
+})
 </script>
 
 <style lang="scss" scoped>
