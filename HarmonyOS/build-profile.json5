@@ -2,18 +2,18 @@
   app: {
     signingConfigs: [
       {
-        name: 'default',
-        type: 'HarmonyOS',
-        material: {
-          certpath: 'C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_Qr8ZSlR1zCT8ELXxtBF8icaynHwpP3lLbSk89lOCW30=.cer',
-          keyAlias: 'debugKey',
-          keyPassword: '0000001bb360043fdc2a687781470a159add3a2b92d09b692222b96454c7ee28a84167ef0592e45a2c3dfa',
-          profile: 'C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_Qr8ZSlR1zCT8ELXxtBF8icaynHwpP3lLbSk89lOCW30=.p7b',
-          signAlg: 'SHA256withECDSA',
-          storeFile: 'C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_Qr8ZSlR1zCT8ELXxtBF8icaynHwpP3lLbSk89lOCW30=.p12',
-          storePassword: '0000001bb360043fdc2a687781470a159add3a2b92d09b692222b96454c7ee28a84167ef0592e45a2c3dfa',
-        },
-      },
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_89AJIhC6ClQUlgCpi8FDvQ_3_Sk5MYRRwv-hLTCVRVc=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B0725F192C668827EA344267C6FA465DF0BA17412ADDBC34735CD0654F7988BCB411E5FC307DA31",
+          "profile": "C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_89AJIhC6ClQUlgCpi8FDvQ_3_Sk5MYRRwv-hLTCVRVc=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_89AJIhC6ClQUlgCpi8FDvQ_3_Sk5MYRRwv-hLTCVRVc=.p12",
+          "storePassword": "0000001BE5D5C9A664DACC0DA786766F9EDE23C765F1F28EB12BDF699BB91BF313BE9D238438F44A094737"
+        }
+      }
     ],
     products: [
       {
