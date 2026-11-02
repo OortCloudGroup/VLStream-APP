@@ -25,6 +25,9 @@
 # 前端离线包（由 vue3-h5 dist 同步，构建产物，不进 git）
 entry/src/main/resources/rawfile/www/
 
+# AGC 发布签名材料（密钥勿进 git）
+/signing/
+
 # DevEco 本地 IDE 配置
 .clang-tidy
 .clangd
