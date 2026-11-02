@@ -19,14 +19,10 @@ import { camera, cameraPicker } from '@kit.CameraKit';
 import { fileIo,fileUri, picker } from '@kit.CoreFileKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
-import { promptAction } from '@kit.ArkUI';
 import { imageCompress } from '../ImageCompress/ImageCompressEx';
 import { getAllExifProperties } from '../ImageCompress/ExifInfo'
 import { fileIo as fs} from '@kit.CoreFileKit';
 import capacitor from 'libcapacitor.so'
-import { dataSharePredicates } from '@kit.ArkData';
-import { image } from '@kit.ImageKit';
-import { util } from '@kit.ArkTS';
 import * as ErrorCode from '../ImageCompress/ErrorCode'
 import { ArkTsAttributeCameraEx, ArkTsAttributeCameraGallery, PhotoFileInfo } from './CameraDefine';
 
@@ -144,22 +140,6 @@ export function selectAudioPicket(pageIndex:NativeAttribute): Promise<ArkTsAttri
       let err: BusinessError = error as BusinessError;
       console.error('AudioViewPicker failed with err: ' + JSON.stringify(err));
       resolve({content: "", result: []});
-    }
-  });
-}
-
-async function uriGetAssets(uri:string, fetchOption: photoAccessHelper.FetchOptions, context: common.UIAbilityContext): Promise<photoAccessHelper.PhotoAsset | null> {
-  let phAccessHelper = photoAccessHelper.getPhotoAccessHelper(context);
-  let fetchResult: photoAccessHelper.FetchResult<photoAccessHelper.PhotoAsset> =
-    await phAccessHelper.getAssets(fetchOption);
-  // 得到URI对应的PhotoAsset对象，读取文件的部分信息
-  const asset: photoAccessHelper.PhotoAsset = await fetchResult.getFirstObject();
-  return new Promise((resolve, reject) => {
-    try {
-      resolve(asset);
-    } catch (error) {
-      console.error(`uriGetAssets failed with err, code is ${error.code}, message is ${error.message}`);
-      resolve(null);
     }
   });
 }
@@ -326,151 +306,4 @@ export async function SelectMedia(pageIndex:NativeAttribute) {
   }
 
   capacitor.onArkTsResult(JSON.stringify(results), pageIndex.pageObject, pageIndex.pageWebTag);
-}
-
-export async function MediaIndex(pageIndex:NativeAttribute) {
-  if(pageIndex.pageValue == 0) { //getMedias
-    let options:object = JSON.parse(pageIndex.pageArgs);
-    let selectMode:number = options?.["selectMode"]?options?.["selectMode"]:101;//101=picker image and video , 100=image , 102=video
-    let maxSelectCount:number = options?.["maxSelectCount"]?options?.["maxSelectCount"]:40;//default 40
-    let type:number = 0;
-    if(selectMode == 100) {
-      type = 0;
-    } else if(selectMode == 102) {
-      type = 1;
-    } else if(selectMode == 101) {
-      type= 2;
-    } else {
-      type = 0;
-    }
-    let result: ArkTsAttributeCameraEx = await selectPhotoPicket(type, maxSelectCount);
-    let uriArray: Array<string> = result.result;
-    if (uriArray.length == 0) {
-      capacitor.onArkTsResult(JSON.stringify(result), pageIndex.pageObject, pageIndex.pageWebTag);
-      return;
-    }
-
-    let medias: Array<string> = new Array<string>();
-    for (let i = 0; i < uriArray.length; i++) {
-      if (uriArray[i].lastIndexOf(".") < 0) {
-        return;
-      }
-      const context: common.UIAbilityContext = getContext() as common.UIAbilityContext;
-      let predicates: dataSharePredicates.DataSharePredicates = new dataSharePredicates.DataSharePredicates();
-      // 配置查询条件，使用PhotoViewPicker选择图片返回的uri进行查询
-      predicates.equalTo('uri', uriArray[i]);
-      let fetchOption: photoAccessHelper.FetchOptions = {
-        fetchColumns: [photoAccessHelper.PhotoKeys.WIDTH, photoAccessHelper.PhotoKeys.HEIGHT, photoAccessHelper.PhotoKeys.TITLE, photoAccessHelper.PhotoKeys.DURATION,photoAccessHelper.PhotoKeys.SIZE],
-        predicates: predicates
-      };
-      let asset:photoAccessHelper.PhotoAsset|null = await uriGetAssets(uriArray[i], fetchOption, context);
-      if (asset != null && asset.photoType == photoAccessHelper.PhotoType.IMAGE) { //0选照片1选视频
-          let media:object = new Object();
-          media["mediaType"] = "image";
-          media["uri"] = uriArray[i];
-          media["size"] = asset.get(photoAccessHelper.PhotoKeys.SIZE);
-          //media["path"]在C++侧添加，ArkTS侧无法获取path值
-          medias.push(JSON.stringify(media));
-      } else if(asset != null && asset.photoType == photoAccessHelper.PhotoType.VIDEO){
-        let media:object = new Object();
-        media["mediaType"] = "video";
-        media["uri"] = uriArray[i];
-        media["size"] = asset.get(photoAccessHelper.PhotoKeys.SIZE);
-        //media["path"]在C++侧添加，ArkTS侧无法获取path值
-        medias.push(JSON.stringify(media));
-      }
-    }
-    result.content = "getMedias";
-    result.result = medias;
-    capacitor.onArkTsResult(JSON.stringify(result), pageIndex.pageObject, pageIndex.pageWebTag);
-  }
-
-  if(pageIndex.pageValue == 3) {
-    let media:object = JSON.parse(pageIndex.pageArgs);
-    if(media?.["uri"]) {
-      const context: common.UIAbilityContext = getContext() as common.UIAbilityContext;
-      let predicates: dataSharePredicates.DataSharePredicates = new dataSharePredicates.DataSharePredicates();
-      // 配置查询条件，使用PhotoViewPicker选择图片返回的uri进行查询
-      predicates.equalTo('uri', media?.["uri"]);
-      let fetchOption: photoAccessHelper.FetchOptions = {
-        fetchColumns: [photoAccessHelper.PhotoKeys.WIDTH, photoAccessHelper.PhotoKeys.HEIGHT, photoAccessHelper.PhotoKeys.TITLE, photoAccessHelper.PhotoKeys.DURATION,photoAccessHelper.PhotoKeys.SIZE],
-        predicates: predicates
-      };
-      let asset:photoAccessHelper.PhotoAsset|null = await uriGetAssets(media?.["uri"], fetchOption, context);
-      asset!.getThumbnail(async (err, pixelMap) => {
-        if(err == undefined) {
-          const imagePacker = image.createImagePacker();
-          const packOpts: image.PackingOption = { format: 'image/jpeg', quality: 100 };
-          const arrayBuffer = await imagePacker.packToData(pixelMap, packOpts);
-
-          const uint8Array = new Uint8Array(arrayBuffer);
-          const base64Helper = new util.Base64Helper();
-          let base64 = base64Helper.encodeToStringSync(uint8Array);
-          let result: ArkTsAttribute = { content: "extractThumbnail", result: [base64] };
-          capacitor.onArkTsResult(JSON.stringify(result), pageIndex.pageObject, pageIndex.pageWebTag);
-        }
-
-      });
-    }
-  }
-
-  if(pageIndex.pageValue ==4) {
-    let media:object = JSON.parse(pageIndex.pageArgs);
-    let uri:string = media?.["uri"];
-    let quality:number = media?.["quality"]?media?.["quality"]:50;
-    promptAction.showToast({ message: '压缩图片，请稍后', duration: 1000 });
-    const context: common.UIAbilityContext = getContext() as common.UIAbilityContext;
-    let predicates: dataSharePredicates.DataSharePredicates = new dataSharePredicates.DataSharePredicates();
-    predicates.equalTo('uri', uri);
-    let fetchOption: photoAccessHelper.FetchOptions = {
-      fetchColumns: [photoAccessHelper.PhotoKeys.WIDTH, photoAccessHelper.PhotoKeys.HEIGHT, photoAccessHelper.PhotoKeys.TITLE, photoAccessHelper.PhotoKeys.DURATION,photoAccessHelper.PhotoKeys.SIZE],
-      predicates: predicates
-    };
-    let asset:photoAccessHelper.PhotoAsset|null = await uriGetAssets(uri, fetchOption, context);
-    if(asset != null && asset.photoType == photoAccessHelper.PhotoType.IMAGE) {
-      let compressSize:number = asset.get(photoAccessHelper.PhotoKeys.SIZE) as number;
-      compressSize = compressSize*quality/100;
-
-      let extName: string = uri.substring(uri.lastIndexOf("."));
-      let resourceFile: fs.File = fs.openSync(uri, fs.OpenMode.READ_ONLY);
-      const context: common.UIAbilityContext = getContext() as common.UIAbilityContext;
-      let cacheDir = context.cacheDir;
-      let fileName: number = new Date().getTime();
-      let filePath: string = `${cacheDir}/${fileName}${extName}`;
-      filePath = await imageCompress(resourceFile, filePath, compressSize);
-      let stat = await fs.statSync(filePath);
-      let obj:object = new Object();
-      obj["path"] = filePath;
-      obj["size"] = stat.size;
-      obj["name"] = asset.get(photoAccessHelper.PhotoKeys.TITLE);
-      let result: ArkTsAttribute = { content: "compressImage", result: [JSON.stringify(obj)] };
-      capacitor.onArkTsResult(JSON.stringify(result), pageIndex.pageObject, pageIndex.pageWebTag);
-    }
-  }
-
-  if(pageIndex.pageValue == 5) {
-    let media = JSON.parse(pageIndex.pageArgs) as Array<string>;
-    if(media.length < 2) {
-      return;
-    }
-    let uri = media[0];
-    let key:string = media[1];
-    const context: common.UIAbilityContext = getContext() as common.UIAbilityContext;
-    let predicates: dataSharePredicates.DataSharePredicates = new dataSharePredicates.DataSharePredicates();
-    predicates.equalTo('uri', uri);
-    let fetchColumns:string[] = [photoAccessHelper.PhotoKeys.WIDTH, photoAccessHelper.PhotoKeys.HEIGHT, photoAccessHelper.PhotoKeys.TITLE, photoAccessHelper.PhotoKeys.DURATION,photoAccessHelper.PhotoKeys.SIZE];
-    if(fetchColumns.indexOf(key) !== -1) {
-      fetchColumns.push(key);
-    }
-    let fetchOption: photoAccessHelper.FetchOptions = {
-      fetchColumns: fetchColumns,
-      predicates: predicates
-    };
-    let asset:photoAccessHelper.PhotoAsset|null = await uriGetAssets(uri, fetchOption, context);
-    if(asset != null && asset.photoType == photoAccessHelper.PhotoType.IMAGE) {
-      let strValue = asset.get(key);
-      let result: ArkTsAttribute = { content: "getExifForKey", result: [strValue+""] };
-      capacitor.onArkTsResult(JSON.stringify(result), pageIndex.pageObject, pageIndex.pageWebTag);
-    }
-  }
 }
