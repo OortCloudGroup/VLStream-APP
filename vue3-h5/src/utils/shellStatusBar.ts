@@ -89,6 +89,23 @@ function handleFullscreenChange(): void {
   if (!active) apply()
 }
 
+/**
+ * 把状态栏安全区高度同步到 CSS 变量 --vl-safe-top（CSS px）。
+ * 原生壳 edge-to-edge 下 WebView 延伸到状态栏下方，页面顶部需要
+ * calc(基准间距 + var(--vl-safe-top)) 让出状态栏；浏览器/PC 环境恒为 0。
+ * 原生壳在 document-start 注入 window.__safeAreaTop，因此本函数在
+ * App.vue setup 阶段调用即可拿到准确值。
+ */
+export function syncShellSafeAreaCssVar(): void {
+  try {
+    const isShell = window.global && window.global.is_native_shell
+    const safeTop = isShell ? (window.__safeAreaTop || 0) : 0
+    document.documentElement.style.setProperty('--vl-safe-top', `${safeTop}px`)
+  } catch (e) {
+    // 非 DOM/非壳环境：保持 CSS 默认回退值 0px
+  }
+}
+
 // Track document fullscreen enter/exit globally so every fullscreen video
 // (grid fullscreen, single cell fullscreen) becomes immersive on the shell.
 if (typeof document !== 'undefined') {

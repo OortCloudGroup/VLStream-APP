@@ -27,7 +27,7 @@ import Config, { applyVlEnv } from '@/config'
 import appConfig from '@/config/AppConfig'
 import { showLoadingToast, showFailToast, showToast } from 'vant'
 import { getAccessToken, getGateWay, getAppInfo, getAppInfoFromHttp } from '@/utils/cordovatUtils.js'
-import { pushStatusBar, popStatusBar } from '@/utils/shellStatusBar'
+import { pushStatusBar, popStatusBar, syncShellSafeAreaCssVar } from '@/utils/shellStatusBar'
 import { useUserStore } from '@/store/modules/useraPaas'
 import OortPopup from '@/components/popup/oort_popup'
 import LoginDev from '@/components/commonpage/LoginDev'
@@ -38,6 +38,10 @@ const store = useUserStore()
 
 const showLoginDev = ref(false)
 const isInitFinsh = ref(false)
+
+// 原生壳 edge-to-edge：把状态栏高度写入 CSS 变量，供各页头部
+// calc(基准间距 + var(--vl-safe-top)) 让出状态栏（浏览器环境为 0，无副作用）
+syncShellSafeAreaCssVar()
 
 // The login panel covers the whole screen with a light gradient; align the
 // shell status bar with it while it is visible (no-op in browsers)

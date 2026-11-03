@@ -257,7 +257,8 @@ const onMenuSelect = (action) => {
 .top-bar {
   position: relative;
   z-index: 1;
-  padding-top: 28px;
+  // 原生壳 edge-to-edge 下让出状态栏（--vl-safe-top 由 shellStatusBar 注入，浏览器为 0）
+  padding-top: calc(28px + var(--vl-safe-top, 0px));
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -297,7 +297,17 @@ $main_color: #1156a6;
 }
 
 .nav_banner_container_nor {
-  height: 48px;
+  height: calc(48px + var(--vl-safe-top, 0px));
+  justify-content: flex-end;
+  // Edge-to-edge 沉浸式壳下 WebView 从屏幕顶部开始，固定 48px 的导航栏会整体
+  // 顶进状态栏（标题/返回箭头与系统时间、图标重叠，旧的非沉浸壳不会）。
+  // 这里让深蓝背景延伸进状态栏区域（padding 透出背景色），内容仍在下方 48px 内。
+  // --vl-safe-top 由壳在 document-start 注入（浏览器/PC 恒为 0，无影响）。
+  .nav_banner {
+    height: calc(48px + var(--vl-safe-top, 0px));
+    padding-top: var(--vl-safe-top, 0px);
+    box-sizing: border-box;
+  }
 }
 
 .nav_banner_container {

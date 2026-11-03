@@ -20,3 +20,13 @@ node_modules/
 *.log
 *.tmp
 err.txt
+
+# macOS 垃圾文件
+.DS_Store
+
+# WorkBuddy 会话工作目录
+.workbuddy/
+
+# iOS 本地构建产物与 SPM 缓存
+iOS/ios/App/build-sim/
+iOS/ios/App/App.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/

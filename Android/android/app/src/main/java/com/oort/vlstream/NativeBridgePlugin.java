@@ -26,7 +26,8 @@ import java.util.Collections;
  *   <li>{@link #getGateway} —— 返回后端网关地址。</li>
  *   <li>{@link #getAppInfo} —— 返回应用信息（包名/appId/secret/版本）。</li>
  *   <li>{@link #tokenOverdue} —— 清 H5 会话并 reload 重登。</li>
- *   <li>{@link #setStatusBar} —— 动态设置状态栏背景/前景色（H5 按页面内容联动）。</li>
+ *   <li>{@link #setStatusBar} —— 动态设置状态栏图标明暗（H5 按页面内容联动；背景在
+ *       edge-to-edge 壳下恒为透明，由 H5 顶部界面透出）。</li>
  *   <li>{@link #setImmersiveMode} —— 全屏视频沉浸式：隐藏/恢复系统状态栏与导航栏。</li>
  * </ul>
  * 通用能力（拍照/相册、退出 App、定位）由官方插件提供：
@@ -169,16 +170,20 @@ public class NativeBridgePlugin extends Plugin {
     }
 
     /**
-     * 动态设置状态栏背景/前景色，使状态栏与紧邻其下的 H5 内容颜色一致。
-     * 参数：color（背景，默认 #F9FAFF）、contentColor（图标/文字，默认 #000000）。
+     * 动态设置状态栏图标明暗（前景色），使图标与紧邻其下的 H5 内容对比度一致。
+     * 参数：color（背景，仅为兼容旧 H5 调用保留，Android 壳已忽略）、
+     * contentColor（图标/文字，默认 #000000）。
      * <p>
-     * targetSdk 35+ 强制 edge-to-edge，{@code setStatusBarColor} 被系统忽略
-     * （背景实际由延伸到状态栏下方的 H5 内容透出），仅图标明暗
-     * （{@code setAppearanceLightStatusBars}）继续生效；低版本两者均生效。
+     * 本壳为 edge-to-edge 沉浸式：WebView 延伸到状态栏下方，状态栏背景由 H5
+     * 顶部界面透出，因此 H5 传入的背景色不再染到状态栏——否则在 API&lt;35
+     * （如 Mate60 的 HarmonyOS/EMUI）上会把状态栏染成页面顶色，形成一条与
+     * API35+（系统强制忽略 {@code setStatusBarColor}，天然沉浸）不一致的纯色硬边。
+     * 这里仅保留图标明暗（{@code setAppearanceLightStatusBars}）联动，并把状态栏
+     * 背景重置为与 {@link MainActivity} 初始值一致的近透明黑（防止 EMUI 对显式
+     * 透明铺主题色保护底）。
      */
     @PluginMethod
     public void setStatusBar(PluginCall call) {
-        String color = call.getString("color", "#F9FAFF");
         String contentColor = call.getString("contentColor", "#000000");
         Activity activity = getActivity();
         if (activity == null) {
@@ -186,16 +191,18 @@ public class NativeBridgePlugin extends Plugin {
             return;
         }
         Window window = activity.getWindow();
-        int background = parseColorSafely(color, Color.TRANSPARENT);
-        // Ignored on API 35+ (edge-to-edge enforced, H5 content shows through);
-        // still effective on lower versions.
-        window.setStatusBarColor(background);
-        WindowInsetsControllerCompat controller =
-                new WindowInsetsControllerCompat(window, window.getDecorView());
         // Light content color (e.g. white icons on a dark bar) → dark system icons are wrong;
         // appearance flag is the inverse of the content color luminance.
-        controller.setAppearanceLightStatusBars(isLightColor(contentColor));
-        call.resolve();
+        boolean lightIcons = isLightColor(contentColor);
+        // Window/View API 必须在 UI 线程调用（Capacitor 插件方法默认运行在 bridge 线程）。
+        activity.runOnUiThread(() -> {
+            // Edge-to-edge：背景固定近透明黑（H5 内容透出），各 API 版本视觉统一。
+            window.setStatusBarColor(0x01000000);
+            WindowInsetsControllerCompat controller =
+                    new WindowInsetsControllerCompat(window, window.getDecorView());
+            controller.setAppearanceLightStatusBars(lightIcons);
+            call.resolve();
+        });
     }
 
     /**
@@ -213,17 +220,20 @@ public class NativeBridgePlugin extends Plugin {
             return;
         }
         Window window = activity.getWindow();
-        WindowInsetsControllerCompat controller =
-                new WindowInsetsControllerCompat(window, window.getDecorView());
-        controller.setSystemBarsBehavior(
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-        if (enabled) {
-            controller.hide(WindowInsetsCompat.Type.systemBars());
-        } else {
-            controller.show(WindowInsetsCompat.Type.systemBars());
-        }
+        // 系统栏显隐同样依赖 View 层，须在 UI 线程执行。
+        activity.runOnUiThread(() -> {
+            WindowInsetsControllerCompat controller =
+                    new WindowInsetsControllerCompat(window, window.getDecorView());
+            controller.setSystemBarsBehavior(
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            if (enabled) {
+                controller.hide(WindowInsetsCompat.Type.systemBars());
+            } else {
+                controller.show(WindowInsetsCompat.Type.systemBars());
+            }
+            call.resolve();
+        });
         immersiveActive = enabled;
-        call.resolve();
     }
 
     /** Whether an immersive fullscreen video is currently active. */
@@ -240,9 +250,11 @@ public class NativeBridgePlugin extends Plugin {
         Activity activity = getActivity();
         if (activity != null) {
             Window window = activity.getWindow();
-            WindowInsetsControllerCompat controller =
-                    new WindowInsetsControllerCompat(window, window.getDecorView());
-            controller.show(WindowInsetsCompat.Type.systemBars());
+            activity.runOnUiThread(() -> {
+                WindowInsetsControllerCompat controller =
+                        new WindowInsetsControllerCompat(window, window.getDecorView());
+                controller.show(WindowInsetsCompat.Type.systemBars());
+            });
         }
         evalJs(
                 "javascript:(function(){try{"

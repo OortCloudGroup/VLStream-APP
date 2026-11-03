@@ -183,7 +183,7 @@ public class NativeBridgePlugin: CAPPlugin, CAPBridgedPlugin {
     /// enabled=true：隐藏系统状态栏，视频铺满整屏；
     /// enabled=false：恢复状态栏显示。
     @objc func setImmersiveMode(_ call: CAPPluginCall) {
-        let enabled = call.getBoolean("enabled") ?? false
+        let enabled = call.getBool("enabled") ?? false
         DispatchQueue.main.async { [weak self] in
             self?.bridge?.statusBarVisible = enabled ? false : true
         }

@@ -182,8 +182,11 @@ const onFileChange = (event) => {
 
 // ========= 设置菜单 =========
 const showSettings = ref(false)
+// 注销客服电话：与隐私政策「个人信息保护投诉渠道」登记号码一致
+const servicePhone = '13723775143'
 const settingsActions = computed(() => [
   { name: t('语言设置'), key: 'language' },
+  { name: '注销账号', color: '#ee0a24', key: 'deleteAccount' },
   { name: t('退出登录'), key: 'logout' }
 ])
 
@@ -203,10 +206,27 @@ const onMenuClick = (item) => {
 
 const onSettingsSelect = async(action) => {
   showSettings.value = false
+  // 注销账号：电话联系客服办理（App 内不直接删除，符合隐私政策声明）
+  if (action.key === 'deleteAccount') {
+    try {
+      await showConfirmDialog({
+        title: '注销账号',
+        message: `注销账号请联系客服办理，将删除账号及关联个人信息。\n客服电话：${servicePhone}\n（工作日 9:00-18:00）`,
+        confirmButtonText: '拨打客服电话',
+        cancelButtonText: '取消'
+      })
+    } catch (e) {
+      return
+    }
+    window.location.href = `tel:${servicePhone}`
+    return
+  }
+
   if (action.key === 'language') {
     showLanguage.value = true
     return
   }
+
   if (action.key === 'logout') {
     try {
       await showConfirmDialog({ title: t('提示'), message: t('确认退出登录？') })
@@ -266,7 +286,8 @@ const onLanguageSelect = (action) => {
 .my-header {
   position: relative;
   z-index: 1;
-  padding-top: 28px;
+  // 原生壳 edge-to-edge 下让出状态栏（--vl-safe-top 由 shellStatusBar 注入，浏览器为 0）
+  padding-top: calc(28px + var(--vl-safe-top, 0px));
 }
 
 .top-title {
