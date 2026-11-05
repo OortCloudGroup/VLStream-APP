@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { closeToast, showToast } from 'vant'
 import OortPopup from '@/components/popup/oort_popup.vue'
@@ -89,11 +89,15 @@ const { t } = useI18n()
 
 const rows = ref([])
 
-// 后端 /vlsDeviceInfo/list 只按实体字段精确匹配，关键字统一在前缀匹配上做
+// 后端 /vlsDeviceInfo/page 的 SQL 不做条件过滤，标签/关键字统一在前端匹配
 const filteredRows = computed(() => {
+  let list = rows.value
+  if (props.tagName) {
+    list = list.filter(row => String(row.tag || '') === String(props.tagName))
+  }
   const kw = (props.keyword || '').trim().toLowerCase()
-  if (!kw) return rows.value
-  return rows.value.filter(row =>
+  if (!kw) return list
+  return list.filter(row =>
     String(row.deviceName || '').toLowerCase().includes(kw) ||
     String(row.deviceId || '').toLowerCase().includes(kw)
   )
@@ -105,10 +109,6 @@ const fetchDevices = async() => {
     current: 1,
     size: 200
   }
-  // 如果传入了 tagName，则添加到请求参数中
-  if (props.tagName) {
-    params.tag = props.tagName
-  }
   const res = await getDeviceList(params)
   if (res.code === 200 && res.data && Array.isArray(res.data.records)) {
     rows.value = res.data.records
@@ -118,14 +118,6 @@ const fetchDevices = async() => {
 onMounted(() => {
   fetchDevices()
 })
-
-// 监听 tagName 变化，重新获取设备列表
-watch(
-  () => props.tagName,
-  () => {
-    fetchDevices()
-  }
-)
 
 const showDetail = ref(false)
 const showAdd = ref(false)
