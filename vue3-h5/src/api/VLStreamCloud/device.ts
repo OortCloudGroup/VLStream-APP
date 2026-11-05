@@ -342,11 +342,13 @@ export function importDevices(formData) {
 }
 
 /**
- * 摄像头算法下发（算法ID + 设备ID逗号串）
+ * 摄像头算法下发（对齐平台：POST /vlsDeviceInfo/{algorithmId}/algorithms）
+ * deviceIds/modelType 为 @RequestParam 查询参数绑定，须走 query 而非 body
  * @param {number} algorithmId 算法ID
- * @param {string} deviceIdsStr 设备ID逗号分隔字符串
+ * @param {string} deviceIdsStr 设备序列号（WVP 行 deviceId）逗号分隔字符串
+ * @param {string} modelType 模型类型，默认 om
  */
-export function dispatchAlgorithmToDevices(algorithmId, deviceIdsStr) {
-  return commonFunc(`/vlsDeviceInfo/${algorithmId}/algorithms`, { deviceIds: deviceIdsStr }, 'POST')
+export function dispatchAlgorithmToDevices(algorithmId, deviceIdsStr, modelType = 'om') {
+  return commonFunc(`/vlsDeviceInfo/${algorithmId}/algorithms`, { deviceIds: deviceIdsStr, modelType }, 'POST', true)
 }
 
