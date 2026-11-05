@@ -2,39 +2,49 @@
   app: {
     signingConfigs: [
       {
-        // 调试签名：日常真机调试使用（devecocli signature generate 自动生成的调试证书）
-        "name": "debug",
-        "type": "HarmonyOS",
-        "material": {
-          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_HarmonyOS_89AJIhC6ClQUlgCpi8FDvQ_3_Sk5MYRRwv-hLTCVRVc=.cer",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001B17B573F11B2FB11D0E753B884291F6997DB463CDDD659277212D911FCC5FCC00BF3A0AFD88946E",
-          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_HarmonyOS_89AJIhC6ClQUlgCpi8FDvQ_3_Sk5MYRRwv-hLTCVRVc=.p7b",
-          "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_HarmonyOS_89AJIhC6ClQUlgCpi8FDvQ_3_Sk5MYRRwv-hLTCVRVc=.p12",
-          "storePassword": "0000001BD2B20C90F9C27CE0A03AE3C4445AECAE66F6CE5BCCE5844E5E9C12C686D2BE7A3F08F4B5E79FAD"
-        }
+        name: 'debug',
+        type: 'HarmonyOS',
+        material: {
+          certpath: 'C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_89AJIhC6ClQUlgCpi8FDvQ_3_Sk5MYRRwv-hLTCVRVc=.cer',
+          keyAlias: 'debugKey',
+          keyPassword: '0000001B17B573F11B2FB11D0E753B884291F6997DB463CDDD659277212D911FCC5FCC00BF3A0AFD88946E',
+          profile: 'C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_89AJIhC6ClQUlgCpi8FDvQ_3_Sk5MYRRwv-hLTCVRVc=.p7b',
+          signAlg: 'SHA256withECDSA',
+          storeFile: 'C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_89AJIhC6ClQUlgCpi8FDvQ_3_Sk5MYRRwv-hLTCVRVc=.p12',
+          storePassword: '0000001BD2B20C90F9C27CE0A03AE3C4445AECAE66F6CE5BCCE5844E5E9C12C686D2BE7A3F08F4B5E79FAD',
+        },
       },
       {
-        // 发布签名：AGC 发布证书（上架应用市场专用），构建命令 --product release --build-mode release
-        "name": "release",
-        "type": "HarmonyOS",
-        "material": {
-          "storeFile": "F:/license/vls/vlstream.p12",
-          "storePassword": "0000001C05D63F399C3FDB07DCF65FF972C0A3E909D4632AF344D6453E495D021A20FFD60BCFFC414B140F93",
-          "keyAlias": "vls",
-          "keyPassword": "0000001CF98A5D29F50245495CF352FABB0C6378F98A73290EBFFE2ED5570934D654A691DD2707EE6C0FA997",
-          "signAlg": "SHA256withECDSA",
-          "profile": "F:/license/vls/vlstreamRelease.p7b",
-          "certpath": "F:/license/vls/VLStream发布证书.cer"
-        }
-      }
+        name: 'release',
+        type: 'HarmonyOS',
+        material: {
+          storeFile: 'F:/license/vls/vlstream.p12',
+          storePassword: '0000001C05D63F399C3FDB07DCF65FF972C0A3E909D4632AF344D6453E495D021A20FFD60BCFFC414B140F93',
+          keyAlias: 'vls',
+          keyPassword: '0000001CF98A5D29F50245495CF352FABB0C6378F98A73290EBFFE2ED5570934D654A691DD2707EE6C0FA997',
+          signAlg: 'SHA256withECDSA',
+          profile: 'F:/license/vls/vlstreamRelease.p7b',
+          certpath: 'F:/license/vls/VLStream发布证书.cer',
+        },
+      },
+      {
+        name: 'default',
+        type: 'HarmonyOS',
+        material: {
+          certpath: 'C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_Qr8ZSlR1zCT8ELXxtBF8icaynHwpP3lLbSk89lOCW30=.cer',
+          keyAlias: 'debugKey',
+          keyPassword: '0000001b804d3c30bdb38baeb64653d1bb4979d4548eca2039a52ce6ca410db856d223771a4f2d88db4f4c',
+          profile: 'C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_Qr8ZSlR1zCT8ELXxtBF8icaynHwpP3lLbSk89lOCW30=.p7b',
+          signAlg: 'SHA256withECDSA',
+          storeFile: 'C:\\Users\\OORT\\.ohos\\config\\default_HarmonyOS_Qr8ZSlR1zCT8ELXxtBF8icaynHwpP3lLbSk89lOCW30=.p12',
+          storePassword: '0000001b804d3c30bdb38baeb64653d1bb4979d4548eca2039a52ce6ca410db856d223771a4f2d88db4f4c',
+        },
+      },
     ],
     products: [
       {
-        // 调试产物：IDE Run / devecocli run 默认使用，绑定调试签名
         name: 'default',
-        signingConfig: 'debug',
+        signingConfig: 'default',
         compatibleSdkVersion: '5.0.1(13)',
         targetSdkVersion: '6.1.1(24)',
         runtimeOS: 'HarmonyOS',
@@ -46,7 +56,6 @@
         },
       },
       {
-        // 发布产物：上架打包专用，绑定 AGC 发布签名
         name: 'release',
         signingConfig: 'release',
         compatibleSdkVersion: '5.0.1(13)',
