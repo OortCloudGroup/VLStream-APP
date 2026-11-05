@@ -54,7 +54,9 @@ export function getPlaybackStream(recordId, params = {}) {
     url: config.URL + config.gateWay + 'apaas-vls-server/vlsVideoRecord/stream/' + recordId,
     method: 'GET',
     params: params,
-    responseType: 'blob'
+    responseType: 'blob',
+    // 回放视频整段下载，覆盖默认 10s 超时，避免大文件下载被中断
+    timeout: 10 * 60 * 1000
   })
 }
 

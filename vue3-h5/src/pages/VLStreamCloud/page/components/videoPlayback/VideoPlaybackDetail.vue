@@ -45,6 +45,11 @@
             <img :src="playImg" alt="" class="player-icon" />
           </div>
         </div>
+        <div v-if="clipLoading" class="player-loading">
+          <van-loading size="24px" vertical>
+            {{ $t('正在加载视频…') }}
+          </van-loading>
+        </div>
       </div>
 
       <!-- 视频列表 -->
@@ -91,7 +96,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onMounted, onBeforeUnmount, nextTick, ref, watch } from 'vue'
+import { showToast } from 'vant'
 import { useUserStore } from '@/store/modules/useraPaas'
 import type { DatePickerColumnType } from 'vant'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
@@ -116,6 +122,7 @@ const currentDay = ref(today.getDate())
 const activeClipId = ref<number | string>('')
 const videoSrc = ref<string>('')
 const videoPlayer = ref<HTMLVideoElement | null>(null)
+const clipLoading = ref(false)
 
 // 底部日期选择器
 const showDatePicker = ref(false)
@@ -202,6 +209,17 @@ const heroImg = computed(() => {
   return active?.thumb || ''
 })
 
+// 服务端异常时可能返回 JSON 错误体（responseType blob 下仍是 Blob），需识别避免当成视频播放
+const readBlobError = async(blob: Blob) => {
+  try {
+    const text = await blob.text()
+    const err = JSON.parse(text)
+    if (err?.msg) showToast(err.msg)
+  } catch (e) {
+    // 非 JSON 内容，忽略
+  }
+}
+
 const playClip = async(clip: ClipItem) => {
   activeClipId.value = clip.id
   if (!clip.id) {
@@ -209,25 +227,36 @@ const playClip = async(clip: ClipItem) => {
     return
   }
 
+  clipLoading.value = true
   try {
     // 调用接口获取视频流
     const params = { accessToken: store.userInfo?.accessToken }
     const res: any = await getPlaybackStream(clip.id, params)
     if (res && res instanceof Blob) {
-      if (videoSrc.value && videoSrc.value.startsWith('blob:')) {
-        URL.revokeObjectURL(videoSrc.value)
-      }
-      videoSrc.value = URL.createObjectURL(res)
+      if (res.type && res.type.includes('json')) {
+        await readBlobError(res)
+        videoSrc.value = ''
+      } else if (res.size > 0) {
+        if (videoSrc.value && videoSrc.value.startsWith('blob:')) {
+          URL.revokeObjectURL(videoSrc.value)
+        }
+        videoSrc.value = URL.createObjectURL(res)
 
-      // 等待视频元素加载后自动播放
-      if (videoPlayer.value) {
-        videoPlayer.value.load()
+        // video 由 v-if 渲染，等 DOM 更新后再触发加载，避免空引用
+        await nextTick()
+        if (videoPlayer.value) {
+          videoPlayer.value.load()
+        }
+      } else {
+        videoSrc.value = ''
       }
     } else {
       videoSrc.value = ''
     }
   } catch (error) {
     videoSrc.value = ''
+  } finally {
+    clipLoading.value = false
   }
 }
 
@@ -319,6 +348,19 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.player-loading {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
 }
 
 .player-placeholder {

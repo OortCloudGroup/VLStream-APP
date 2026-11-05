@@ -178,7 +178,8 @@ const playClip = async(clip: ClipItem) => {
   try {
     const params = { accessToken: store.userInfo?.accessToken }
     const res: any = await getPlaybackStream(clip.id, params)
-    if (res && res instanceof Blob) {
+    // 服务端异常返回 JSON 错误体（responseType blob 下仍是 Blob），不能当成视频播放
+    if (res && res instanceof Blob && res.size > 0 && !(res.type && res.type.includes('json'))) {
       const src = URL.createObjectURL(res)
       emit('play', { src, thumb: clip.thumb })
     }
