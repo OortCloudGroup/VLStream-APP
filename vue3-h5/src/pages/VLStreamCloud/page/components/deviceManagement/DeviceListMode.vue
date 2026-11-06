@@ -43,7 +43,8 @@
       </div>
     </div>
 
-    <div class="fab" @click="onAdd">
+    <!-- 单租户：设备由视频平台推送接入，不提供业务表手工新增入口 -->
+    <div v-if="!isLocalAuth" class="fab" @click="onAdd">
       <span class="fab-plus">+</span>
     </div>
 
@@ -69,8 +70,10 @@ import OortPopup from '@/components/popup/oort_popup.vue'
 import CameraDetail from '@/pages/VLStreamCloud/page/components/cameraDetail/CameraDetail.vue'
 import EditDevice from '../deviceManagement/EditDevice.vue'
 import { getDeviceList } from '@/api/VLStreamCloud/device'
+import { getWvpVlsDeviceList } from '@/api/VLStreamCloud/wvp'
 import { resolveWvpDeviceRow } from '@/utils/wvpDevice'
 import { useUserStore } from '@/store/modules/useraPaas'
+import config from '@/config'
 
 const props = defineProps({
   tagName: {
@@ -84,6 +87,9 @@ const props = defineProps({
 })
 
 const store = useUserStore()
+
+// 单租户集群：业务设备表只有测试数据，真实设备在 WVP（VLStream 协议推送）
+const isLocalAuth = config.authMode === 'local'
 
 const { t } = useI18n()
 
@@ -103,7 +109,21 @@ const filteredRows = computed(() => {
   )
 })
 
+// WVP 行无 status 字段，归一化在线状态供模板判断
+const normalizeWvpRow = (row) => ({
+  ...row,
+  status: row.online === true ? '1' : '0'
+})
+
 const fetchDevices = async() => {
+  if (isLocalAuth) {
+    // 真实设备源：WVP VLStream 协议设备（RuoYi 分页格式 { code, rows }）
+    const res = await getWvpVlsDeviceList({ pageNum: 1, pageSize: 200 })
+    if (res && res.code === 200 && Array.isArray(res.rows)) {
+      rows.value = res.rows.map(normalizeWvpRow)
+    }
+    return
+  }
   const params = {
     accessToken: store.userInfo?.accessToken,
     current: 1,
@@ -123,8 +143,14 @@ const showDetail = ref(false)
 const showAdd = ref(false)
 const currentRow = ref(null)
 
-// 点击设备打开摄像头详情：先按设备序列号找到 WVP 设备行
+// 点击设备打开摄像头详情
 const openDetail = async(row) => {
+  // 单租户：列表行本身就是 WVP 设备行，无需再按序列号解析
+  if (isLocalAuth) {
+    currentRow.value = row
+    showDetail.value = true
+    return
+  }
   showToast({ message: t('正在打开设备详情…'), duration: 0, forbidClick: true })
   let wvpRow = null
   let failed = false
