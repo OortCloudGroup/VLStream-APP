@@ -261,7 +261,7 @@ import OortPopup from '@/components/popup/oort_popup.vue'
 import CommonExpressions from '@/components/commonExpressions.vue'
 import OortUploader from '@/components/uploader/oort_uploader.vue'
 import Oort_image from '@/components/image/oort_image.vue'
-import { getDeviceList } from '@/api/VLStreamCloud/device'
+import { getWvpVlsDeviceList } from '@/api/VLStreamCloud/wvp'
 import { saveVlsAnalysisk } from '@/api/VLStreamCloud/intelligentAnalysis'
 import { definitionDataGroupList } from '@/api/VLStreamCloud/region'
 import { useUserStore } from '@/store/modules/useraPaas'
@@ -323,14 +323,10 @@ const showCameraPopup = ref(false)
 const tempCameras = ref<string[]>([])
 
 const fetchDevices = async() => {
-  const params = {
-    accessToken: store.userInfo?.accessToken,
-    current: 1,
-    size: 500
-  }
-  const res: any = await getDeviceList(params)
-  if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
-    deviceOptions.value = res.data.records
+  // 真实设备源：WVP VLStream 协议设备（与视频广场/算法下发同口径）
+  const res: any = await getWvpVlsDeviceList({ pageNum: 1, pageSize: 200 })
+  if (res && res.code === 200 && Array.isArray(res.rows)) {
+    deviceOptions.value = res.rows
   } else {
     deviceOptions.value = []
   }
@@ -522,12 +518,14 @@ const submit = async() => {
   // 分析区域
   const regionInfo = formData.value.areas.join('，')
 
-  // 设备ID
+  // 设备ID：取所选 WVP 设备的序列号（deviceId），后端按序列号关联录像/摄像头
   const selectedNames = formData.value.cameras || []
   const selectedIds = (deviceOptions.value as any[])
     .filter((item: any) => (selectedNames as any[]).includes(item.deviceName))
-    .map((item: any) => item.id)
-  const deviceIds = selectedIds.join('，')
+    .map((item: any) => String(item.deviceId || '').trim())
+    .filter((id: string) => !!id)
+  // 后端按英文逗号拆分 deviceIds
+  const deviceIds = selectedIds.join(',')
 
   // 图片列表
   const images = imgArr.value

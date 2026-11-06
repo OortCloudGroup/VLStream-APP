@@ -117,11 +117,12 @@ const buildRangeParams = () => {
 
 // 获取当前任务设备的回放片段列表
 const fetchPlayback = async() => {
+  // deviceIds 为设备序列号逗号串（历史数据可能是数字ID），统一按字符串处理
   const rawDeviceIds = String((props.task as any).deviceIds || '')
   const idList = rawDeviceIds
     .split(/[，,]/)
-    .map((s: string) => Number(s.trim()))
-    .filter((n: number) => Number.isFinite(n) && n > 0)
+    .map((s: string) => s.trim())
+    .filter((s: string) => !!s)
 
   if (!idList.length) {
     clips.value = []
@@ -132,10 +133,10 @@ const fetchPlayback = async() => {
   const { startTime, endTime } = buildRangeParams()
   const allRecords: any[] = []
 
-  for (const deviceIdNum of idList) {
+  for (const deviceIdText of idList) {
     const params = {
       accessToken: store.userInfo?.accessToken,
-      deviceId: deviceIdNum,
+      deviceId: deviceIdText,
       startTime,
       endTime
     }
