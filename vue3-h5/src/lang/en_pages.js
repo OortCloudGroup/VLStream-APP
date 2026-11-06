@@ -46,6 +46,7 @@ export default {
   '居中': 'Center',
   '未上报': 'Not Reported',
   '暂无数据': 'No data',
+  '暂无录像': 'No recordings',
   '没有更多了': 'No more data',
   '加载中...': 'Loading...',
   '刷新成功': 'Refreshed successfully',

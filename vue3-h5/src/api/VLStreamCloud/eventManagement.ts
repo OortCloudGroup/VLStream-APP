@@ -26,6 +26,34 @@ export function getEventPage(params) {
 }
 
 /**
+ * 按设备序列号查询事件列表（/list 走字段等值过滤，事件录像回放列表数据源）
+ * @param {string} reportDevice 设备序列号（WVP deviceId）
+ * @param {Object} params
+ * @param {number} [params.current] 当前页
+ * @param {number} [params.size] 每页数量
+ */
+export function getEventListByDevice(reportDevice, params = {}) {
+  return commonFunc('/vlsEventManagement/list', { reportDevice, ...params }, 'GET')
+}
+
+/**
+ * 获取事件媒体短期私有播放地址（图片/MP4 通用）
+ * @param {string} mediaId 媒体ID
+ * @param {number} [seconds] 地址有效期秒数，默认 300
+ */
+export function getEventMediaViewUrl(mediaId, seconds = 300) {
+  return commonFunc(`/vlsDeviceMedia/${mediaId}/view-url`, { seconds }, 'GET')
+}
+
+/**
+ * 获取事件媒体短期下载地址（view-url 失败时的兜底）
+ * @param {string} mediaId 媒体ID
+ */
+export function getEventMediaDownloadUrl(mediaId) {
+  return commonFunc(`/vlsDeviceMedia/${mediaId}/download-url`, {}, 'GET')
+}
+
+/**
  * 获取事件详情
  * @param {number} id 事件ID
  */

@@ -72,10 +72,10 @@
       </div>
     </van-pull-refresh>
     <oort-popup v-model="showDetail" position="right" style="width: 100%;height: 100%;" teleport="body">
+      <!-- 详情页需要 WVP 行 id（云端录像查询）与 deviceId 序列号（事件录像过滤），传整行 -->
       <VideoPlaybackDetail
         v-if="currentDevice"
-        :device-id="currentDevice.id"
-        :device-name="currentDevice.deviceName"
+        :device="currentDevice"
         @close="showDetail = false"
       />
     </oort-popup>
@@ -86,10 +86,7 @@
 import { computed, onMounted, ref } from 'vue'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import VideoPlaybackDetail from './VideoPlaybackDetail.vue'
-import { getDeviceList } from '@/api/VLStreamCloud/device'
-import { useUserStore } from '@/store/modules/useraPaas'
-
-const store = useUserStore()
+import { getWvpVlsDeviceList } from '@/api/VLStreamCloud/wvp'
 
 const props = defineProps({
   keyword: {
@@ -117,23 +114,28 @@ const finished = ref(false)
 const page = ref(1)
 const pageSize = ref(10)
 
+// 真实设备源：WVP VLStream 协议设备（与平台视频回放/视频广场同口径）
+// WVP 行无 status/address 字段，归一化为列表模板所需结构
+const normalizeWvpRow = (row: any) => ({
+  ...row,
+  status: row.online === true ? '1' : '0',
+  address: row.ipAddr || '',
+  deviceType: row.deviceModel || ''
+})
+
 const fetchDevices = async() => {
   try {
-    const params: any = {
-      accessToken: store.userInfo?.accessToken,
-      current: page.value,
-      size: pageSize.value
-    }
-    const res: any = await getDeviceList(params)
-    if (res.code === 200 && res.data && Array.isArray(res.data.records)) {
-      const list = res.data.records
+    // WVP 列表为 RuoYi 分页格式：{ code, rows, total }
+    const res: any = await getWvpVlsDeviceList({ pageNum: page.value, pageSize: pageSize.value })
+    if (res && res.code === 200 && Array.isArray(res.rows)) {
+      const list = res.rows.map(normalizeWvpRow)
       if (page.value === 1) {
         devices.value = list
       } else {
         devices.value = [...devices.value, ...list]
       }
 
-      const total = (res.data && (res.data.total || res.data.count)) || 0
+      const total = Number(res.total) || 0
       if (!total || devices.value.length >= total || list.length === 0) {
         finished.value = true
       } else {
