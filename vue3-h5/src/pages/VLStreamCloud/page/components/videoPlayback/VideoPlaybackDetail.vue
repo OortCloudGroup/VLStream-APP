@@ -107,7 +107,7 @@ import { useUserStore } from '@/store/modules/useraPaas'
 import type { DatePickerColumnType } from 'vant'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
 import playImg from '@/assets/img/VLStreamCloud/play.png'
-import { getPlayback, getPlaybackStream } from '@/api/VLStreamCloud/videoPlayback'
+import { getPlayback, getPlaybackStream, resolveVlsDeviceIds } from '@/api/VLStreamCloud/videoPlayback'
 import { getEventListByDevice, getEventMediaViewUrl, getEventMediaDownloadUrl } from '@/api/VLStreamCloud/eventManagement'
 
 const props = defineProps<{
@@ -178,7 +178,7 @@ const buildRangeParams = () => {
   }
 }
 
-// 云端录像（/vlsVideoRecord/playback 按 Long deviceId 查询，用 WVP 行 id）
+// 云端录像（/vlsVideoRecord/playback 按 vls_device_info.id 查询，由序列号换取）
 const mapRecordClip = (r: any, idx: number, fallbackName: string): ClipItem => ({
   id: r.id ?? `r${idx}`,
   kind: 'videoRecord',
@@ -205,11 +205,10 @@ const mapEventClip = (e: any, idx: number, fallbackName: string): ClipItem => ({
 
 const fetchPlayback = async() => {
   const device = props.device || {}
-  // WVP 行 id 为数字串（如 "9"），后端 playback 形参为 Long；deviceId 为设备序列号
-  const rowId = String(device.id ?? '').trim()
+  // device 为 WVP 设备行：id 是 WVP 行 id（与录像表无关），deviceId 是设备序列号
   const serial = String(device.deviceId ?? '').trim()
   const fallbackName = String(device.deviceName ?? '')
-  if (!rowId && !serial) {
+  if (!serial) {
     clips.value = []
     activeClipId.value = ''
     return
@@ -217,9 +216,11 @@ const fetchPlayback = async() => {
   const { dateStr, startTime, endTime } = buildRangeParams()
   clipLoading.value = true
   try {
+    // 录像表 device_id 为 vls_device_info.id，需先按序列号换取
+    const [vlsId] = await resolveVlsDeviceIds([serial])
     const [recordRes, eventRes]: any[] = await Promise.all([
-      rowId
-        ? getPlayback({ accessToken: store.userInfo?.accessToken, deviceId: rowId, startTime, endTime })
+      vlsId
+        ? getPlayback({ accessToken: store.userInfo?.accessToken, deviceId: vlsId, startTime, endTime })
         : Promise.resolve(null),
       serial
         ? getEventListByDevice(serial, { current: 1, size: 100 })
