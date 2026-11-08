@@ -43,6 +43,7 @@ import { onMounted, ref, watch } from 'vue'
 import { useUserStore } from '@/store/modules/useraPaas'
 import playImg from '@/assets/img/VLStreamCloud/play.png'
 import { getPlayback, getPlaybackStream } from '@/api/VLStreamCloud/intelligentAnalysis'
+import { resolveVlsDeviceIds } from '@/api/VLStreamCloud/videoPlayback'
 
 interface TaskInfo {
   id: number | string
@@ -133,10 +134,12 @@ const fetchPlayback = async() => {
   const { startTime, endTime } = buildRangeParams()
   const allRecords: any[] = []
 
-  for (const deviceIdText of idList) {
+  // 录像表 device_id 为 vls_device_info.id，序列号需先换成 vls 主键，匹配不到的跳过
+  const vlsIds = (await resolveVlsDeviceIds(idList)).filter((id: string) => !!id)
+  for (const vlsId of Array.from(new Set(vlsIds))) {
     const params = {
       accessToken: store.userInfo?.accessToken,
-      deviceId: deviceIdText,
+      deviceId: vlsId,
       startTime,
       endTime
     }
