@@ -176,7 +176,7 @@ import { showToast } from 'vant'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import CameraDetail from '@/pages/VLStreamCloud/page/components/cameraDetail/CameraDetail.vue'
 import { getWvpVlsDeviceList } from '@/api/VLStreamCloud/wvp'
-import { listTodoProcess, listFinishedProcess, listOwnProcess } from '@/api/processui'
+import { todoWorkOrderList, finishedWorkOrderList, ownWorkOrderList } from '@/api/processui'
 import bgImg from '@/assets/img/VLStreamCloud/bg.png'
 import sxjImg from '@/assets/img/VLStreamCloud/sxj.png'
 import bfImg from '@/assets/img/VLStreamCloud/bf.png'
@@ -398,20 +398,23 @@ const allCount = ref(0) // 所有申请数量
 // 我的待审批列表
 const approvalList = ref([])
 
-const PROCESS_COMMON_PARAMS = {
+// 工单接口的权限码随「我的/待办/已办工单」页面一起授权（workflow:workorder:*），
+// 通用流程接口 /workflow/process/* 要求的 workflow:process:* 不在菜单目录里，普通用户无法授权。
+// categoryType 为必填（后端按它查分类名），workOrderAppAll 聚合全部工单应用。
+const WORKORDER_COMMON_PARAMS = {
   pageNum: 1,
   pageSize: 10,
-  category: '2029435351850999810',
-  categoryType: 'wfAppAll'
+  categoryType: 'WorkOrderAppAll',
+  workOrderAppAll: true
 }
 
 // 获取审批统计和列表
 const fetchApprovalData = async() => {
   try {
     const [todoRes, finishedRes, ownRes] = await Promise.all([
-      listTodoProcess(PROCESS_COMMON_PARAMS),
-      listFinishedProcess(PROCESS_COMMON_PARAMS),
-      listOwnProcess(PROCESS_COMMON_PARAMS)
+      todoWorkOrderList(WORKORDER_COMMON_PARAMS),
+      finishedWorkOrderList(WORKORDER_COMMON_PARAMS),
+      ownWorkOrderList(WORKORDER_COMMON_PARAMS)
     ])
 
     if (todoRes && todoRes.code === 200) {
@@ -430,9 +433,9 @@ const fetchApprovalData = async() => {
       allCount.value = ownRes.total || (ownRes.data && ownRes.data.total) || 0
       const rows = ownRes.rows || (ownRes.data && ownRes.data.rows) || []
       approvalList.value = rows.map(row => ({
-        id: row.procInsId || row.hisProcInsId || row.taskId,
-        deviceName: row.procDefName || row.workOrderName || '-',
-        applicant: row.startUserName || '-'
+        id: row.procInsId || row.procInstId || row.taskId || row.id,
+        deviceName: row.title || row.procDefName || '-',
+        applicant: row.startUserName || row.createBy || '-'
       }))
     } else {
       allCount.value = 0
