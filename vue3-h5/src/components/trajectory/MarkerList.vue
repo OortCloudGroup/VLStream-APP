@@ -16,14 +16,14 @@
 </template>
 
 <script setup>
-import { defineProps, ref } from 'vue'
+import { ref } from 'vue'
 import L from 'leaflet'
 import { LMarker, LPopup } from '@vue-leaflet/vue-leaflet'
 import WorkerPopup from './WorkerPopup.vue'
 import blueIcon from '@/assets/img/maintenanceManagement/blue.png'
 import redIcon from '@/assets/img/maintenanceManagement/red.png'
 import mapactive from '@/assets/img/smartGraden/map_active.png'
-defineProps({
+const props = defineProps({
   markers: {
     type: Array,
     required: true
