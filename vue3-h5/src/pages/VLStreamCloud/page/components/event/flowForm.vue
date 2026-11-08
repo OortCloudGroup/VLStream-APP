@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { listModel } from '@/api/processui'
 
 const props = defineProps(['listObj'])

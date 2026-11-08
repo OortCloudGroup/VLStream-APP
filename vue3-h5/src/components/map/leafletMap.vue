@@ -4,6 +4,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
+import type { PropType } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { covertCurrentLocationURL } from '@/utils/converGatewayPath'
