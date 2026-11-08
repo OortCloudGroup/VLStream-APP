@@ -84,5 +84,12 @@ export default {
     technicalSupport: '技术支持',
     operationSupport: '运维支持',
     share: '分享到聊天'
-  }
+  },
+  // 中文以原文为 key，缺 key 时 vue-i18n 原样返回 key 且不做插值，
+  // 带 {参数} 的文案必须在这里登记，否则页面会直接显示 {year}年 这类占位符
+  '{year}年': '{year}年',
+  '{month}月': '{month}月',
+  '{day}日': '{day}日',
+  '可升级至 {version}': '可升级至 {version}',
+  '审批「{name}」请前往 PC 端处理': '审批「{name}」请前往 PC 端处理'
 }
