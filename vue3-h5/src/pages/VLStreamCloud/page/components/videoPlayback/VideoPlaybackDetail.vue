@@ -24,6 +24,7 @@
         <van-date-picker
           v-model="pickerValues"
           :columns-type="pickerColumnsType"
+          :max-date="maxDate"
           @confirm="onDateConfirm"
           @cancel="showDatePicker = false"
         />
@@ -136,10 +137,14 @@ const emit = defineEmits(['close'])
 const store = useUserStore()
 const { t } = useI18n()
 const onBack = () => {
+  // 弹层关闭后组件仍挂载，先暂停，避免录像在后台继续播放出声
+  videoPlayer.value?.pause()
   emit('close')
 }
 
+// 默认当天；只能选到今天，未来日期不可能有录像
 const today = new Date()
+const maxDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
 const currentYear = ref(today.getFullYear())
 const currentMonth = ref(today.getMonth() + 1)
 const currentDay = ref(today.getDate())

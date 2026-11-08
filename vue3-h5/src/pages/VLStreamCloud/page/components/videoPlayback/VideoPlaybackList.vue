@@ -73,8 +73,10 @@
     </van-pull-refresh>
     <oort-popup v-model="showDetail" position="right" style="width: 100%;height: 100%;" teleport="body">
       <!-- 详情页需要 WVP 行 id（云端录像查询）与 deviceId 序列号（事件录像过滤），传整行 -->
+      <!-- 每次打开都重建详情页：日期回到当天，不沿用上次选的日期与播放状态 -->
       <VideoPlaybackDetail
         v-if="currentDevice"
+        :key="detailKey"
         :device="currentDevice"
         @close="showDetail = false"
       />
@@ -180,9 +182,11 @@ const onRefresh = () => {
 
 const showDetail = ref(false)
 const currentDevice = ref<any | null>(null)
+const detailKey = ref(0)
 
 const openDetail = (item: any) => {
   currentDevice.value = item
+  detailKey.value++
   showDetail.value = true
 }
 </script>
