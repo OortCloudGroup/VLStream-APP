@@ -447,7 +447,7 @@ watch(() => props.work_order_data, () => {
 
   .i_bor.bl {
     color: #1c1c1e;
-    border: 1px solid rgba(28, 28, 30, 1);
+    border: 1px solid var(--vl-primary);
   }
 }
 
@@ -468,7 +468,7 @@ watch(() => props.work_order_data, () => {
     border: none;
     margin-right: 10px;
     margin-bottom: 20px;
-    background-color: #1c1c1e;
+    background-color: var(--vl-primary);
     color: #fff;
   }
 
@@ -487,7 +487,7 @@ watch(() => props.work_order_data, () => {
   }
 
   .btn.fin {
-    border: 1px solid #1c1c1e;
+    border: 1px solid var(--vl-primary);
     color: #1c1c1e;
     padding: 4px 8px;
     background-color: transparent;
@@ -528,7 +528,7 @@ watch(() => props.work_order_data, () => {
 
     .on {
       flex: 1;
-      background-color: #1c1c1e;
+      background-color: var(--vl-primary);
       color: #fff;
       border: none;
     }
@@ -536,7 +536,7 @@ watch(() => props.work_order_data, () => {
 
   .weipai {
     flex: 1;
-    background-color: #1c1c1e;
+    background-color: var(--vl-primary);
     color: #fff;
     border: none;
   }
@@ -599,11 +599,11 @@ watch(() => props.work_order_data, () => {
       height: 40px;
       font-size: 14px;
       color: #1c1c1e;
-      border: 1px solid #1c1c1e;
+      border: 1px solid var(--vl-primary);
       border-radius: 6px;
 
       &.on {
-        background-color: #1c1c1e;
+        background-color: var(--vl-primary);
         border: none;
         color: #fff;
       }

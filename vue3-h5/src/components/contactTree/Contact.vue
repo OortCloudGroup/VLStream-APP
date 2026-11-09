@@ -282,7 +282,7 @@ export default {
   .contact_sub {
     height: 36px;
     width: 91.1%;
-    background: #1c1c1e;
+    background: var(--vl-primary);
     margin-top: 10px;
     border-radius: 24px;
     display: flex;

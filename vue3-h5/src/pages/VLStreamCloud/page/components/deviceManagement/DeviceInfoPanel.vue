@@ -219,7 +219,7 @@ const openConfigRecord = () => {
   .bottom-action-item {
     background: rgba(216, 216, 216, 0);
     border: 1px solid;
-    border-color: #1c1c1e;
+    border-color: var(--vl-primary);
     border-radius: 20px;
     padding: 10px 20px;
     color: #1c1c1e;

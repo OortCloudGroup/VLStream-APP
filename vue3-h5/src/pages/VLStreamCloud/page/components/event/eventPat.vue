@@ -399,7 +399,7 @@ onUnmounted(() => {
 
 .task-tab-item.active {
   color: #ffffff;
-  background: var(--vl-ink);
+  background: var(--vl-primary);
   border-radius: 999px;
   font-weight: 700;
 }
@@ -566,7 +566,7 @@ onUnmounted(() => {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background-color: #1c1c1e;
+  background-color: var(--vl-primary);
   color: #fff;
   font-size: 28px;
   border: none;

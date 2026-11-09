@@ -186,7 +186,7 @@ onMounted(() => {
         width: 9px;
         height: 9px;
         border-radius: 50%;
-        border: 2px solid rgba(28, 28, 30, 1);
+        border: 2px solid var(--vl-primary);
       }
     }
   }
@@ -259,7 +259,7 @@ onMounted(() => {
 
   .qu {
     background: #FFFFFF;
-    border: 2px solid rgba(28, 28, 30, 1);
+    border: 2px solid var(--vl-primary);
   }
 
   .dot {

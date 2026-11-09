@@ -529,7 +529,7 @@ onMounted(() => {
 
   .van-button {
     width: 90%;
-    background: #1c1c1e;
+    background: var(--vl-primary);
     border-radius: 18px;
   }
 }

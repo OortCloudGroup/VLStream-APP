@@ -111,7 +111,7 @@ const toggleSearch = () => {
     margin-top: 24px;
 
     div {
-      border: 1px solid rgba(28, 28, 30, 1);
+      border: 1px solid var(--vl-primary);
       border-radius: 24px;
       font-weight: 500;
       font-size: 14px;
@@ -129,7 +129,7 @@ const toggleSearch = () => {
     margin-top: 24px;
 
     div {
-      border: 1px solid rgba(28, 28, 30, 1);
+      border: 1px solid var(--vl-primary);
       border-radius: 24px;
       font-weight: 500;
       font-size: 14px;

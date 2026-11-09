@@ -107,7 +107,7 @@ const menuItems = computed(() => [
 
 // ========= 头像（默认由用户名生成，支持本地更换） =========
 // 黑白主题：头像统一用深浅不同的中性色
-const AVATAR_COLORS = ['#1c1c1e', '#3a3a3c', '#48484a', '#2c2c2e']
+const AVATAR_COLORS = ['#ff6a00', '#f2780c', '#e8590c', '#ff8a33']
 const avatarStorageKey = computed(() => `vlstream_avatar_${store.userInfo?.userName || 'default'}`)
 const customAvatar = ref(localStorage.getItem(avatarStorageKey.value) || '')
 const avatarLetter = computed(() => {

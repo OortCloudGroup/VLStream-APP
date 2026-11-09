@@ -1,13 +1,16 @@
 /*
- * VLStream 黑白极简主题（Monochrome）
- * 白底、浅灰圆角面板、近黑主色胶囊按钮、粗体黑色标题，橙色作为亮色点缀
- * （选中态、指示条、关键数字、链接、浮动按钮）
+ * VLStream 橙色主题
+ * 白底、浅灰圆角面板、橙色主色胶囊按钮、粗体黑色标题；
+ * 橙色同时用于选中态、指示条、关键数字、链接、浮动按钮
  * 在 Vant 样式之后全局引入，统一覆盖组件主题变量
  */
 
 :root {
   /* 品牌色板 */
-  --vl-ink: #1c1c1e;          // 主色 / 标题 / 主按钮
+  --vl-primary: #ff6a00;      // 主色：主按钮 / 选中 / 品牌
+  --vl-primary-press: #e65f00; // 主色按下态
+  --vl-primary-soft: rgba(255, 106, 0, 0.1); // 主色浅底
+  --vl-ink: #1c1c1e;          // 标题 / 正文
   --vl-ink-2: #3a3a3c;        // 次级强调
   --vl-text: #1c1c1e;
   --vl-text-2: #6e6e73;       // 说明文字
@@ -16,9 +19,9 @@
   --vl-surface: #f4f4f6;      // 面板 / 输入框
   --vl-surface-2: #ebebef;    // 按下态 / 分组底
   --vl-line: #e5e5ea;         // 分隔线 / 描边
-  --vl-accent: #ff6a00;       // 亮色橙（选中、指示、关键数字）
-  --vl-accent-soft: rgba(255, 106, 0, 0.1); // 橙色浅底（标签、提示条）
-  --vl-accent-press: #e65f00; // 橙色按下态
+  --vl-accent: var(--vl-primary);            // 亮色（与主色一致）
+  --vl-accent-soft: var(--vl-primary-soft);
+  --vl-accent-press: var(--vl-primary-press);
   --vl-danger: #e5484d;
   --vl-success: #30a46c;
   --vl-warning: #f5a623;
@@ -30,8 +33,9 @@
   --vl-font-mono: 'SF Mono', 'JetBrains Mono', Menlo, Consolas, 'Roboto Mono', monospace;
 
   /* Vant 全局变量 */
-  --van-primary-color: var(--vl-ink);
-  --van-blue: var(--vl-ink);
+  --van-primary-color: var(--vl-primary);
+  --van-blue: var(--vl-primary);
+  --van-orange: var(--vl-primary);
   --van-success-color: var(--vl-success);
   --van-danger-color: var(--vl-danger);
   --van-warning-color: var(--vl-warning);
@@ -50,8 +54,8 @@
   --van-button-radius: 999px;
   --van-button-default-height: 44px;
   --van-button-normal-font-size: 15px;
-  --van-button-primary-background: var(--vl-ink);
-  --van-button-primary-border-color: var(--vl-ink);
+  --van-button-primary-background: var(--vl-primary);
+  --van-button-primary-border-color: var(--vl-primary);
   --van-button-default-border-color: var(--vl-line);
   --van-button-default-color: var(--vl-ink);
   --van-button-plain-background: #ffffff;
@@ -106,7 +110,7 @@
   --van-dialog-confirm-button-text-color: var(--vl-accent);
   --van-popup-round-radius: var(--vl-radius-lg);
   --van-action-sheet-item-height: 54px;
-  --van-tag-primary-color: var(--vl-ink);
+  --van-tag-primary-color: var(--vl-primary);
   --van-tag-radius: 999px;
   --van-toast-background: rgba(28, 28, 30, 0.88);
   --van-toast-radius: 14px;
@@ -138,9 +142,14 @@ body {
 
 /* 主按钮去掉渐变与彩色阴影 */
 .van-button--primary {
-  background: var(--vl-ink);
-  border-color: var(--vl-ink);
+  background: var(--vl-primary);
+  border-color: var(--vl-primary);
   box-shadow: none;
+
+  &:active {
+    background: var(--vl-primary-press);
+    border-color: var(--vl-primary-press);
+  }
 }
 
 .van-button--default {
@@ -149,8 +158,8 @@ body {
 
 .van-button--plain.van-button--primary {
   background: #ffffff;
-  color: var(--vl-ink);
-  border-color: var(--vl-line);
+  color: var(--vl-primary);
+  border-color: var(--vl-primary);
 }
 
 /* 底部导航细线 */

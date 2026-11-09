@@ -766,7 +766,7 @@ const onRefresh = async() => {
   height: 32px;
   padding: 0 14px;
   border-radius: 999px;
-  background: var(--vl-ink);
+  background: var(--vl-primary);
   color: #ffffff;
   font-size: 13px;
   font-weight: 600;

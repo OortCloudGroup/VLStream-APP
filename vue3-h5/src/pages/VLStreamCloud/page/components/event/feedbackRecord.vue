@@ -145,7 +145,7 @@ const eventBuiltFn = () => {
     margin-top: 24px;
 
     div {
-      border: 1px solid rgba(28, 28, 30, 1);
+      border: 1px solid var(--vl-primary);
       border-radius: 24px;
       font-weight: 500;
       font-size: 14px;
@@ -163,7 +163,7 @@ const eventBuiltFn = () => {
     margin-top: 24px;
 
     div {
-      border: 1px solid rgba(28, 28, 30, 1);
+      border: 1px solid var(--vl-primary);
       border-radius: 24px;
       font-weight: 500;
       font-size: 14px;
@@ -383,7 +383,7 @@ const eventBuiltFn = () => {
   }
 
   .btn{
-    background: var(--vl-ink);
+    background: var(--vl-primary);
     box-shadow: none;
     border-radius: 999px;
     padding: 6px 10px;

@@ -1196,7 +1196,7 @@ const updateInterval = (value: string | number) => {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  border: 1px solid #1c1c1e;
+  border: 1px solid var(--vl-primary);
   background: #fff;
   overflow: hidden;
 }
@@ -1292,7 +1292,7 @@ const updateInterval = (value: string | number) => {
   position: absolute;
   top: 0;
   height: 100%;
-  background: #1c1c1e;
+  background: var(--vl-primary);
   border-radius: 4px;
   overflow: visible;
 }

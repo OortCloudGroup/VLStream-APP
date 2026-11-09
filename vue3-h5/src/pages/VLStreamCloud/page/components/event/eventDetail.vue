@@ -566,7 +566,7 @@ onMounted(() => {
 }
 
 .upload-btn:hover {
-    border-color: #1c1c1e;
+    border-color: var(--vl-primary);
     color: #1c1c1e;
     background-color: #f4f4f6;
 }
@@ -607,7 +607,7 @@ onMounted(() => {
 }
 
 .feedback-textarea:focus {
-    border-color: #1c1c1e;
+    border-color: var(--vl-primary);
     box-shadow: 0 0 0 2px rgba(28, 28, 30, 0.2);
 }
 
@@ -617,7 +617,7 @@ onMounted(() => {
 }
 
 .submit-btn {
-    background: #1c1c1e;
+    background: var(--vl-primary);
     color: #FFFFFF;
     border: none;
     border-radius: 8px;
@@ -629,7 +629,7 @@ onMounted(() => {
 }
 
 .submit-btn:hover {
-    background: #1c1c1e;
+    background: var(--vl-primary-press);
     transform: translateY(-1px);
 }
 

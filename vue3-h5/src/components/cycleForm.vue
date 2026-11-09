@@ -460,7 +460,7 @@ const updateEvery = (value: string) => {
 
 }
 .butActive {
-  background-color: #1c1c1e;
+  background-color: var(--vl-primary);
   color: #fff;
 }
 .selectionCriteria{

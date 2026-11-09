@@ -1286,7 +1286,7 @@ onMounted(() => {
 }
 
 .butActive {
-  background-color: #1c1c1e;
+  background-color: var(--vl-primary);
   color: #fff;
 }
 
@@ -1553,7 +1553,7 @@ onMounted(() => {
 }
 
 .day-chip.active {
-  background: rgba(28, 28, 30, 1);
+  background: var(--vl-primary);
   color: #fff;
 }
 

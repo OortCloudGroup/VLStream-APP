@@ -257,7 +257,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-$brand: var(--vl-ink);
+$brand: var(--vl-primary);
 $text_main: var(--vl-ink);
 $text_sub: var(--vl-text-2);
 

@@ -209,7 +209,7 @@ watch(
   width: 32px;
   height: 3px;
   border-radius: 999px;
-  background: #1c1c1e;
+  background: var(--vl-primary);
 }
 
 .tab-body {

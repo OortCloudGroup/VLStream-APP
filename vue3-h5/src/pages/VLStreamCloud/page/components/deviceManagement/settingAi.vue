@@ -132,7 +132,7 @@ onMounted(() => {
   align-items: center;
   gap: 4px;
   border-radius: 18px;
-  background: #1c1c1e;
+  background: var(--vl-primary);
   color: #ffffff;
   font-size: 12px;
   padding: 10px 16px;

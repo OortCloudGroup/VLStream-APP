@@ -338,7 +338,7 @@ const onMenuSelect = (action) => {
 }
 
 .top-tabs :deep(.van-tab--active .van-tab__text) {
-  background: var(--vl-ink);
+  background: var(--vl-primary);
 }
 
 .status-tabs {
@@ -385,7 +385,7 @@ const onMenuSelect = (action) => {
       width: 46px;
       height: 4px;
       border-radius: 4px;
-      background: #1c1c1e;
+      background: var(--vl-primary);
     }
   }
 }
