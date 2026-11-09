@@ -99,7 +99,7 @@ defineExpose({ form, vmFormRef, appObj, selectedOptions_1, options })
   }
 
   .title {
-    font-family: OPPOSans-M;
+    font-weight: 500;
     font-size: 12px;
     color: #999999;
     letter-spacing: 0;
@@ -135,7 +135,7 @@ defineExpose({ form, vmFormRef, appObj, selectedOptions_1, options })
 }
 
 .vf_content {
-  background-color: #F5F6F8;
+  background-color: var(--vl-bg);
   display: flex;
   flex-direction: column;
   overflow: auto;

@@ -302,7 +302,7 @@ onMounted(() => {
     }
 
     .title {
-      font-family: OPPOSans-M;
+      font-weight: 500;
       font-size: 12px;
       color: #999999;
       letter-spacing: 0;
@@ -333,7 +333,7 @@ onMounted(() => {
   align-items: flex-start;
 
   .title {
-    font-family: OPPOSans-M;
+    font-weight: 500;
     font-size: 16px;
     color: #999999;
     letter-spacing: 0;
@@ -367,7 +367,6 @@ onMounted(() => {
   background: #F7F7F7;
   border-radius: 4px;
   margin-right: 8px;
-  font-family: OPPOSans-R;
   font-size: 12px;
   color: #989EB5;
   text-align: center;
@@ -384,11 +383,10 @@ onMounted(() => {
   flex-direction: column;
 
   .addBtn {
-    background: rgba(26, 83, 255, 0.12);
+    background: rgba(28, 28, 30, 0.12);
     border-radius: 16px;
-    font-family: MicrosoftYaHei;
     font-size: 12px;
-    color: #1A53FF;
+    color: #1c1c1e;
     letter-spacing: 0;
     font-weight: 400;
     padding: 8px 12px;
@@ -401,12 +399,11 @@ onMounted(() => {
 
   .tag {
     margin-top: 8px;
-    background: rgba(24, 144, 255, 0.12);
+    background: rgba(28, 28, 30, 0.12);
     border-radius: 4px;
-    font-family: MicrosoftYaHei;
     font-size: 12px;
     line-height: 14px;
-    color: #1890FF;
+    color: #1c1c1e;
     letter-spacing: 0;
     font-weight: 400;
     padding: 6px 4px;
@@ -431,7 +428,7 @@ onMounted(() => {
 
   .van-button {
     width: 90%;
-    background: #2F69F8;
+    background: #1c1c1e;
     border-radius: 18px;
   }
 }

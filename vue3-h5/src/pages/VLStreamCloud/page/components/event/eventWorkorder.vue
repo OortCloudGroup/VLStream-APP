@@ -227,7 +227,6 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   margin: 0 auto;
-  font-family: Arial, sans-serif;
   overflow: hidden;
 }
 
@@ -244,8 +243,8 @@ onUnmounted(() => {
 }
 
 .tab-item.active {
-  color: #007bff;
-  border-bottom: 2px solid #007bff;
+  color: #1c1c1e;
+  border-bottom: 2px solid #1c1c1e;
 }
 
 .work-content {
@@ -275,7 +274,6 @@ onUnmounted(() => {
   align-items: center;
   cursor: pointer;
   width: 34%;
-  font-family: SourceHanSansSC-Regular;
   font-size: 14px;
   color: #666666;
   font-weight: 400;
@@ -283,7 +281,7 @@ onUnmounted(() => {
 
 .order-tab-item.active {
   color: #ffff;
-  background: #2F69F8;
+  background: #1c1c1e;
   border-radius: 16px;
 }
 
@@ -319,7 +317,6 @@ onUnmounted(() => {
   justify-content: space-between;
   padding-bottom: 16px;
   margin-bottom: 12px;
-  font-family: SourceHanSansSC-Regular;
   font-size: 16px;
   line-height: 16px;
   color: #1A1A1A;
@@ -340,7 +337,6 @@ onUnmounted(() => {
 
   .info-content {
     flex: 1;
-    font-family: SourceHanSansSC-Regular;
     font-size: 14px;
     line-height: 20px;
     color: #1A1A1A;
@@ -350,9 +346,9 @@ onUnmounted(() => {
     .device_tag {
       font-size: 12px;
       line-height: 12px;
-      color: #1A53FF;
+      color: #1c1c1e;
       font-weight: 400;
-      background: rgba(26, 83, 255, 0.08);
+      background: rgba(28, 28, 30, 0.08);
       border-radius: 4px;
       padding: 2px 4px 4px;
       margin-right: 6px;
@@ -360,7 +356,6 @@ onUnmounted(() => {
   }
 
   .info-lable {
-    font-family: SourceHanSansSC-Regular;
     font-size: 14px;
     line-height: 16px;
     color: #B1B9C5;
@@ -404,7 +399,7 @@ onUnmounted(() => {
 }
 
 .ongoing-status {
-  background-color: #28a745;
+  background-color: #30a46c;
 }
 
 .completed-status {
@@ -418,7 +413,7 @@ onUnmounted(() => {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background-color: #007bff;
+  background-color: #1c1c1e;
   color: #fff;
   font-size: 28px;
   border: none;

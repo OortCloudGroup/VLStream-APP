@@ -59,9 +59,8 @@ const toggleSearch = () => {
   }
 
   .card-but {
-    font-family: MicrosoftYaHei;
     font-size: 12px;
-    color: #2F69F8;
+    color: #1c1c1e;
     letter-spacing: 0;
     font-weight: 400;
     display: flex;
@@ -76,7 +75,6 @@ const toggleSearch = () => {
     margin-top: 8px;
 
     .label {
-      font-family: 'SourceHanSansSC-Regular', sans-serif;
       font-size: 13px;
       color: #B1B9C5;
       font-weight: 400;
@@ -84,7 +82,6 @@ const toggleSearch = () => {
     }
 
     .value {
-      font-family: 'SourceHanSansSC-Regular', sans-serif;
       font-size: 13px;
       color: #3D3D3D;
       font-weight: 500;
@@ -92,14 +89,13 @@ const toggleSearch = () => {
     }
 
     .biaoti {
-      font-family: SourceHanSansSC-Medium;
+      font-weight: 500;
       font-size: 14px;
       color: #3D3D3D;
       font-weight: 500;
     }
 
     .neirong {
-      font-family: SourceHanSansSC-Regular;
       font-size: 14px;
       color: #666666;
       font-weight: 400;
@@ -115,11 +111,11 @@ const toggleSearch = () => {
     margin-top: 24px;
 
     div {
-      border: 1px solid rgba(1, 93, 252, 1);
+      border: 1px solid rgba(28, 28, 30, 1);
       border-radius: 24px;
-      font-family: OPPOSans-M;
+      font-weight: 500;
       font-size: 14px;
-      color: #015DFC;
+      color: #1c1c1e;
       text-align: center;
       font-weight: 500;
       padding: 15px 32px 15px 32px;
@@ -133,11 +129,11 @@ const toggleSearch = () => {
     margin-top: 24px;
 
     div {
-      border: 1px solid rgba(1, 93, 252, 1);
+      border: 1px solid rgba(28, 28, 30, 1);
       border-radius: 24px;
-      font-family: OPPOSans-M;
+      font-weight: 500;
       font-size: 14px;
-      color: #015DFC;
+      color: #1c1c1e;
       text-align: center;
       font-weight: 500;
       padding: 15px 1.5px 15px 1.5px;
@@ -146,8 +142,8 @@ const toggleSearch = () => {
 }
 
 .status-tag {
-  background-color: #fdf3d2;
-  color: #EC6C14;
+  background-color: #f4f4f6;
+  color: #f5a623;
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 4px;
@@ -167,32 +163,32 @@ const toggleSearch = () => {
 }
 
 .status-tag {
-  background-color: #fdf3d2;
-  color: #EC6C14;
+  background-color: #f4f4f6;
+  color: #f5a623;
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 4px;
 }
 
 .status-tag1 {
-  background-color: #ebfff2;
-  color: #14EC41;
+  background-color: #f4f4f6;
+  color: #30a46c;
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 4px;
 }
 
 .status-tag2 {
-  background-color: #fff6ed;
-  color: #EC2E14;
+  background-color: #f4f4f6;
+  color: #e5484d;
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 4px;
 }
 
 .status-tag3 {
-  background-color: #edf3ff;
-  color: #2DB5FF;
+  background-color: #f4f4f6;
+  color: #1c1c1e;
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 4px;
@@ -207,7 +203,6 @@ const toggleSearch = () => {
   line-height: 11px;
 
   .label {
-    font-family: 'SourceHanSansSC-Regular', sans-serif;
     font-size: 13px;
     color: #B1B9C5;
     font-weight: 400;
@@ -217,7 +212,6 @@ const toggleSearch = () => {
   }
 
   .value {
-    font-family: 'SourceHanSansSC-Regular', sans-serif;
     font-size: 13px;
     color: #3D3D3D;
     font-weight: 500;

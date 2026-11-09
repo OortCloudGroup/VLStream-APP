@@ -146,7 +146,7 @@ onMounted(() => {
     // 左边样式
     .info-item {
       background-color: #fff;
-      border-left: 1px dashed rgba(3, 120, 255, 1);
+      border-left: 1px dashed rgba(28, 28, 30, 1);
       padding-left: 10px;
       margin-bottom: 2px;
       position: relative;
@@ -186,7 +186,7 @@ onMounted(() => {
         width: 9px;
         height: 9px;
         border-radius: 50%;
-        border: 2px solid rgba(3, 120, 255, 1);
+        border: 2px solid rgba(28, 28, 30, 1);
       }
     }
   }
@@ -204,7 +204,6 @@ onMounted(() => {
   .info-lable {
     align-items: flex-start;
     padding-bottom: 10px;
-    font-family: SourceHanSansSC-Regular;
     font-size: 14px;
     line-height: 16px;
     color: #333333;
@@ -245,7 +244,6 @@ onMounted(() => {
   justify-content: space-between;
 
   .time {
-    font-family: SourceHanSansSC-Regular;
     font-size: 12px;
     color: #515A6E;
     letter-spacing: 0;
@@ -261,7 +259,7 @@ onMounted(() => {
 
   .qu {
     background: #FFFFFF;
-    border: 2px solid rgba(3, 120, 255, 1);
+    border: 2px solid rgba(28, 28, 30, 1);
   }
 
   .dot {

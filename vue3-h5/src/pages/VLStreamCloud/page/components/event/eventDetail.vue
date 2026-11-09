@@ -315,13 +315,12 @@ onMounted(() => {
     width: 100%;
     max-width: 500px;
     margin: 0 auto;
-    font-family: Arial, sans-serif;
-    background-color: #efefef;
+    background-color: var(--vl-bg);
 }
 
 .task-content {
     height: calc(100vh - 68px - 53px);
-    padding: 15px;
+    padding: 12px 20px;
     overflow-y: scroll;
 }
 
@@ -329,10 +328,10 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 16px 20px;
-    margin-bottom: 15px;
-    background: #F9F9F9;
-    border-radius: 8px;
+    padding: 18px 16px 6px;
+    margin-bottom: 12px;
+    background: var(--vl-surface);
+    border-radius: var(--vl-radius-lg);
     position: relative;
 }
 
@@ -356,7 +355,6 @@ onMounted(() => {
 }
 
 .task-title {
-    font-family: SourceHanSansSC-Regular;
     font-size: 18px;
     color: #333333;
     letter-spacing: 0;
@@ -369,16 +367,15 @@ onMounted(() => {
     height: 20px;
     width: 5px;
 
-    border-left: 3px solid #2F69F8;
+    border-left: 3px solid #1c1c1e;
 
 }
 
 .task-desc {
-    margin-bottom: 12px;
+    margin-bottom: 4px;
     display: flex;
-    font-family: MicrosoftYaHei;
-    font-size: 15px !important;
-    color: #1A1A1A;
+    font-size: 14px !important;
+    color: var(--vl-ink);
     line-height: 1.6;
     font-weight: 400;
     /* align-items: flex-start; */
@@ -396,28 +393,29 @@ onMounted(() => {
 .info-content {
     flex: 1;
     flex-wrap: wrap;
-    font-family: SourceHanSansSC-Regular;
-    font-size: 15px !important;
-    color: #1A1A1A;
-    letter-spacing: 0.43px;
+    font-size: 14px !important;
+    color: var(--vl-ink);
+    letter-spacing: 0;
     font-weight: 400;
     line-height: 1.6;
 }
 
 .info-lable {
     /* text-align: right; */
-    min-width: 80px;
-    font-family: SourceHanSansSC-Regular;
-    font-size: 15px !important;
-    color: #666666;
+    min-width: 88px;
+    font-size: 14px !important;
+    color: var(--vl-text-2);
     letter-spacing: 0;
     font-weight: 400;
     margin-bottom: 12px;
     line-height: 1.6;
 
     > img {
-        width: 20px;
-        height: 20px;
+        width: 16px;
+        height: 16px;
+        margin-right: 6px;
+        opacity: 0.7;
+        vertical-align: -2px;
     }
 }
 
@@ -428,7 +426,6 @@ onMounted(() => {
 .task-desc2 {
     display: flex;
     flex-direction: column;
-    font-family: MicrosoftYaHei;
     font-size: 15px !important;
     color: #1A1A1A;
     line-height: 1.6;
@@ -445,7 +442,6 @@ onMounted(() => {
 .info-lable2 {
     text-align: left;
     min-width: 74px;
-    font-family: SourceHanSansSC-Regular;
     font-size: 14px;
     color: #666666;
     letter-spacing: 0;
@@ -503,7 +499,6 @@ onMounted(() => {
     background-color: #E8E8E8;
     border: 1px solid #E8E8E8;
     cursor: pointer;
-    font-family: AppleSystemUIFont;
     font-size: 12px;
     color: #989EB5;
     font-weight: 400;
@@ -539,7 +534,7 @@ onMounted(() => {
     right: -8px;
     width: 20px;
     height: 20px;
-    background-color: #ff4757;
+    background-color: #e5484d;
     color: white;
     border-radius: 50%;
     display: flex;
@@ -552,7 +547,7 @@ onMounted(() => {
 }
 
 .delete-btn:hover {
-    background-color: #ff3742;
+    background-color: #e5484d;
     transform: scale(1.1);
 }
 
@@ -571,9 +566,9 @@ onMounted(() => {
 }
 
 .upload-btn:hover {
-    border-color: #3476FC;
-    color: #3476FC;
-    background-color: #F0F8FF;
+    border-color: #1c1c1e;
+    color: #1c1c1e;
+    background-color: #f4f4f6;
 }
 
 .upload-icon {
@@ -584,7 +579,7 @@ onMounted(() => {
 }
 
 .upload-btn:hover .upload-icon {
-    color: #3476FC;
+    color: #1c1c1e;
 }
 
 .upload-text {
@@ -594,7 +589,7 @@ onMounted(() => {
 }
 
 .upload-btn:hover .upload-text {
-    color: #3476FC;
+    color: #1c1c1e;
 }
 
 .feedback-textarea {
@@ -604,7 +599,6 @@ onMounted(() => {
     padding: 12px 16px;
     border: 1px solid #D9D9D9;
     border-radius: 4px;
-    font-family: SourceHanSansSC-Regular;
     font-size: 15px;
     resize: vertical;
     outline: none;
@@ -613,8 +607,8 @@ onMounted(() => {
 }
 
 .feedback-textarea:focus {
-    border-color: #3476FC;
-    box-shadow: 0 0 0 2px rgba(52, 118, 252, 0.2);
+    border-color: #1c1c1e;
+    box-shadow: 0 0 0 2px rgba(28, 28, 30, 0.2);
 }
 
 .submit-section {
@@ -623,12 +617,11 @@ onMounted(() => {
 }
 
 .submit-btn {
-    background: #3476FC;
+    background: #1c1c1e;
     color: #FFFFFF;
     border: none;
     border-radius: 8px;
     padding: 14px 36px;
-    font-family: SourceHanSansSC-Regular;
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
@@ -636,7 +629,7 @@ onMounted(() => {
 }
 
 .submit-btn:hover {
-    background: #2B5CD9;
+    background: #1c1c1e;
     transform: translateY(-1px);
 }
 
@@ -652,7 +645,6 @@ onMounted(() => {
 }
 
 .no-data-text {
-    font-family: SourceHanSansSC-Regular;
     font-size: 14px;
     color: #999999;
 }
@@ -735,12 +727,12 @@ onMounted(() => {
 /* 响应式设计 */
 @media (max-width: 480px) {
     .task-content {
-        padding: 12px;
+        padding: 12px 16px;
     }
 
     .task-item {
-        padding: 10px 12px;
-        margin-bottom: 8px;
+        padding: 18px 16px 6px;
+        margin-bottom: 12px;
     }
 
     .image-item,
@@ -828,7 +820,6 @@ onMounted(() => {
 }
 
 .upload-header h3 {
-    font-family: SourceHanSansSC-Regular;
     font-size: 16px;
     color: #333333;
     letter-spacing: 0;
@@ -838,7 +829,6 @@ onMounted(() => {
 }
 
 .upload-header span {
-    font-family: SourceHanSansSC-Regular;
     font-size: 14px;
     color: #666666;
     letter-spacing: 0;
@@ -887,7 +877,6 @@ onMounted(() => {
 }
 
 .option-item p {
-    font-family: SourceHanSansSC-Regular;
     font-size: 15px;
     color: #333333;
     letter-spacing: 0;

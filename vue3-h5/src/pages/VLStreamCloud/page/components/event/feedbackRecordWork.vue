@@ -201,7 +201,7 @@ onMounted(() => {
 .main_item_name {
   //padding-top: 10px;
   .line {
-    background: #3476FC;
+    background: #1c1c1e;
     width: 3px;
     height: 14px;
     flex-shrink: 0;

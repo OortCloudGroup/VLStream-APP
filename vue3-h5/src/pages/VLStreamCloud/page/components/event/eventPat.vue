@@ -130,7 +130,7 @@
                     </div>
                     <div class="info-content">
                       {{ task.device_name }}
-                      <span class="device_tag">{{ task.device_tag }}</span>
+                      <span v-if="task.device_tag" class="device_tag">{{ task.device_tag }}</span>
                     </div>
                   </div>
                   <div class="task-desc fl">
@@ -346,7 +346,6 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   margin: 0 auto;
-  font-family: Arial, sans-serif;
   overflow: hidden;
 }
 
@@ -363,8 +362,8 @@ onUnmounted(() => {
 }
 
 .tab-item.active {
-  color: #007bff;
-  border-bottom: 2px solid #007bff;
+  color: #1c1c1e;
+  border-bottom: 2px solid #1c1c1e;
 }
 
 .task-content {
@@ -380,11 +379,10 @@ onUnmounted(() => {
 
 .task-tab-header {
   display: flex;
-  margin-bottom: 10px;
-  background: #FFFF;
-  border-radius: 16px;
-  padding: 2px;
-  height: 28px;
+  background: var(--vl-surface);
+  border-radius: 999px;
+  padding: 3px;
+  height: 34px;
   margin: 16px 0;
 }
 
@@ -394,16 +392,16 @@ onUnmounted(() => {
   align-items: center;
   cursor: pointer;
   width: 34%;
-  font-family: SourceHanSansSC-Regular;
   font-size: 14px;
-  color: #666666;
-  font-weight: 400;
+  color: var(--vl-text-2);
+  font-weight: 500;
 }
 
 .task-tab-item.active {
-  color: #ffff;
-  background: #2F69F8;
-  border-radius: 16px;
+  color: #ffffff;
+  background: var(--vl-ink);
+  border-radius: 999px;
+  font-weight: 700;
 }
 
 .task-list {
@@ -416,10 +414,10 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 20px 10px 6px;
-  margin-bottom: 10px;
-  background: #FFFF;
-  border-radius: 8px;
+  padding: 18px 16px 10px;
+  margin-bottom: 12px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
   position: relative;
 }
 
@@ -436,24 +434,24 @@ onUnmounted(() => {
 
 .task-title {
   justify-content: space-between;
-  padding-bottom: 16px;
+  padding-bottom: 14px;
   margin-bottom: 12px;
-  font-family: SourceHanSansSC-Regular;
   font-size: 16px;
-  line-height: 16px;
-  color: #1A1A1A;
-  letter-spacing: 0;
-  font-weight: 400;
-  border-bottom: 1px solid rgba(51, 51, 51, 0.2);
+  line-height: 22px;
+  color: var(--vl-ink);
+  font-weight: 600;
+  border-bottom: 1px solid var(--vl-line);
 
   .van-icon-arrow {
-    color: #999;
+    color: var(--vl-text-3);
+    font-size: 14px;
   }
 }
 
 .task-name-wrap {
   flex: 1;
   min-width: 0;
+  padding-right: 60px; // 给右上角状态印章留位
 }
 
 // 标题超长时单行省略号截断
@@ -473,7 +471,7 @@ onUnmounted(() => {
   line-height: 14px;
   font-weight: 400;
   color: #fff;
-  background: #F5222D;
+  background: #e5484d;
   border-radius: 8px;
 }
 
@@ -485,37 +483,40 @@ onUnmounted(() => {
 
   .info-content {
     flex: 1;
-    font-family: SourceHanSansSC-Regular;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 20px;
-    color: #1A1A1A;
-    letter-spacing: 0.43px;
+    color: var(--vl-ink);
     font-weight: 400;
+    word-break: break-all;
+
+    .device_tag:empty {
+      display: none;
+    }
 
     .device_tag{
       font-size: 12px;
       line-height: 12px;
-      color: #1A53FF;
+      color: #1c1c1e;
       font-weight: 400;
-      background: rgba(26,83,255,0.08);
-      border-radius: 4px;
-      padding: 2px 4px 4px;
+      background: #ffffff;
+      border-radius: 999px;
+      padding: 3px 8px;
       margin-right: 6px;
     }
   }
 
   .info-lable {
-    font-family: SourceHanSansSC-Regular;
-    font-size: 14px;
-    line-height: 16px;
-    color: #B1B9C5;
-    letter-spacing: 0.43px;
+    flex-shrink: 0;
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--vl-text-2);
     font-weight: 400;
 
     > img {
-      width: 20px;
-      height: 20px;
-      margin-right: 4px;
+      width: 16px;
+      height: 16px;
+      margin-right: 6px;
+      opacity: 0.7;
     }
   }
 
@@ -538,18 +539,20 @@ onUnmounted(() => {
 
 .task-status {
   z-index: 1;
-  top: -4px;
-  right: 24px;
+  top: 6px;
+  right: 34px;
   position: absolute;
+  opacity: 0.55;
+  transform: rotate(-8deg);
 }
 
 .task-status img {
-  width: 60px;
-  height: 60px;
+  width: 48px;
+  height: 48px;
 }
 
 .ongoing-status {
-  background-color: #28a745;
+  background-color: #30a46c;
 }
 
 .completed-status {
@@ -563,7 +566,7 @@ onUnmounted(() => {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background-color: #007bff;
+  background-color: #1c1c1e;
   color: #fff;
   font-size: 28px;
   border: none;
