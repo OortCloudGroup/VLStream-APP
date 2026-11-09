@@ -5,7 +5,6 @@
   <div>
     <van-pull-refresh v-model="isLoading" class="workbench-body" @refresh="onRefresh">
       <div class="workbench-container">
-        <div class="top-bg" :style="{ backgroundImage: `url(${bgImg})` }" />
         <!-- 顶部标题区域 -->
         <div class="header-section" :style="{ paddingTop: headerPaddingTop }">
           <h1 class="page-title">
@@ -14,27 +13,25 @@
 
           <!-- 天气和个人信息卡片 -->
           <div class="weather-card">
-            <div class="weather-title">
-              <img src="@/assets/img/VLStreamCloud/qt.png" alt="" />
-              <div>
-                <div class="temperature">
-                  {{ weatherTemp }}
+            <div class="hero-top">
+              <div class="hero-text">
+                <div class="greeting">
+                  {{ greetingWithUser }}
                 </div>
                 <div class="date">
-                  {{ currentDate }} {{ currentTime }} {{ currentDay }}
+                  {{ currentDate }} · {{ currentTime }} · {{ currentDay }}
                 </div>
               </div>
-            </div>
-            <div class="weather-info">
-              <div class="greeting">
-                {{ greetingWithUser }}
+              <div class="weather-chip">
+                <img src="@/assets/img/VLStreamCloud/qt.png" alt="" />
+                <span class="temperature vl-mono">{{ weatherTemp }}</span>
               </div>
             </div>
 
             <!-- 状态卡片区域 -->
             <div class="status-cards">
               <div class="status-card pending">
-                <div class="status-number">
+                <div class="status-number vl-mono">
                   {{ pendingCount }}
                 </div>
                 <div class="status-label">
@@ -42,7 +39,7 @@
                 </div>
               </div>
               <div class="status-card approved">
-                <div class="status-number">
+                <div class="status-number vl-mono">
                   {{ approvedCount }}
                 </div>
                 <div class="status-label">
@@ -50,7 +47,7 @@
                 </div>
               </div>
               <div class="status-card all">
-                <div class="status-number">
+                <div class="status-number vl-mono">
                   {{ allCount }}
                 </div>
                 <div class="status-label">
@@ -75,7 +72,9 @@
               class="function-item"
               @click="handleFunctionClick(item)"
             >
-              <img class="function-icon" :src="item.iconSvg" alt="" />
+              <div class="function-icon">
+                <LineIcon :name="item.icon" :size="24" />
+              </div>
               <div class="function-label">
                 {{ $t(item.label) }}
               </div>
@@ -99,12 +98,15 @@
               :key="index"
               class="device-item"
             >
-              <img class="device-icon" :src="sxjImg" alt="" />
+              <div class="device-icon">
+                <LineIcon name="device" :size="18" />
+              </div>
               <div class="device-name">
                 {{ device.name }}
               </div>
               <div class="play-btn" @click="handlePlay(device)">
-                <img class="play-icon" :src="bfImg" alt="" />
+                <LineIcon name="play" :size="12" :stroke="2.4" />
+                <span>{{ $t('播放') }}</span>
               </div>
             </div>
           </div>
@@ -177,21 +179,7 @@ import OortPopup from '@/components/popup/oort_popup.vue'
 import CameraDetail from '@/pages/VLStreamCloud/page/components/cameraDetail/CameraDetail.vue'
 import { getWvpVlsDeviceList } from '@/api/VLStreamCloud/wvp'
 import { todoWorkOrderList, finishedWorkOrderList, ownWorkOrderList } from '@/api/processui'
-import bgImg from '@/assets/img/VLStreamCloud/bg.png'
-import sxjImg from '@/assets/img/VLStreamCloud/sxj.png'
-import bfImg from '@/assets/img/VLStreamCloud/bf.png'
-import spgc from '@/assets/img/VLStreamCloud/spgc.png'
-import cjzl from '@/assets/img/VLStreamCloud/cjzl.png'
-import bqgl from '@/assets/img/VLStreamCloud/bqgl.png'
-import czrz from '@/assets/img/VLStreamCloud/czrz.png'
-import fwzx from '@/assets/img/VLStreamCloud/fwzx.png'
-import sbgl from '@/assets/img/VLStreamCloud/sbgl.png'
-import sfbp from '@/assets/img/VLStreamCloud/sfbp.png'
-import sfbz from '@/assets/img/VLStreamCloud/sfbz.png'
-import sfcs from '@/assets/img/VLStreamCloud/sfcs.png'
-import sfxl from '@/assets/img/VLStreamCloud/sfxl.png'
-import sjgl from '@/assets/img/VLStreamCloud/sjgl.png'
-import sphf from '@/assets/img/VLStreamCloud/sphf.png'
+import LineIcon from '@/pages/VLStreamCloud/page/components/LineIcon.vue'
 
 const router = useRouter()
 const store = useUserStore()
@@ -316,62 +304,62 @@ const functionList = ref([
   {
     key: 'square',
     label: '视频广场',
-    iconSvg: spgc
+    icon: 'square'
   },
   {
     key: 'govern',
     label: '场景治理',
-    iconSvg: cjzl
+    icon: 'govern'
   },
   {
     key: 'event',
     label: '事件管理',
-    iconSvg: sjgl
+    icon: 'bell'
   },
   {
     key: 'algo',
     label: '算法超市',
-    iconSvg: sfcs
+    icon: 'algo'
   },
   {
     key: 'annotation',
     label: '算法标注',
-    iconSvg: sfbz
+    icon: 'annotation'
   },
   {
     key: 'tag',
     label: '标签管理',
-    iconSvg: bqgl
+    icon: 'tag'
   },
   {
     key: 'playback',
     label: '视频回放',
-    iconSvg: sphf
+    icon: 'playback'
   },
   {
     key: 'device',
     label: '设备管理',
-    iconSvg: sbgl
+    icon: 'device'
   },
   {
     key: 'training',
     label: '算法训练',
-    iconSvg: sfxl
+    icon: 'training'
   },
   {
     key: 'orchestration',
     label: '算法编排',
-    iconSvg: sfbp
+    icon: 'orchestration'
   },
   {
     key: 'log',
     label: '操作日志',
-    iconSvg: czrz
+    icon: 'log'
   },
   {
     key: 'service',
     label: '服务中心',
-    iconSvg: fwzx
+    icon: 'service'
   }
 ])
 
@@ -540,9 +528,9 @@ const onRefresh = async() => {
 
 <style lang="scss" scoped>
 .workbench-body {
-  height: calc(100vh - 50px);
+  height: calc(100vh - 56px - env(safe-area-inset-bottom));
   overflow: scroll;
-  background: #fff;
+  background: var(--vl-bg);
   scrollbar-width: none;
   -ms-overflow-style: none;
 
@@ -553,22 +541,9 @@ const onRefresh = async() => {
 
 .workbench-container {
   min-height: 100%;
-  background: #F9FAFF;
-  padding: 0 20px;
-  padding-bottom: 20px;
+  background: var(--vl-bg);
+  padding: 0 20px 24px;
   position: relative;
-}
-
-.top-bg {
-  position: absolute;
-  top: -15px;
-  left: -20px;
-  right: -20px;
-  height: 168px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  z-index: 0;
 }
 
 .header-section,
@@ -580,68 +555,72 @@ const onRefresh = async() => {
 }
 
 .page-title {
-  font-weight: 700;
-  color: #ffffff;
-  font-size: 17px;
   margin: 0;
-  padding: 0 0 10px 0;
+  padding: 12px 0 16px;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--vl-ink);
 }
 
+// 概览面板：浅灰大圆角；问候语为主角，天气做成右上角小胶囊
 .weather-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 12px;
-  box-shadow: 0 4px 16px rgba(35, 60, 120, 0.06);
-  .weather-title{
-    display: flex;
-    gap: 12px;
-    margin-bottom: 8px;
-    img{
-      width: 27px;
-      height: 26.38px;
-    }
-
-    .temperature{
-      line-height: 21px;
-      font-weight: 700;
-      color: #323233;
-      font-size: 18px;
-      letter-spacing: 0.96px;
-    }
-
-    .date{
-      line-height: 14px;
-      font-weight: 700;
-      color: #999999;
-      font-size: 12px;
-      letter-spacing: 0.64px;
-    }
-  }
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius-lg);
+  padding: 20px 16px 16px;
 }
 
-.weather-icon {
-  width: 48px;
-  height: 48px;
-  margin-right: 16px;
+.hero-top {
   display: flex;
-  align-items: center;
-  justify-content: center;
-
-  svg {
-    width: 100%;
-    height: 100%;
-  }
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
-.weather-info {
-  flex: 1;
-  margin-bottom: 8px;
+.hero-text {
+  min-width: 0;
 
   .greeting {
-    line-height: 20px;
-    font-weight: 500;
-    color: #323233;
-    font-size: 15px;
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: var(--vl-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .date {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--vl-text-2);
+  }
+}
+
+.weather-chip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 10px 0 6px;
+  border-radius: 999px;
+  background: #ffffff;
+
+  img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
+
+  .temperature {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--vl-ink);
   }
 }
 
@@ -654,111 +633,102 @@ const onRefresh = async() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  align-items: center;
+  gap: 4px;
+  align-items: flex-start;
   justify-content: center;
-  height: 72px;
-  background: #fddedb;
-  border-radius: 4px;
-
-  &.pending {
-    .status-number {
-      color: rgba(254, 69, 90, 1);
-    }
-    background: rgba(253, 222, 219, 0.2);
-  }
-
-  &.approved {
-    .status-number {
-      color: rgba(30, 225, 0, 1);
-    }
-    background: rgba(30, 225, 0, 0.2);
-  }
-
-  &.all {
-    .status-number {
-      color: rgba(47, 105, 248, 1);
-    }
-    background: rgba(229, 243, 254, 0.2);
-  }
+  padding: 14px 14px 12px;
+  background: #ffffff;
+  border-radius: 16px;
 }
 
 .status-number {
-  font-size:28px;
+  font-size: 26px;
+  line-height: 32px;
   font-weight: 700;
+  color: var(--vl-ink);
 }
 
 .status-label {
-  font-size: 14px;
-  color: #000000;
-}
-
-.section-title {
-  line-height: 24px;
-  color: #969799;
   font-size: 12px;
-}
-
-.functions-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  background-color: #FFFFFF;
-  border-radius: 12px;
-  padding: 16px 0;
-}
-
-.function-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 12px;
-}
-
-.function-icon {
-  width: 40px;
-  height: 40px;
-  margin-bottom: 8px;
-  display: block;
-  object-fit: contain;
-}
-
-.function-label {
-  line-height: 16px;
-  color: #323233;
-  font-size: 12px;
-  letter-spacing: 0.82px;
+  color: var(--vl-text-2);
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-  margin-top: 16px;
+  margin: 28px 0 12px;
+}
+
+.section-title {
+  line-height: 22px;
+  color: var(--vl-ink);
+  font-size: 17px;
+  font-weight: 700;
 }
 
 .more-link {
-  line-height: 16px;
-  color: #1a53ff;
-  font-size: 12px;
+  line-height: 18px;
+  color: var(--vl-text-2);
+  font-size: 13px;
 }
 
-// 热门设备区域
+.functions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  row-gap: 18px;
+}
+
+.function-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &:active .function-icon {
+    background: var(--vl-surface-2);
+  }
+}
+
+.function-icon {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: var(--vl-surface);
+  color: var(--vl-ink);
+  transition: background-color 0.15s ease;
+}
+
+.function-label {
+  line-height: 16px;
+  color: var(--vl-ink);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+// 热门设备
 .devices-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  background-color: #FFFFFF;
-  border-radius: 12px;
+  border: 1px solid var(--vl-line);
+  border-radius: var(--vl-radius-lg);
   padding: 0 16px;
+  background: #ffffff;
+
+  &:empty {
+    display: none;
+  }
 }
 
 .device-item {
   display: flex;
   align-items: center;
-  padding: 20px 0;
-  border-bottom: 1px solid #ebedf0;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--vl-line);
 
   &:last-child {
     border-bottom: none;
@@ -766,48 +736,67 @@ const onRefresh = async() => {
 }
 
 .device-icon {
-  width: 15.99px;
-  height: 15px;
-  margin-right: 8px;
-  object-fit: contain;
+  width: 36px;
+  height: 36px;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--vl-surface);
+  color: var(--vl-ink);
+  flex-shrink: 0;
 }
 
 .device-name {
   flex: 1;
-  line-height: 19px;
-  color: #333333;
-  font-size: 14px;
-  letter-spacing: 0.75px;
+  line-height: 20px;
+  color: var(--vl-ink);
+  font-size: 15px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .play-btn {
   display: flex;
-  .play-icon {
-    width: 58px;
-    height: 30px;
-    border-radius: 4px;
-}
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--vl-ink);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+
+  &:active {
+    opacity: 0.8;
+  }
 }
 
-// 我的待审批区域
+// 我的待审批
 .approval-section {
-  border-radius: 12px;
   margin-bottom: 20px;
 }
 
 .approval-table {
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--vl-line);
+  border-radius: var(--vl-radius-lg);
+  overflow: hidden;
 }
 
 .approval-header {
   display: flex;
-  padding: 10px 12px;
-  border-bottom: 1px solid #ebedf0;
-  background: rgba(250, 250, 250, 1);
+  padding: 12px 16px;
+  background: var(--vl-surface);
   line-height: 18px;
-  color: #333333;
-  font-size: 14px;
+  color: var(--vl-text-2);
+  font-size: 13px;
 }
 
 .header-cell {
@@ -830,22 +819,21 @@ const onRefresh = async() => {
 .approval-item {
   display: flex;
   align-items: center;
-  padding: 22px 12px;
+  padding: 16px;
   background: #ffffff;
-  border-bottom: 1px solid #ebedf0;
-
-  &:last-child {
-    border-bottom: none;
-  }
+  border-top: 1px solid var(--vl-line);
 }
 
 .approval-cell {
   font-size: 14px;
-  color: #323233;
+  color: var(--vl-ink);
 
   &.device-name-cell {
     flex: 1;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &.applicant-cell {
@@ -863,8 +851,9 @@ const onRefresh = async() => {
 }
 
 .approve-btn {
-  color: rgba(26, 83, 255, 1);
+  color: var(--vl-ink);
   font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
 
   &:active {
@@ -873,7 +862,7 @@ const onRefresh = async() => {
 }
 
 .reject-btn {
-  color: rgba(246, 46, 46, 1);
+  color: var(--vl-danger);
   font-size: 14px;
   cursor: pointer;
 
@@ -881,5 +870,4 @@ const onRefresh = async() => {
     opacity: 0.7;
   }
 }
-
 </style>

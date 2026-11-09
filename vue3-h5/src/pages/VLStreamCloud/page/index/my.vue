@@ -1,8 +1,5 @@
 <template>
   <div class="my-page">
-    <!-- 顶部背景 -->
-    <div class="top-bg" :style="{ backgroundImage: `url(${bgImg})` }" />
-
     <div class="my-header">
       <div class="top-title">
         {{ $t('我的') }}
@@ -39,11 +36,11 @@
         >
           <div class="menu-left">
             <div class="menu-icon-wrapper">
-              <img :src="item.icon" alt="" class="menu-icon-img" />
+              <LineIcon :name="item.icon" :size="20" />
             </div>
             <span class="menu-title">{{ item.title }}</span>
           </div>
-          <img :src="arrowImg" alt="" class="menu-arrow-img" />
+          <LineIcon name="chevron" :size="18" class="menu-arrow" />
         </div>
       </div>
     </div>
@@ -90,11 +87,7 @@ import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store/modules/useraPaas'
 import { getAppLocale, setAppLocale } from '@/lang/index'
 import config from '@/config'
-import bgImg from '@/assets/img/VLStreamCloud/bg.png'
-import helpImg from '@/assets/img/VLStreamCloud/mine/bz.png'
-import aboutImg from '@/assets/img/VLStreamCloud/mine/gywm.png'
-import arrowImg from '@/assets/img/VLStreamCloud/mine/jt.png'
-import settingImg from '@/assets/img/VLStreamCloud/mine/sz.png'
+import LineIcon from '@/pages/VLStreamCloud/page/components/LineIcon.vue'
 
 const { t } = useI18n()
 
@@ -107,13 +100,14 @@ const displayDept = computed(() => store.userInfo?.deptName || '--')
 
 // 菜单配置
 const menuItems = computed(() => [
-  { key: 'help', title: t('帮助'), icon: helpImg },
-  { key: 'about', title: t('关于我们'), icon: aboutImg },
-  { key: 'settings', title: t('设置'), icon: settingImg }
+  { key: 'help', title: t('帮助'), icon: 'help' },
+  { key: 'about', title: t('关于我们'), icon: 'info' },
+  { key: 'settings', title: t('设置'), icon: 'settings' }
 ])
 
 // ========= 头像（默认由用户名生成，支持本地更换） =========
-const AVATAR_COLORS = ['#2f69f8', '#00ba52', '#ff8d1e', '#e33645', '#7b61ff', '#00b8d4']
+// 黑白主题：头像统一用深浅不同的中性色
+const AVATAR_COLORS = ['#1c1c1e', '#3a3a3c', '#48484a', '#2c2c2e']
 const avatarStorageKey = computed(() => `vlstream_avatar_${store.userInfo?.userName || 'default'}`)
 const customAvatar = ref(localStorage.getItem(avatarStorageKey.value) || '')
 const avatarLetter = computed(() => {
@@ -246,21 +240,9 @@ const onLanguageSelect = (action) => {
 <style lang="scss" scoped>
 .my-page {
   min-height: 100vh;
-  background: #F9FAFF;
+  background: var(--vl-bg);
   position: relative;
-  padding: 0 16px 24px;
-}
-
-.top-bg {
-  position: absolute;
-  top: -15px;
-  left: -20px;
-  right: -20px;
-  height: 200px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  z-index: 0;
+  padding: 0 20px 24px;
 }
 
 .my-header {
@@ -270,9 +252,11 @@ const onLanguageSelect = (action) => {
 }
 
 .top-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--vl-ink);
 }
 
 .my-content {
@@ -284,9 +268,9 @@ const onLanguageSelect = (action) => {
 .profile-card {
   display: flex;
   align-items: center;
-  padding: 16px;
-  background:#f7f7f7;
-  border-radius: 8px;
+  padding: 20px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius-lg);
 }
 
 .avatar {
@@ -294,8 +278,8 @@ const onLanguageSelect = (action) => {
 }
 
 .avatar-img {
-  width: 50px;
-  height: 50px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -325,25 +309,43 @@ const onLanguageSelect = (action) => {
 }
 
 .name {
-  color: #333333;
-  font-size: 16px;
+  color: var(--vl-ink);
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .phone {
-  color: #333333;
-  font-size: 16px;
+  color: var(--vl-text-2);
+  font-size: 14px;
+  font-family: var(--vl-font-mono);
 }
 
 .dept {
-  color: #666666;
-  font-size: 12px;
+  color: var(--vl-text-2);
+  font-size: 13px;
+}
+
+.menu-list {
+  margin-top: 16px;
+  border: 1px solid var(--vl-line);
+  border-radius: var(--vl-radius-lg);
+  overflow: hidden;
 }
 
 .menu-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px;
+  padding: 14px 16px;
+  background: #ffffff;
+
+  & + .menu-item {
+    border-top: 1px solid var(--vl-line);
+  }
+
+  &:active {
+    background: var(--vl-surface);
+  }
 }
 
 .menu-left {
@@ -353,28 +355,23 @@ const onLanguageSelect = (action) => {
 }
 
 .menu-icon-wrapper {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-}
-
-.menu-icon-img {
-  width: 34px;
-  height: 34px;
-  object-fit: contain;
+  border-radius: 50%;
+  background: var(--vl-surface);
+  color: var(--vl-ink);
 }
 
 .menu-title {
-  color: #333333;
-  font-size: 14px;
+  color: var(--vl-ink);
+  font-size: 15px;
+  font-weight: 500;
 }
 
-.menu-arrow-img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
+.menu-arrow {
+  color: var(--vl-text-3);
 }
 </style>

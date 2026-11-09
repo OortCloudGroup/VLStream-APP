@@ -1,8 +1,5 @@
 <template>
   <div class="event-page">
-    <!-- 顶部背景 -->
-    <div class="top-bg" :style="{ backgroundImage: `url(${bgImg})` }" />
-
     <div class="event-header">
       <div class="top-title">
         {{ $t('事件') }}
@@ -11,7 +8,7 @@
         class="header-search"
         name="search"
         size="22"
-        color="#333333"
+        color="#1c1c1e"
         @click="toggleSearch"
       />
     </div>
@@ -24,7 +21,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import bgImg from '@/assets/img/VLStreamCloud/bg.png'
 import bus from '@/utils/bus'
 import eventPat from '@/pages/VLStreamCloud/page/components/event/eventPat.vue'
 
@@ -40,21 +36,9 @@ const toggleSearch = () => {
 <style lang="scss" scoped>
 .event-page {
   min-height: 100vh;
-  background: #F9FAFF;
+  background: #ffffff;
   position: relative;
   padding: 0 16px 24px;
-}
-
-.top-bg {
-  position: absolute;
-  top: -15px;
-  left: -20px;
-  right: -20px;
-  height: 200px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  z-index: 0;
 }
 
 .event-header {
@@ -67,9 +51,11 @@ const toggleSearch = () => {
 }
 
 .top-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--vl-ink);
 }
 
 .page-content {

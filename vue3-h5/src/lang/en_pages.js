@@ -218,6 +218,7 @@ export default {
   '查看视频': 'View Video',
   '查看回放': 'View Playback',
   '播放失败': 'Playback failed',
+  '播放': 'Play',
   '重新播放': 'Retry',
   '全屏': 'Fullscreen',
   '正在加载视频…': 'Loading video…',
