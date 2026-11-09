@@ -259,37 +259,21 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-$brand: #2f69f8;
-$brand_dark: #1a53ff;
-$brand_light: #5b8cff;
-$text_main: #1a1a1a;
-$text_sub: #8a8f99;
+$brand: var(--vl-ink);
+$text_main: var(--vl-ink);
+$text_sub: var(--vl-text-2);
 
 .login_page {
   min-height: 100vh;
   max-height: 100%;
   width: 100%;
-  background: linear-gradient(160deg, #eef3ff 0%, #f7f9ff 38%, #ffffff 100%);
+  background: var(--vl-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
-}
-
-/* 顶部装饰光斑 */
-.login_page::before {
-  content: '';
-  position: absolute;
-  top: -120px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 420px;
-  height: 420px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(47, 105, 248, 0.22) 0%, rgba(47, 105, 248, 0) 70%);
-  pointer-events: none;
 }
 
 /* 品牌区 */
@@ -305,8 +289,33 @@ $text_sub: #8a8f99;
   z-index: 1;
 }
 
+/* 首屏入场：品牌区与表单依次上浮淡入 */
+@keyframes vl-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.brand_area {
+  animation: vl-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.form_card {
+  animation: vl-rise 0.6s 0.08s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.footer_tip {
+  animation: vl-rise 0.6s 0.16s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
 .brand_logo {
-  width: 140px;
+  width: 168px;
   height: auto;
   margin-bottom: 12px;
   object-fit: contain;
@@ -320,19 +329,22 @@ $text_sub: #8a8f99;
 
 /* 表单卡片 */
 .form_card {
-  width: calc(100% - 48px);
-  max-width: 420px;
+  align-self: stretch;
+  margin: 0 20px;
+  box-sizing: border-box;
   background: #fff;
-  border-radius: 20px;
+  border: 1px solid var(--vl-line);
+  border-radius: var(--vl-radius-lg);
   padding: 28px 20px 24px;
-  box-shadow: 0 10px 40px rgba(35, 60, 120, 0.08);
+  box-shadow: var(--vl-shadow);
   position: relative;
   z-index: 1;
 }
 
 .form_card_title {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
   color: $text_main;
   margin-bottom: 22px;
 }
@@ -344,13 +356,13 @@ $text_sub: #8a8f99;
 }
 
 :deep(.login_field) {
-  background: #f4f6fa;
-  border-radius: 12px;
-  padding: 10px 14px;
+  background: var(--vl-surface);
+  border-radius: 16px;
+  padding: 12px 16px;
   align-items: center;
 
   .van-field__left-icon {
-    color: $brand;
+    color: $text_main;
     font-size: 20px;
     margin-right: 10px;
   }
@@ -367,7 +379,7 @@ $text_sub: #8a8f99;
   }
 
   input::placeholder {
-    color: #b3b8c2;
+    color: var(--vl-text-3);
   }
 }
 
@@ -385,9 +397,9 @@ $text_sub: #8a8f99;
 .captcha_img {
   width: 110px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: 16px;
   object-fit: cover;
-  background: #f4f6fa;
+  background: var(--vl-surface);
 }
 
 .aux_row {
@@ -407,7 +419,7 @@ $text_sub: #8a8f99;
   width: 18px;
   height: 18px;
   border-radius: 5px;
-  border: 1.5px solid #cfd4de;
+  border: 1.5px solid #c7c7cc;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -428,15 +440,15 @@ $text_sub: #8a8f99;
 }
 
 .login_btn {
-  height: 48px;
-  border-radius: 12px;
+  height: 50px;
+  border-radius: 999px;
   border: none;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 4px;
   color: #fff;
-  background: linear-gradient(135deg, $brand_light 0%, $brand 100%);
-  box-shadow: 0 8px 20px rgba(47, 105, 248, 0.3);
+  background: $brand;
+  box-shadow: none;
 }
 
 .login_btn:active {
@@ -447,7 +459,7 @@ $text_sub: #8a8f99;
   margin-top: 28px;
   margin-bottom: auto;
   font-size: 12px;
-  color: #b3b8c2;
+  color: var(--vl-text-3);
   position: relative;
   z-index: 1;
 }
@@ -455,13 +467,13 @@ $text_sub: #8a8f99;
 /* 租户选择弹窗 */
 :deep(.tenant_popup) {
   width: 86%;
-  border-radius: 16px;
+  border-radius: var(--vl-radius-lg);
   overflow: hidden;
 }
 
 .tenant_container {
   background: #fff;
-  border-radius: 16px;
+  border-radius: var(--vl-radius-lg);
   padding: 24px 18px 18px;
 }
 
@@ -492,17 +504,17 @@ $text_sub: #8a8f99;
   align-items: center;
   padding: 12px;
   margin-bottom: 10px;
-  background: #f4f6fa;
-  border-radius: 12px;
+  background: var(--vl-surface);
+  border-radius: 16px;
   border: 1.5px solid transparent;
   transition: all 0.2s ease;
 
   &:active {
-    background: #eaeefb;
+    background: var(--vl-surface-2);
   }
 
   &.active {
-    background: #eef3ff;
+    background: #ffffff;
     border-color: $brand;
   }
 }
@@ -510,8 +522,8 @@ $text_sub: #8a8f99;
 .tenant_avatar {
   width: 42px;
   height: 42px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, $brand_light 0%, $brand 100%);
+  border-radius: 50%;
+  background: $brand;
   color: #fff;
   font-size: 18px;
   font-weight: 600;
