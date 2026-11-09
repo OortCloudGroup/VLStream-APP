@@ -248,7 +248,7 @@ const onLanguageSelect = (action) => {
 .my-header {
   position: relative;
   z-index: 1;
-  padding-top: 28px;
+  padding-top: calc(28px + var(--vl-safe-top, 0px));
 }
 
 .top-title {
