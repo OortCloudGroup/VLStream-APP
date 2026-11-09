@@ -276,7 +276,7 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 .ptz-panel {
-  background: #f6f8ff;
+  background: #f5f5f7;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -290,8 +290,8 @@ onBeforeUnmount(() => {
   gap: 6px;
   padding: 10px 12px;
   border-radius: 8px;
-  background: rgba(255, 141, 34, 0.1);
-  color: #c26a10;
+  background: rgba(245, 166, 35, 0.1);
+  color: #b26a00;
   font-size: 13px;
   line-height: 18px;
   box-sizing: border-box;
@@ -309,7 +309,7 @@ onBeforeUnmount(() => {
   width: 220px;
   height: 220px;
   border-radius: 50%;
-  background: rgba(227, 234, 255, 1);
+  background: rgba(244, 244, 246, 1);
   position: relative;
   display: grid;
   place-items: center;
@@ -326,7 +326,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #1c6cff;
+  color: #1c1c1e;
   font-size: 22px;
   touch-action: none;
 
@@ -396,7 +396,7 @@ onBeforeUnmount(() => {
   width: 28px;
   text-align: right;
   font-size: 14px;
-  color: #1a53ff;
+  color: #1c1c1e;
 }
 
 .preset-section {
@@ -452,11 +452,11 @@ onBeforeUnmount(() => {
 .preset-actions {
   display: flex;
   gap: 16px;
-  color: #2f69f8;
+  color: #1c1c1e;
   font-size: 14px;
 
   .danger {
-    color: #e33645;
+    color: #e5484d;
   }
 }
 

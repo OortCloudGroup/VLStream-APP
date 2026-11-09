@@ -164,7 +164,7 @@ const onBack = () => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f9faff;
+  background: #ffffff;
 }
 
 .view-body {
@@ -180,8 +180,8 @@ const onBack = () => {
 }
 
 .info-card {
-  background: #ffffff;
-  border-radius: 12px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
   padding: 12px;
   margin: 16px;
 }
@@ -205,10 +205,10 @@ const onBack = () => {
   justify-content: flex-start;
   align-items: center;
   box-sizing: border-box;
-  background: rgba(255, 141, 34, 0.12);
+  background: rgba(245, 166, 35, 0.12);
   border-radius: 4px;
   line-height: 18px;
-  color: #ff8d22;
+  color: #f5a623;
   font-size: 12px;
   padding: 0 6px;
 }
@@ -245,7 +245,7 @@ const onBack = () => {
 
 .footer-bar {
   padding: 12px 16px 22px;
-  background: #f9faff;
+  background: #ffffff;
 }
 
 .apply-btn {

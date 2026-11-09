@@ -168,9 +168,9 @@ const infoList = computed(() => [
   border-radius: 4px;
   font-size: 12px;
   line-height: 18px;
-  color: #00ba52;
-  background: rgba(0, 186, 82, 0.08);
-  border: 1px solid rgba(0, 186, 82, 0.15);
+  color: #30a46c;
+  background: rgba(48, 164, 108, 0.08);
+  border: 1px solid rgba(48, 164, 108, 0.15);
 
   &.offline {
     color: #999999;
@@ -182,8 +182,8 @@ const infoList = computed(() => [
 .info-card {
   margin-top: 12px;
   padding: 12px 16px;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
 }
 
 .info-row {
@@ -219,7 +219,7 @@ const infoList = computed(() => [
   word-break: break-all;
 
   &.is-warning {
-    color: #ff8d22;
+    color: #f5a623;
   }
 }
 
@@ -231,8 +231,8 @@ const infoList = computed(() => [
 }
 
 .table-card {
-  background: #fff;
-  border-radius: 8px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
   padding: 4px 16px;
 }
 
@@ -302,13 +302,13 @@ const infoList = computed(() => [
   background: #f0f2f5;
 
   &.primary {
-    color: #2f69f8;
-    background: rgba(47, 105, 248, 0.1);
+    color: #1c1c1e;
+    background: rgba(28, 28, 30, 0.1);
   }
 
   &.warning {
-    color: #ff8d22;
-    background: rgba(255, 141, 34, 0.1);
+    color: #f5a623;
+    background: rgba(245, 166, 35, 0.1);
   }
 }
 
@@ -322,7 +322,7 @@ const infoList = computed(() => [
 
 .upgrade-version {
   font-size: 12px;
-  color: #ff8d22;
+  color: #f5a623;
   white-space: nowrap;
 }
 

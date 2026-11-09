@@ -243,7 +243,7 @@ defineExpose({
 }
 
 .checkbox-group {
-  --van-checkbox-color: #2f69f8;
+  --van-checkbox-color: #1c1c1e;
   --van-checkbox-icon-size: 18px;
   --van-checkbox-label-font-size: 16px;
 

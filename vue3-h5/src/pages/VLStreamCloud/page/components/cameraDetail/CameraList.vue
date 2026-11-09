@@ -153,8 +153,8 @@ const openDetail = (item) => {
 
 .device-card {
   position: relative;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
   padding: 12px;
 }
 
@@ -211,7 +211,7 @@ const openDetail = (item) => {
 }
 
 .chip {
-  background: rgba(47, 105, 248, 1);
+  background: rgba(28, 28, 30, 1);
   border-radius: 2px;
   line-height: 16px;
   color: #ffffff;

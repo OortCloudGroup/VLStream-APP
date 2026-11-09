@@ -159,7 +159,7 @@ const onSubmit = async() => {
 .form-label {
   display: block;
   font-size: 14px;
-  color: #111827;
+  color: #1c1c1e;
   margin-bottom: 8px;
   font-weight: 400;
 }
@@ -199,12 +199,12 @@ const onSubmit = async() => {
 }
 
 .btn.cancel {
-  color: #111827;
+  color: #1c1c1e;
   font-weight: 400;
 }
 
 .btn.confirm {
-  color: #2f69f8;
+  color: #1c1c1e;
   font-weight: 500;
 }
 

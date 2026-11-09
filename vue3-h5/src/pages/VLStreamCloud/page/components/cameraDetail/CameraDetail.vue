@@ -207,7 +207,7 @@ onBeforeUnmount(stopPlayer)
 <style scoped lang="scss">
 .camera-detail {
   height: 100vh;
-  background: #f6f8ff;
+  background: var(--vl-bg);
   display: flex;
   flex-direction: column;
 }
@@ -274,7 +274,7 @@ onBeforeUnmount(stopPlayer)
   padding-bottom: 6px;
 
   &.active {
-    color: #2f69f8;
+    color: #1c1c1e;
     font-weight: 500;
   }
 }
@@ -287,7 +287,7 @@ onBeforeUnmount(stopPlayer)
   width: 32px;
   height: 3px;
   border-radius: 999px;
-  background: #1c6cff;
+  background: #1c1c1e;
 }
 
 .tab-body {

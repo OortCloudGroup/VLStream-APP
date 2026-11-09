@@ -81,7 +81,7 @@ const onBack = () => {
 <style scoped lang="scss">
 .device-detail {
   height: 100vh;
-  background: #f6f8ff;
+  background: var(--vl-bg);
   display: flex;
   flex-direction: column;
 }
@@ -111,7 +111,7 @@ const onBack = () => {
 .hero {
   width: 100%;
   height: 210px;
-  background: linear-gradient(180deg, #dce9ff 0%, #f0f4ff 100%);
+  background: linear-gradient(180deg, #ebebef 0%, #f4f4f6 100%);
 }
 
 .tab-header {
@@ -132,7 +132,7 @@ const onBack = () => {
 
   &.active {
     font-weight: 500;
-    color: #2f69f8;
+    color: #1c1c1e;
   }
 }
 
@@ -144,12 +144,12 @@ const onBack = () => {
   width: 24px;
   height: 3px;
   border-radius: 999px;
-  background: #2f69f8;
+  background: #1c1c1e;
 }
 
 .tab-body {
   flex: 1;
-  background: #f6f8ff;
+  background: var(--vl-bg);
   padding: 16px;
 }
 </style>

@@ -584,7 +584,7 @@ const onBack = () => {
   -webkit-overflow-scrolling: touch;
   padding-left: 16px;
   padding-right: 16px;
-  background: #F9FAFF;
+  background: #ffffff;
 }
 
 :deep(.form) {
@@ -681,7 +681,7 @@ const onBack = () => {
 }
 
 .switch-value span.active {
-  color: #2f69f8;
+  color: #1c1c1e;
 }
 
 .coord-section {
@@ -711,7 +711,7 @@ const onBack = () => {
   min-width: 0;
   height: 28px;
   padding: 0 8px;
-  border: 1px solid #e3e7f0;
+  border: 1px solid #e5e5ea;
   border-radius: 6px;
   font-size: 14px;
   color: #333;
@@ -723,7 +723,7 @@ const onBack = () => {
   min-width: 0;
   height: 32px;
   padding: 0 8px;
-  border: 1px solid #e3e7f0;
+  border: 1px solid #e5e5ea;
   border-radius: 6px;
   font-size: 14px;
   color: #333;
@@ -752,7 +752,7 @@ const onBack = () => {
 
 .tag-picker-cancel,
 .tag-picker-confirm {
-  color: #1989fa;
+  color: #1c1c1e;
 }
 
 .tag-popup-content {
@@ -768,14 +768,14 @@ const onBack = () => {
 .tag-chip {
   padding: 4px 16px;
   border-radius: 4px;
-  background: #f9faff;
+  background: #ffffff;
   color: #333333;
   font-size: 14px;
 }
 
 .tag-chip.active {
-  color: #2f69f8;
-  background: rgba(47, 105, 248, 0.12);
+  color: #1c1c1e;
+  background: rgba(28, 28, 30, 0.12);
 }
 
 .uploadBox {

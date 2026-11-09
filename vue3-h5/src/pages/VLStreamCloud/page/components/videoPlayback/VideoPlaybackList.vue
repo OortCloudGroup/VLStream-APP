@@ -198,8 +198,8 @@ const openDetail = (item: any) => {
 
 .playback-card {
   position: relative;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
   padding: 12px;
   margin-bottom: 12px;
 }
@@ -260,17 +260,34 @@ const openDetail = (item: any) => {
 }
 
 .chip {
-  background: rgba(47, 105, 248, 1);
-  border-radius: 2px;
-  line-height: 16px;
-  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--vl-ink);
   font-size: 12px;
-  padding: 4px 12px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* 第一个胶囊是在线状态：圆点指示 */
+.chip:first-child::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--vl-success);
 }
 
 .chip.offline {
-  background: rgba(216, 216, 216, 1);
-  color: #ffffff;
+  color: var(--vl-text-2);
+
+  &::before {
+    background: #c7c7cc;
+  }
 }
 
 .play-btn {

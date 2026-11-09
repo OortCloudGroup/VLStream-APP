@@ -186,10 +186,9 @@ const onAdd = () => {
 }
 
 .table-card {
-  background: #fff;
-  border-radius: 14px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
   overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
   margin-top: 16px;
 }
 
@@ -197,7 +196,7 @@ const onAdd = () => {
   display: grid;
   grid-template-columns: 1.2fr 1fr 0.8fr;
   padding: 10px 12px;
-  background:#fafafa;
+  background: var(--vl-surface-2);
   line-height:18px;
   color:#333333;
   font-size:14px;
@@ -217,16 +216,16 @@ const onAdd = () => {
 }
 
 .status-tag {
-  border-radius:4px;
-  padding: 0 6px;
+  border-radius: 999px;
+  padding: 0 8px;
   font-size: 12px;
   line-height:18px;
 }
 
 .status-tag.online {
-  color: rgba(0, 186, 82, 1);
-  border-color: rgba(0, 186, 82, 0.15);
-  background: rgba(0, 186, 82, 0.08);
+  color: rgba(48, 164, 108, 1);
+  border-color: rgba(48, 164, 108, 0.15);
+  background: rgba(48, 164, 108, 0.08);
 }
 
 .status-tag.offline {
@@ -242,11 +241,11 @@ const onAdd = () => {
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  background: #2f69f8;
+  background: #1c1c1e;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 24px rgba(47, 105, 248, 0.35);
+  box-shadow: 0 10px 24px rgba(28, 28, 30, 0.35);
   z-index: 20;
 }
 

@@ -146,7 +146,7 @@ const onBack = () => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #F9FAFF;
+  background: #ffffff;
 }
 
 .header-save {
@@ -181,7 +181,7 @@ const onBack = () => {
 
   &.active {
     font-weight:500;
-    color:#2f69f8;
+    color:#1c1c1e;
   }
 }
 
@@ -193,11 +193,11 @@ const onBack = () => {
   width: 24px;
   height: 3px;
   border-radius: 999px;
-  background:#2f69f8;
+  background:#1c1c1e;
 }
 
 .tab-body {
-  background: #F9FAFF;
+  background: #ffffff;
   padding: 0 12px 20px;
 }
 
@@ -207,13 +207,13 @@ const onBack = () => {
 
 .placeholder-card {
   border-radius: 12px;
-  background: #f5f7fb;
+  background: #f5f5f7;
   padding: 16px 14px;
 }
 
 .placeholder-title {
   font-size: 15px;
-  color: #111827;
+  color: #1c1c1e;
   font-weight: 600;
   margin-bottom: 6px;
 }

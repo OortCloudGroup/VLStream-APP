@@ -25,7 +25,7 @@ const onBack = () => {
 <style scoped lang="scss">
 .device-detail {
   height: 100vh;
-  background: #f6f8ff;
+  background: var(--vl-bg);
   display: flex;
   flex-direction: column;
 }
@@ -43,7 +43,7 @@ const onBack = () => {
 
 .tab-body {
   flex: 1;
-  background: #f6f8ff;
+  background: var(--vl-bg);
   padding: 12px 12px 24px;
 }
 </style>

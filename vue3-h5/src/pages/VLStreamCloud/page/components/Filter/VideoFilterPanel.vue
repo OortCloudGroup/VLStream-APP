@@ -424,7 +424,7 @@ const onConfirm = () => {
   align-items: center;
   margin: 0 16px 12px;
   padding: 8px 12px;
-  background: #f9faff;
+  background: #ffffff;
   border-radius: 20px;
 }
 
@@ -441,7 +441,7 @@ const onConfirm = () => {
 
   :deep(.van-field__control) {
     font-size: 14px;
-    color: rgba(31, 41, 55, 1);
+    color: rgba(28, 28, 30, 1);
   }
 }
 
@@ -462,7 +462,7 @@ const onConfirm = () => {
 }
 
 .filter-tab.active {
-  color: #2563eb;
+  color: #1c1c1e;
 }
 
 .tab-icon {
@@ -496,12 +496,12 @@ const onConfirm = () => {
   justify-content: center;
   padding: 10px 16px;
   font-size: 14px;
-  color: rgba(31, 41, 55, 1);
+  color: rgba(28, 28, 30, 1);
 }
 
 .tree-item.active {
-  color:#3f70ff;
-  background: rgba(37, 99, 235, 0.04);
+  color:#1c1c1e;
+  background: rgba(28, 28, 30, 0.04);
 }
 
 .placeholder {
@@ -521,14 +521,14 @@ const onConfirm = () => {
 .tag-chip {
   padding: 4px 24px;
   border-radius: 4px;
-  background:#f9faff;
+  background:#ffffff;
   color:#333333;
   font-size:14px;
 }
 
 .tag-chip.active {
-  color:#2f69f8;
-  background:rgba(47, 105, 248, 0.12);
+  color:#1c1c1e;
+  background:rgba(28, 28, 30, 0.12);
 }
 
 .filter-footer {
