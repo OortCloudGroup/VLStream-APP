@@ -139,10 +139,7 @@
               </div>
             </div>
           </div>
-          <div class="play-btn">
-            <img v-if="item.status == '1'" src="@/assets/img/VLStreamCloud/spgc/playing.png" alt="" />
-            <img v-else src="@/assets/img/VLStreamCloud/spgc/no_playing.png" alt="" />
-          </div>
+          <PlayButton class="play-btn" :online="item.status == '1'" />
         </div>
       </div>
     </div>
@@ -159,6 +156,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import PlayButton from '../PlayButton.vue'
 import { useI18n } from 'vue-i18n'
 import { getWvpVlsDeviceList, getWvpVlsDeviceDetail, getWvpVlsDeviceStreams, createWvpVlsDevicePreview } from '@/api/VLStreamCloud/wvp'
 import { CameraRtcPlayer, parseCameraRtcTarget } from '@/utils/cameraRtc'
@@ -1025,16 +1023,5 @@ const openDetail = (item: any) => {
   position: absolute;
   top: 16px;
   right: 12px;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.play-btn img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
 }
 </style>

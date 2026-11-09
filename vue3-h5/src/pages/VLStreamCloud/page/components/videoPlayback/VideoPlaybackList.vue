@@ -57,10 +57,7 @@
                 </div>
               </div>
             </div>
-            <div class="play-btn">
-              <img v-if="item.status == '1'" src="@/assets/img/VLStreamCloud/spgc/playing.png" alt="" />
-              <img v-else src="@/assets/img/VLStreamCloud/spgc/no_playing.png" alt="" />
-            </div>
+            <PlayButton class="play-btn" :online="item.status == '1'" />
           </div>
         </div>
       </van-list>
@@ -86,6 +83,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import PlayButton from '../PlayButton.vue'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import VideoPlaybackDetail from './VideoPlaybackDetail.vue'
 import { getWvpVlsDeviceList } from '@/api/VLStreamCloud/wvp'
@@ -294,17 +292,6 @@ const openDetail = (item: any) => {
   position: absolute;
   top: 16px;
   right: 12px;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.play-btn img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
 }
 
 // 暂无数据（同 eventPat.vue）

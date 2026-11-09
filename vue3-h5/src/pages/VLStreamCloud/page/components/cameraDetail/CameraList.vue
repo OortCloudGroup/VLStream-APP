@@ -54,10 +54,7 @@
           </div>
         </div>
       </div>
-      <div class="play-btn">
-        <img v-if="item.online === true" src="@/assets/img/VLStreamCloud/spgc/playing.png" alt="" />
-        <img v-else src="@/assets/img/VLStreamCloud/spgc/no_playing.png" alt="" />
-      </div>
+      <PlayButton class="play-btn" :online="item.online === true" />
     </div>
 
     <oort-popup v-model="showDetail" position="right" style="width: 100%;height: 100%;" teleport="body">
@@ -72,6 +69,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import PlayButton from '../PlayButton.vue'
 import { useI18n } from 'vue-i18n'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import CameraDetail from './CameraDetail.vue'
@@ -228,16 +226,5 @@ const openDetail = (item) => {
   position: absolute;
   top: 16px;
   right: 12px;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
 }
 </style>

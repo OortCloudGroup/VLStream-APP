@@ -104,10 +104,7 @@
               <div class="device-name">
                 {{ device.name }}
               </div>
-              <div class="play-btn" @click="handlePlay(device)">
-                <LineIcon name="play" :size="12" :stroke="2.4" />
-                <span>{{ $t('播放') }}</span>
-              </div>
+              <PlayButton shape="pill" :online="device.status == '1'" @click="handlePlay(device)" />
             </div>
           </div>
         </div>
@@ -171,6 +168,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import PlayButton from '../components/PlayButton.vue'
 import { getSafeAreaTop } from '@/utils/safeArea'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -757,24 +755,6 @@ const onRefresh = async() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.play-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  height: 32px;
-  padding: 0 14px;
-  border-radius: 999px;
-  background: var(--vl-primary);
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 600;
-  flex-shrink: 0;
-
-  &:active {
-    opacity: 0.8;
-  }
 }
 
 // 我的待审批
