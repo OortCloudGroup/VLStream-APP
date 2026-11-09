@@ -122,10 +122,10 @@ export class NativeBridgePlugin extends CapacitorPlugin {
 
   /**
    * 动态设置状态栏背景/前景色，使状态栏与紧邻其下的 H5 内容颜色一致。
-   * 参数：color（背景，默认 #F9FAFF）、contentColor（图标/文字，默认 #000000）。
+   * 参数：color（背景，默认 #FFFFFF）、contentColor（图标/文字，默认 #000000）。
    */
   setStatusBar(call: PluginCall): void {
-    const color: string = call.getString('color', '#F9FAFF');
+    const color: string = call.getString('color', '#FFFFFF');
     const contentColor: string = call.getString('contentColor', '#000000');
     const win: window.Window | null = MainWindowHolder.get();
     if (!win) {

@@ -170,7 +170,7 @@ public class NativeBridgePlugin extends Plugin {
 
     /**
      * 动态设置状态栏背景/前景色，使状态栏与紧邻其下的 H5 内容颜色一致。
-     * 参数：color（背景，默认 #F9FAFF）、contentColor（图标/文字，默认 #000000）。
+     * 参数：color（背景，默认 #FFFFFF）、contentColor（图标/文字，默认 #000000）。
      * <p>
      * targetSdk 35+ 强制 edge-to-edge，{@code setStatusBarColor} 被系统忽略
      * （背景实际由延伸到状态栏下方的 H5 内容透出），仅图标明暗
@@ -178,7 +178,7 @@ public class NativeBridgePlugin extends Plugin {
      */
     @PluginMethod
     public void setStatusBar(PluginCall call) {
-        String color = call.getString("color", "#F9FAFF");
+        String color = call.getString("color", "#FFFFFF");
         String contentColor = call.getString("contentColor", "#000000");
         Activity activity = getActivity();
         if (activity == null) {
@@ -192,9 +192,9 @@ public class NativeBridgePlugin extends Plugin {
         window.setStatusBarColor(background);
         WindowInsetsControllerCompat controller =
                 new WindowInsetsControllerCompat(window, window.getDecorView());
-        // Light content color (e.g. white icons on a dark bar) → dark system icons are wrong;
-        // appearance flag is the inverse of the content color luminance.
-        controller.setAppearanceLightStatusBars(isLightColor(contentColor));
+        // setAppearanceLightStatusBars(true) means a light bar with DARK icons, so the flag is
+        // the inverse of the content color: #000000 icons -> true, #FFFFFF icons -> false.
+        controller.setAppearanceLightStatusBars(!isLightColor(contentColor));
         call.resolve();
     }
 
