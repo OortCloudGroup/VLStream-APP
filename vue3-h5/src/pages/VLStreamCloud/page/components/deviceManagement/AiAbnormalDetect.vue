@@ -51,7 +51,7 @@
         <path
           d="M0,75 C100,20 150,130 200,75 S300,130 350,75 S400,130 450,75 C500,20 550,75 600,75 L800,75"
           fill="none"
-          stroke="#1c1c1e"
+          stroke="#ff6a00"
           stroke-width="2"
         />
       </svg>
@@ -165,7 +165,7 @@ defineExpose({
 
 // 复选框组样式
 .checkbox-group {
-  --van-checkbox-color: #1c1c1e;
+  --van-checkbox-color: var(--vl-accent);
   --van-checkbox-icon-size: 18px;
   --van-checkbox-label-font-size: 16px;
   margin-bottom: 25px;

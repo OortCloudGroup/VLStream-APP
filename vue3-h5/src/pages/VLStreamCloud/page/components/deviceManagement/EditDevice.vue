@@ -681,7 +681,7 @@ const onBack = () => {
 }
 
 .switch-value span.active {
-  color: #1c1c1e;
+  color: var(--vl-accent);
 }
 
 .coord-section {
@@ -750,9 +750,13 @@ const onBack = () => {
   color: #323233;
 }
 
-.tag-picker-cancel,
+.tag-picker-cancel {
+  color: var(--vl-text-2);
+}
+
 .tag-picker-confirm {
-  color: #1c1c1e;
+  color: var(--vl-accent);
+  font-weight: 600;
 }
 
 .tag-popup-content {
@@ -774,8 +778,8 @@ const onBack = () => {
 }
 
 .tag-chip.active {
-  color: #1c1c1e;
-  background: rgba(28, 28, 30, 0.12);
+  color: var(--vl-accent);
+  background: var(--vl-accent-soft);
 }
 
 .uploadBox {

@@ -163,7 +163,7 @@ const onBack = () => {
 }
 
 .content-tabs {
-  --van-tabs-bottom-bar-color: #1c1c1e;
+  --van-tabs-bottom-bar-color: var(--vl-accent);
   padding: 0 16px;
 
   :deep(.van-tabs__nav) {
@@ -182,7 +182,7 @@ const onBack = () => {
 
   :deep(.van-tab--active) {
     line-height: 24px;
-    color: #1c1c1e;
+    color: var(--vl-accent);
     font-size: 16px;
   }
 }

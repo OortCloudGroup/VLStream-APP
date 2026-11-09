@@ -399,11 +399,11 @@ onMounted(() => {
 
   .tag {
     margin-top: 8px;
-    background: rgba(28, 28, 30, 0.12);
+    background: var(--vl-accent-soft);
     border-radius: 4px;
     font-size: 12px;
     line-height: 14px;
-    color: #1c1c1e;
+    color: var(--vl-accent);
     letter-spacing: 0;
     font-weight: 400;
     padding: 6px 4px;

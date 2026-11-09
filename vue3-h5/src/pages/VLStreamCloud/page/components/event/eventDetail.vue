@@ -367,7 +367,7 @@ onMounted(() => {
     height: 20px;
     width: 5px;
 
-    border-left: 3px solid #1c1c1e;
+    border-left: 3px solid var(--vl-accent);
 
 }
 

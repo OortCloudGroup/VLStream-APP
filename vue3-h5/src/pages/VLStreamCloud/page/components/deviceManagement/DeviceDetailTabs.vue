@@ -196,7 +196,7 @@ watch(
   cursor: pointer;
 
   &.active {
-    color:#1c1c1e;
+    color:var(--vl-accent);
     font-weight:500;
   }
 }

@@ -348,11 +348,11 @@ const onMenuSelect = (action) => {
 }
 
 .status-tabs :deep(.van-tab--active .van-tab__text) {
-  color: #1c1c1e;
+  color: var(--vl-accent);
 }
 
 .status-tabs :deep(.van-tabs__line) {
-  background: #1c1c1e;
+  background: var(--vl-accent);
 }
 
 .mode-tabs {

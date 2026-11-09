@@ -274,7 +274,7 @@ onBeforeUnmount(stopPlayer)
   padding-bottom: 6px;
 
   &.active {
-    color: #1c1c1e;
+    color: var(--vl-accent);
     font-weight: 500;
   }
 }

@@ -452,7 +452,7 @@ onBeforeUnmount(() => {
 .preset-actions {
   display: flex;
   gap: 16px;
-  color: #1c1c1e;
+  color: var(--vl-accent);
   font-size: 14px;
 
   .danger {

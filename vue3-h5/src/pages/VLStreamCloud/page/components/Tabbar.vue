@@ -88,7 +88,7 @@ onUnmounted(() => {
   color: var(--vl-text-3);
 
   &.van-tabbar-item--active {
-    color: var(--vl-ink);
+    color: var(--vl-accent);
     font-weight: 700;
     background: transparent;
   }
@@ -102,7 +102,7 @@ onUnmounted(() => {
   color: var(--vl-text-3);
 
   &.active {
-    color: var(--vl-ink);
+    color: var(--vl-accent);
   }
 }
 </style>

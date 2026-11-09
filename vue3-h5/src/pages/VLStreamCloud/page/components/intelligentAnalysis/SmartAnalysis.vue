@@ -344,11 +344,11 @@ onMounted(() => {
 }
 
 :deep(.van-tab--active .van-tab__text){
-  color: #1c1c1e;
+  color: var(--vl-accent);
 }
 
 :deep(.van-tabs__line){
-  background:#1c1c1e;
+  background:var(--vl-accent);
 }
 
 .task-list {
@@ -480,11 +480,11 @@ onMounted(() => {
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  background: #1c1c1e;
+  background: var(--vl-accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 24px rgba(28, 28, 30, 0.35);
+  box-shadow: 0 10px 24px rgba(255, 106, 0, 0.32);
   z-index: 20;
 }
 

@@ -664,11 +664,11 @@ onBeforeUnmount(() => {
   gap: 4px;
   width:64px;
   height:22px;
-  background: rgba(28, 28, 30, 0.12);
+  background: var(--vl-accent-soft);
   border-radius: 4px;
   line-height: 16px;
   font-weight: 500;
-  color: #1c1c1e;
+  color: var(--vl-accent);
   font-size: 12px;
   padding: 5px 6px;
   box-sizing: border-box;

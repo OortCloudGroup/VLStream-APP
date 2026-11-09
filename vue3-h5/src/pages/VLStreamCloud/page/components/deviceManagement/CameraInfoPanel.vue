@@ -302,8 +302,8 @@ const infoList = computed(() => [
   background: #f0f2f5;
 
   &.primary {
-    color: #1c1c1e;
-    background: rgba(28, 28, 30, 0.1);
+    color: var(--vl-accent);
+    background: var(--vl-accent-soft);
   }
 
   &.warning {

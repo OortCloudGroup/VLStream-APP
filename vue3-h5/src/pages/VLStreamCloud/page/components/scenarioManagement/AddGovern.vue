@@ -1369,7 +1369,7 @@ onMounted(() => {
 
   .van-icon {
     font-size: 16px;
-    color: #1c1c1e;
+    color: var(--vl-accent);
     flex-shrink: 0;
     margin-top: 2px;
   }
@@ -1472,9 +1472,13 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.camera-popup-cancel,
+.camera-popup-cancel {
+  color: var(--vl-text-2);
+}
+
 .camera-popup-confirm {
-  color: #1c1c1e;
+  color: var(--vl-accent);
+  font-weight: 600;
 }
 
 .camera-popup-title {
@@ -1506,9 +1510,13 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.area-popup-cancel,
+.area-popup-cancel {
+  color: var(--vl-text-2);
+}
+
 .area-popup-confirm {
-  color: #1c1c1e;
+  color: var(--vl-accent);
+  font-weight: 600;
 }
 
 .area-popup-title {
@@ -1568,7 +1576,7 @@ onMounted(() => {
 }
 
 .area-input-confirm {
-  color: #1c1c1e;
+  color: var(--vl-accent);
 }
 </style>
 

@@ -647,6 +647,11 @@ const onRefresh = async() => {
   color: var(--vl-text-2);
 }
 
+// 待审批是需要处理的数字，用亮色突出
+.status-card.pending .status-number {
+  color: var(--vl-accent);
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -663,7 +668,8 @@ const onRefresh = async() => {
 
 .more-link {
   line-height: 18px;
-  color: var(--vl-text-2);
+  color: var(--vl-accent);
+  font-weight: 500;
   font-size: 13px;
 }
 

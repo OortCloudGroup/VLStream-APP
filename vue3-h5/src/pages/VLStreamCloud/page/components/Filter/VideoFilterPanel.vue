@@ -527,8 +527,8 @@ const onConfirm = () => {
 }
 
 .tag-chip.active {
-  color:#1c1c1e;
-  background:rgba(28, 28, 30, 0.12);
+  color:var(--vl-accent);
+  background:var(--vl-accent-soft);
 }
 
 .filter-footer {

@@ -305,8 +305,8 @@ const updateEvery = (value: string) => {
           border-radius: 2px;
 
           &.van-radio__icon--checked {
-            background-color: #1c1c1e;
-            border-color: #1c1c1e;
+            background-color: var(--vl-accent);
+            border-color: var(--vl-accent);
           }
         }
       }
@@ -332,8 +332,8 @@ const updateEvery = (value: string) => {
         border-radius: 2px;
 
         &.van-checkbox__icon--checked {
-          background-color: #1c1c1e;
-          border-color: #1c1c1e;
+          background-color: var(--vl-accent);
+          border-color: var(--vl-accent);
         }
       }
     }
@@ -372,7 +372,7 @@ const updateEvery = (value: string) => {
       font-size: 12px;
 
       &:focus {
-        border-color: #1c1c1e;
+        border-color: var(--vl-accent);
       }
     }
   }
@@ -407,7 +407,7 @@ const updateEvery = (value: string) => {
 
   .van-icon {
     font-size: 16px;
-    color: #1c1c1e;
+    color: var(--vl-accent);
     flex-shrink: 0;
     margin-top: 2px;
   }

@@ -390,7 +390,7 @@ export default {
     &_item_active {
       background: #FFFFFF;
       span {
-        color: #1c1c1e;
+        color: var(--vl-accent);
       }
     }
   }

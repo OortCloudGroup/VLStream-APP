@@ -204,7 +204,7 @@ const onSubmit = async() => {
 }
 
 .btn.confirm {
-  color: #1c1c1e;
+  color: var(--vl-accent);
   font-weight: 500;
 }
 

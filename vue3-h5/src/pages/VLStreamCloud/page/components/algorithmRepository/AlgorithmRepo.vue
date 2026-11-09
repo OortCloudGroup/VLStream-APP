@@ -249,25 +249,25 @@ const onRefresh = () => {
 .tip-bar {
   margin: 10px 0;
   padding: 12px 13px;
-  background:rgba(28, 28, 30, 0.12);
+  background:var(--vl-accent-soft);
   border-radius:6px;
   display: flex;
   align-items: center;
   gap: 5px;
-  color:#1c1c1e;
+  color:var(--vl-accent);
   font-size:12px;
 }
 
 :deep(.van-tab--active .van-tab__text){
-  color: #1c1c1e;
+  color: var(--vl-accent);
 }
 
 :deep(.van-tabs__line){
-  background:#1c1c1e;
+  background:var(--vl-accent);
 }
 
 .tip-icon {
-  color:#1c1c1e;
+  color:var(--vl-accent);
   padding-top: 2px;
 }
 
@@ -276,7 +276,7 @@ const onRefresh = () => {
 }
 
 .tip-close {
-  color:#1c1c1e;
+  color:var(--vl-accent);
 }
 
 .card-grid {

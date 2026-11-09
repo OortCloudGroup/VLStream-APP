@@ -132,7 +132,7 @@ const onBack = () => {
 
   &.active {
     font-weight: 500;
-    color: #1c1c1e;
+    color: var(--vl-accent);
   }
 }
 
@@ -144,7 +144,7 @@ const onBack = () => {
   width: 24px;
   height: 3px;
   border-radius: 999px;
-  background: #1c1c1e;
+  background: var(--vl-accent);
 }
 
 .tab-body {

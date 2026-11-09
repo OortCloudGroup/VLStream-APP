@@ -60,7 +60,7 @@ const toggleSearch = () => {
 
   .card-but {
     font-size: 12px;
-    color: #1c1c1e;
+    color: var(--vl-accent);
     letter-spacing: 0;
     font-weight: 400;
     display: flex;

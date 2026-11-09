@@ -1,6 +1,7 @@
 /*
  * VLStream 黑白极简主题（Monochrome）
- * 白底、浅灰圆角面板、近黑主色胶囊按钮、粗体黑色标题，蓝色仅作点缀
+ * 白底、浅灰圆角面板、近黑主色胶囊按钮、粗体黑色标题，橙色作为亮色点缀
+ * （选中态、指示条、关键数字、链接、浮动按钮）
  * 在 Vant 样式之后全局引入，统一覆盖组件主题变量
  */
 
@@ -15,7 +16,9 @@
   --vl-surface: #f4f4f6;      // 面板 / 输入框
   --vl-surface-2: #ebebef;    // 按下态 / 分组底
   --vl-line: #e5e5ea;         // 分隔线 / 描边
-  --vl-accent: #2f6bff;       // 点缀蓝（推荐、进度）
+  --vl-accent: #ff6a00;       // 亮色橙（选中、指示、关键数字）
+  --vl-accent-soft: rgba(255, 106, 0, 0.1); // 橙色浅底（标签、提示条）
+  --vl-accent-press: #e65f00; // 橙色按下态
   --vl-danger: #e5484d;
   --vl-success: #30a46c;
   --vl-warning: #f5a623;
@@ -62,36 +65,45 @@
   --van-nav-bar-arrow-size: 20px;
 
   /* 标签页 / 底部导航 */
-  --van-tabs-bottom-bar-color: var(--vl-ink);
+  --van-tabs-bottom-bar-color: var(--vl-accent);
   --van-tabs-bottom-bar-width: 20px;
   --van-tabs-bottom-bar-height: 3px;
   --van-tab-text-color: var(--vl-text-2);
   --van-tab-active-text-color: var(--vl-ink);
   --van-tab-font-size: 15px;
-  --van-tabbar-item-active-color: var(--vl-ink);
+  --van-tabbar-item-active-color: var(--vl-accent);
   --van-tabbar-item-text-color: var(--vl-text-3);
   --van-tabbar-height: 56px;
 
   /* 表单 / 选择类 */
   --van-cell-group-inset-radius: var(--vl-radius);
-  --van-checkbox-checked-icon-color: var(--vl-ink);
-  --van-radio-checked-icon-color: var(--vl-ink);
-  --van-switch-on-background: var(--vl-ink);
-  --van-slider-active-background: var(--vl-ink);
-  --van-stepper-button-round-theme-color: var(--vl-ink);
-  --van-picker-confirm-action-color: var(--vl-ink);
-  --van-calendar-range-edge-background: var(--vl-ink);
-  --van-calendar-selected-day-background: var(--vl-ink);
-  --van-calendar-range-middle-color: var(--vl-ink);
-  --van-dropdown-menu-title-active-text-color: var(--vl-ink);
-  --van-dropdown-menu-option-active-color: var(--vl-ink);
-  --van-tree-select-item-active-color: var(--vl-ink);
+  --van-checkbox-checked-icon-color: var(--vl-accent);
+  --van-radio-checked-icon-color: var(--vl-accent);
+  --van-switch-on-background: var(--vl-accent);
+  --van-slider-active-background: var(--vl-accent);
+  --van-stepper-button-round-theme-color: var(--vl-accent);
+  --van-picker-confirm-action-color: var(--vl-accent);
+  --van-calendar-range-edge-background: var(--vl-accent);
+  --van-calendar-selected-day-background: var(--vl-accent);
+  --van-calendar-range-middle-color: var(--vl-accent);
+  --van-dropdown-menu-title-active-text-color: var(--vl-accent);
+  --van-dropdown-menu-option-active-color: var(--vl-accent);
+  --van-tree-select-item-active-color: var(--vl-accent);
   --van-search-content-background: var(--vl-surface);
   --van-loading-spinner-color: var(--vl-text-3);
   --van-pull-refresh-head-text-color: var(--vl-text-3);
+  --van-progress-color: var(--vl-accent);
+  --van-circle-color: var(--vl-accent);
+  --van-steps-active-color: var(--vl-accent);
+  --van-step-active-color: var(--vl-accent);
+  --van-step-process-text-color: var(--vl-accent);
+  --van-cascader-active-color: var(--vl-accent);
+  --van-index-bar-index-active-color: var(--vl-accent);
+  --van-rate-icon-full-color: var(--vl-accent);
+  --van-action-sheet-item-disabled-text-color: var(--vl-text-3);
   --van-empty-description-color: var(--vl-text-3);
   --van-dialog-radius: var(--vl-radius-lg);
-  --van-dialog-confirm-button-text-color: var(--vl-ink);
+  --van-dialog-confirm-button-text-color: var(--vl-accent);
   --van-popup-round-radius: var(--vl-radius-lg);
   --van-action-sheet-item-height: 54px;
   --van-tag-primary-color: var(--vl-ink);
@@ -192,7 +204,13 @@ body {
 /* ============ 精致化细节 ============ */
 
 ::selection {
-  background: rgba(28, 28, 30, 0.12);
+  background: var(--vl-accent-soft);
+}
+
+/* 输入光标用亮色 */
+input,
+textarea {
+  caret-color: var(--vl-accent);
 }
 
 /* 隐藏滚动条，保留滚动；阻止橡皮筋穿透 */
