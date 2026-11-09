@@ -282,7 +282,7 @@ export default {
   .contact_sub {
     height: 36px;
     width: 91.1%;
-    background: #047FF6;
+    background: #1c1c1e;
     margin-top: 10px;
     border-radius: 24px;
     display: flex;
@@ -390,7 +390,7 @@ export default {
     &_item_active {
       background: #FFFFFF;
       span {
-        color: #1156A6;
+        color: #1c1c1e;
       }
     }
   }

@@ -206,7 +206,7 @@ watch(
 
 <style scoped lang="scss">
 .video-list-tab {
-  background: #f9faff;
+  background: #ffffff;
   margin-top: 16px;
 }
 
@@ -225,7 +225,7 @@ watch(
   position: relative;
   width: 120px;
   height: 88px;
-  border: 2px solid rgba(47, 105, 248, 0.2);
+  border: 2px solid rgba(28, 28, 30, 0.2);
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
@@ -291,11 +291,11 @@ watch(
   gap: 4px;
   width: 64px;
   height: 22px;
-  background: rgba(47, 105, 248, 0.12);
+  background: rgba(28, 28, 30, 0.12);
   border-radius: 4px;
   line-height: 16px;
   font-weight: 500;
-  color: #2f69f8;
+  color: #1c1c1e;
   font-size: 12px;
   padding: 5px 6px;
   box-sizing: border-box;

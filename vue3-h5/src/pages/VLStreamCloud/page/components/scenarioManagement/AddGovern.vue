@@ -1167,7 +1167,7 @@ onMounted(() => {
 .add-govern {
   height: 100vh;
   overflow: hidden;
-  background: #f3f3f3;
+  background: var(--vl-bg);
 }
 
 .add_content {
@@ -1286,7 +1286,7 @@ onMounted(() => {
 }
 
 .butActive {
-  background-color: #2f69f8;
+  background-color: #1c1c1e;
   color: #fff;
 }
 
@@ -1357,11 +1357,11 @@ onMounted(() => {
   align-items: flex-start;
   padding: 10px;
   margin: 10px;
-  background: #f0f9ff;
-  border: 1px solid #b3d8ff;
+  background: #f4f4f6;
+  border: 1px solid #d1d1d6;
   border-radius: 6px;
   font-size: 12px;
-  color: #1f84f0;
+  color: #1c1c1e;
   line-height: 20px;
   font-weight: 400;
   gap: 8px;
@@ -1369,7 +1369,7 @@ onMounted(() => {
 
   .van-icon {
     font-size: 16px;
-    color: #409eff;
+    color: #1c1c1e;
     flex-shrink: 0;
     margin-top: 2px;
   }
@@ -1378,7 +1378,7 @@ onMounted(() => {
 .section {
   padding: 16px;
   background: #fff;
-  margin-top: 12px;
+  border-top: 8px solid var(--vl-surface);
 }
 
 .section-header {
@@ -1446,7 +1446,7 @@ onMounted(() => {
 }
 
 .custom-required {
-  color: #ee0a24;
+  color: #e5484d;
   font-size: 14px;
   margin-right: 4px;
 }
@@ -1474,7 +1474,7 @@ onMounted(() => {
 
 .camera-popup-cancel,
 .camera-popup-confirm {
-  color: #1989fa;
+  color: #1c1c1e;
 }
 
 .camera-popup-title {
@@ -1508,7 +1508,7 @@ onMounted(() => {
 
 .area-popup-cancel,
 .area-popup-confirm {
-  color: #1989fa;
+  color: #1c1c1e;
 }
 
 .area-popup-title {
@@ -1539,13 +1539,13 @@ onMounted(() => {
   padding: 4px 8px;
   text-align: center;
   border-radius: 14px;
-  background: #f2f4f8;
+  background: #f4f4f6;
   color: #646566;
   font-size: 13px;
 }
 
 .day-chip.active {
-  background: rgba(47, 105, 248, 1);
+  background: rgba(28, 28, 30, 1);
   color: #fff;
 }
 
@@ -1568,7 +1568,7 @@ onMounted(() => {
 }
 
 .area-input-confirm {
-  color: #1989fa;
+  color: #1c1c1e;
 }
 </style>
 

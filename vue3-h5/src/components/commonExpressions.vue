@@ -76,15 +76,14 @@ const clickContent = (content) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: MicrosoftYaHei;
 font-size: 12px;
-color: #1A53FF;
+color: #1c1c1e;
 letter-spacing: 0;
 font-weight: 400;
     padding:10px 0px;
     margin-top: 10px;
     cursor: pointer;
-    background: rgba(26,83,255,0.12);
+    background: rgba(28, 28, 30, 0.12);
     border-radius: 30px;
 
     .add_common_btn_icon {
@@ -108,14 +107,12 @@ font-weight: 400;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        font-family: MicrosoftYaHei;
         font-size: 12px;
-        font-family: MicrosoftYaHei;
 font-size: 12px;
-color: #1890FF;
+color: #1c1c1e;
 letter-spacing: 0;
 font-weight: 400;
-background: rgba(24,144,255,0.12);
+background: rgba(28, 28, 30,0.12);
         font-weight: 400;
         padding:10px;
         margin: 10px 10px 0 0;

@@ -572,7 +572,7 @@ onMounted(() => {
 .analysis-application {
   height: 100vh;
   overflow: hidden;
-  background: #f3f3f3;
+  background: var(--vl-bg);
   display: flex;
   flex-direction: column;
 }
@@ -656,6 +656,7 @@ onMounted(() => {
 .section {
   padding: 16px;
   background: #fff;
+  border-top: 8px solid var(--vl-surface);
 }
 
 .section-header {
@@ -828,7 +829,7 @@ onMounted(() => {
 
 .camera-popup-cancel,
 .camera-popup-confirm {
-  color: #1989fa;
+  color: #1c1c1e;
 }
 
 .camera-popup-title {
@@ -861,7 +862,7 @@ onMounted(() => {
 
 .area-popup-cancel,
 .area-popup-confirm {
-  color: #1989fa;
+  color: #1c1c1e;
 }
 
 .area-popup-title {
@@ -938,6 +939,6 @@ onMounted(() => {
 }
 
 .area-input-confirm {
-  color: #1989fa;
+  color: #1c1c1e;
 }
 </style>

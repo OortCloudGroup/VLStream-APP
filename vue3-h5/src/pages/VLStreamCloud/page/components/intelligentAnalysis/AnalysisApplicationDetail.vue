@@ -228,7 +228,7 @@ const onBack = () => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f9faff;
+  background: #ffffff;
 }
 
 .detail-body {
@@ -246,8 +246,8 @@ const onBack = () => {
 
 .detail-card {
   position: relative;
-  background:#ffffff;
-  border-radius:8px;
+  background:var(--vl-surface);
+  border-radius:var(--vl-radius);
   padding: 12px;
 }
 
@@ -282,9 +282,9 @@ const onBack = () => {
 }
 
 .status-stamp.processing {
-  border-color: rgba(251, 146, 60, 0.6);
-  color: #f97316;
-  background: rgba(251, 146, 60, 0.1);
+  border-color: rgba(245, 166, 35, 0.6);
+  color: #f5a623;
+  background: rgba(245, 166, 35, 0.1);
 }
 
 .info-row {

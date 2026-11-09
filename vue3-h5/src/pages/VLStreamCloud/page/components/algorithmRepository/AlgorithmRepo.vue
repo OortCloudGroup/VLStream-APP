@@ -249,25 +249,25 @@ const onRefresh = () => {
 .tip-bar {
   margin: 10px 0;
   padding: 12px 13px;
-  background:rgba(47, 105, 248, 0.12);
+  background:rgba(28, 28, 30, 0.12);
   border-radius:6px;
   display: flex;
   align-items: center;
   gap: 5px;
-  color:#2f69f8;
+  color:#1c1c1e;
   font-size:12px;
 }
 
 :deep(.van-tab--active .van-tab__text){
-  color: #2f69f8;
+  color: #1c1c1e;
 }
 
 :deep(.van-tabs__line){
-  background:#2f69f8;
+  background:#1c1c1e;
 }
 
 .tip-icon {
-  color:#2f69f8;
+  color:#1c1c1e;
   padding-top: 2px;
 }
 
@@ -276,7 +276,7 @@ const onRefresh = () => {
 }
 
 .tip-close {
-  color:#2f69f8;
+  color:#1c1c1e;
 }
 
 .card-grid {
@@ -286,8 +286,8 @@ const onRefresh = () => {
 }
 
 .algo-card {
-  background:#ffffff;
-  border-radius:12px;
+  background:var(--vl-surface);
+  border-radius:var(--vl-radius);
   overflow: hidden;
 }
 
@@ -295,6 +295,8 @@ const onRefresh = () => {
   width: 100%;
   height: 100px;
   object-fit: cover;
+  // 后端 imageUrl 是彩色配图，黑白主题下统一去色
+  filter: grayscale(1);
 }
 
 .card-content {
