@@ -18,6 +18,7 @@
 import { CapacitorPlugin, PluginCall } from 'harmony-capacitor';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { bundleManager } from '@kit.AbilityKit';
 import { MainWindowHolder } from '../common/MainWindowHolder';
 
 // 后端环境名：multi=多租户生产 / single=单租户，域名预设表在 H5（vue3-h5/src/config/index.js）
@@ -28,8 +29,20 @@ const APP_ID: string = '747aa0fa18d047c8b526e242142e0a6c';
 const APP_SECRET: string = '3a97f4f65b204a3a96071746fa42936a';
 // App display label: consistent with the launcher label (AppScope string.json)
 const APP_LABEL: string = 'VLStream';
-const APP_VERSION: string = '1.0.0';
+// Fallback only; the real version is read from the installed bundle (AppScope/app.json5 versionName)
+const APP_VERSION_FALLBACK: string = '1.0.0';
 const APP_PACKAGE: string = 'com.oort.vlstream';
+
+/** Version name of the installed bundle, so the H5 about page matches the real app version. */
+function appVersion(): string {
+  try {
+    const info: bundleManager.BundleInfo =
+      bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT);
+    return info.versionName || APP_VERSION_FALLBACK;
+  } catch (e) {
+    return APP_VERSION_FALLBACK;
+  }
+}
 
 export class NativeBridgePlugin extends CapacitorPlugin {
   // Whether an immersive fullscreen video is currently active (set by setImmersiveMode)
@@ -50,7 +63,7 @@ export class NativeBridgePlugin extends CapacitorPlugin {
       'app_id': APP_ID,
       'app_secret': APP_SECRET,
       'applabel': APP_LABEL,
-      'version': APP_VERSION
+      'version': appVersion()
     };
     const appInfoJson: string = JSON.stringify(appInfo);
     const vlEnvJson: string = JSON.stringify(APP_VL_ENV);
@@ -86,7 +99,7 @@ export class NativeBridgePlugin extends CapacitorPlugin {
       'app_id': APP_ID,
       'app_secret': APP_SECRET,
       'applabel': APP_LABEL,
-      'version': APP_VERSION
+      'version': appVersion()
     };
     call.resolve(ret);
   }

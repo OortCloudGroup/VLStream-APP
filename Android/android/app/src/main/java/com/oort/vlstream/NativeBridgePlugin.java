@@ -1,6 +1,7 @@
 package com.oort.vlstream;
 
 import android.app.Activity;
+import android.content.pm.PackageInfo;
 import android.graphics.Color;
 import android.view.Window;
 import android.webkit.WebView;
@@ -128,8 +129,20 @@ public class NativeBridgePlugin extends Plugin {
         info.put("app_id", "747aa0fa18d047c8b526e242142e0a6c");
         info.put("app_secret", "3a97f4f65b204a3a96071746fa42936a");
         info.put("applabel", "VLStreamCloud");
-        info.put("version", "1.0.0");
+        info.put("version", appVersionName());
         return info;
+    }
+
+    /** 安装包真实版本号（build.gradle versionName），保证 H5「关于」页与应用版本一致。 */
+    private String appVersionName() {
+        try {
+            PackageInfo pi = getContext().getPackageManager()
+                    .getPackageInfo(getContext().getPackageName(), 0);
+            if (pi.versionName != null && !pi.versionName.isEmpty()) return pi.versionName;
+        } catch (Exception ignore) {
+            // fall through to the default
+        }
+        return "1.0.0";
     }
 
     /**
