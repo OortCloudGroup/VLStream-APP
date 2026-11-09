@@ -295,8 +295,6 @@ const onRefresh = () => {
   width: 100%;
   height: 100px;
   object-fit: cover;
-  // 后端 imageUrl 是彩色配图，黑白主题下统一去色
-  filter: grayscale(1);
 }
 
 .card-content {
