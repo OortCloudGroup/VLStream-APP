@@ -120,6 +120,7 @@
 <script setup>
 
 import { ref, onMounted } from 'vue'
+import { getSafeAreaTop } from '@/utils/safeArea'
 
 import OortPopup from '@/components/popup/oort_popup'
 
@@ -137,10 +138,7 @@ const selectedTenantId = ref('')
 // 沉浸式状态栏适配：整页内容垂直居中，安全区只作为容器上边距，避免内容顶进状态栏
 const safeAreaTop = ref('0px')
 const computeSafeAreaTop = () => {
-  const sh = window.global && window.global.is_native_shell
-    ? (window.__safeAreaTop || 0)
-    : 0
-  safeAreaTop.value = sh + 'px'
+  safeAreaTop.value = getSafeAreaTop() + 'px'
 }
 
 const getTenantInfo = () => {

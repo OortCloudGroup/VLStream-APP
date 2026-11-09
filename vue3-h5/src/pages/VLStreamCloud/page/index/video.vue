@@ -242,7 +242,7 @@ const onMenuSelect = (action) => {
 .top-bar {
   position: relative;
   z-index: 1;
-  padding-top: calc(28px + var(--vl-safe-top, 0px));
+  padding-top: calc(12px + var(--vl-safe-top, 0px));
   display: flex;
   align-items: center;
   justify-content: space-between;

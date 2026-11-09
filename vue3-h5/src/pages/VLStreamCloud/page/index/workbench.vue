@@ -171,6 +171,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { getSafeAreaTop } from '@/utils/safeArea'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store/modules/useraPaas'
@@ -189,17 +190,10 @@ const { t, locale } = useI18n()
 const showVideoDetail = ref(false)
 const currentDevice = ref(null)
 
-// 沉浸式状态栏适配：原生壳注入 window.__safeAreaTop（CSS px），
-// 非原生环境（浏览器/PC）留少量默认留白。
+// 沉浸式状态栏适配：状态栏高度见 utils/safeArea，其下只留 12px
 const headerPaddingTop = ref('12px')
 const computeHeaderPadding = () => {
-  try {
-    const isShell = window.global && window.global.is_native_shell
-    const safeTop = isShell ? (window.__safeAreaTop || 0) : 0
-    headerPaddingTop.value = (safeTop + 12) + 'px'
-  } catch (e) {
-    headerPaddingTop.value = '12px'
-  }
+  headerPaddingTop.value = (getSafeAreaTop() + 12) + 'px'
 }
 
 // 用户名
@@ -556,7 +550,7 @@ const onRefresh = async() => {
 
 .page-title {
   margin: 0;
-  padding: 12px 0 16px;
+  padding: 0 0 16px;
   font-size: 28px;
   line-height: 36px;
   font-weight: 800;
