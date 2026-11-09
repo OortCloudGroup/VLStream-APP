@@ -43,7 +43,7 @@ const isInitFinsh = ref(false)
 // shell status bar with it while it is visible (no-op in browsers)
 watch(showLoginDev, (visible) => {
   if (visible) {
-    pushStatusBar('#EEF3FF', '#000000')
+    pushStatusBar('#FFFFFF', '#000000')
   } else {
     popStatusBar()
   }
@@ -153,10 +153,11 @@ onUnmounted(() => {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: var(--vl-font);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
+  color: var(--vl-text);
+  background: var(--vl-bg);
   width:100vw;
   height: 100vh;
 }

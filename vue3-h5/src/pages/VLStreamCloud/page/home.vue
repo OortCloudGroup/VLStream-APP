@@ -3,7 +3,11 @@ Created by 兰舰 on 2019/12/3  17:58
 */
 <template>
   <div class="page_container">
-    <router-view />
+    <router-view v-slot="{ Component }">
+      <transition name="vl-page" mode="out-in">
+        <component :is="Component" />
+      </transition>
+    </router-view>
     <Tabbar />
   </div>
 </template>
@@ -16,7 +20,7 @@ import Tabbar from './components/Tabbar.vue'
 .page_container {
   height: 100vh;
   overflow: hidden;
-  background: #f5f5f5;
+  background: var(--vl-bg);
   position: relative;
 }
 </style>
