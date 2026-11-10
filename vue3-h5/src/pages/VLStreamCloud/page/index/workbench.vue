@@ -104,7 +104,7 @@
               <div class="device-name">
                 {{ device.name }}
               </div>
-              <PlayButton shape="pill" :online="device.status == '1'" @click="handlePlay(device)" />
+              <PlayButton shape="pill" :online="device.online === true" @click="handlePlay(device)" />
             </div>
           </div>
         </div>
