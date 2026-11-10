@@ -2,15 +2,16 @@
  * 工作台页面
  */
 <template>
-  <div>
+  <div class="workbench-page">
+    <!-- 顶部标题固定，内容在其下方滚动 -->
+    <div class="page-header" :style="{ paddingTop: headerPaddingTop }">
+      <h1 class="page-title">
+        {{ $t('工作台') }}
+      </h1>
+    </div>
     <van-pull-refresh v-model="isLoading" class="workbench-body" @refresh="onRefresh">
       <div class="workbench-container">
-        <!-- 顶部标题区域 -->
-        <div class="header-section" :style="{ paddingTop: headerPaddingTop }">
-          <h1 class="page-title">
-            {{ $t('工作台') }}
-          </h1>
-
+        <div class="header-section">
           <!-- 天气和个人信息卡片 -->
           <div class="weather-card">
             <div class="hero-top">
@@ -519,8 +520,24 @@ const onRefresh = async() => {
 </script>
 
 <style lang="scss" scoped>
-.workbench-body {
+.workbench-page {
+  display: flex;
+  flex-direction: column;
   height: calc(100vh - 56px - env(safe-area-inset-bottom));
+  background: var(--vl-bg);
+}
+
+.page-header {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  padding: 0 20px;
+  background: var(--vl-bg);
+}
+
+.workbench-body {
+  flex: 1;
+  min-height: 0;
   overflow: scroll;
   background: var(--vl-bg);
   scrollbar-width: none;
@@ -534,7 +551,7 @@ const onRefresh = async() => {
 .workbench-container {
   min-height: 100%;
   background: var(--vl-bg);
-  padding: 0 20px 24px;
+  padding: 4px 20px 24px;
   position: relative;
 }
 
@@ -548,7 +565,7 @@ const onRefresh = async() => {
 
 .page-title {
   margin: 0;
-  padding: 0 0 16px;
+  padding: 0 0 12px;
   font-size: 28px;
   line-height: 36px;
   font-weight: 800;
