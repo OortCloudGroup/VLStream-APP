@@ -68,72 +68,69 @@ const clickContent = (content) => {
 }
 </script>
 <style scoped lang="scss">
-.common_wrapper{
-    width: 100%;
+.common_wrapper {
+  width: 100%;
+}
 
+/* 常用语：白色描边胶囊按钮 + 主色浅底胶囊 */
 .add_common_btn {
-    width: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-font-size: 12px;
-color: #1c1c1e;
-letter-spacing: 0;
-font-weight: 400;
-    padding:10px 0px;
-    margin-top: 10px;
-    cursor: pointer;
-    background: rgba(28, 28, 30, 0.12);
-    border-radius: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--vl-ink);
+  background: #ffffff;
+  border: 1px solid var(--vl-line);
+  border-radius: 999px;
 
-    .add_common_btn_icon {
-        font-size: 16px;
-        font-weight: 700;
-        margin-right: 5px;
-    }
+  .add_common_btn_icon {
+    font-size: 14px;
+  }
 
-    &:hover {
-        background: var(--van-primary-color-light);
-        opacity: 0.8;
-    }
+  &:active {
+    background: var(--vl-surface-2);
+  }
 }
 
 .common_btn_list {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 
-    .common_content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 12px;
-font-size: 12px;
-color: var(--vl-accent);
-letter-spacing: 0;
-font-weight: 400;
-background: var(--vl-accent-soft);
-        font-weight: 400;
-        padding:10px;
-        margin: 10px 10px 0 0;
-        border-radius: 5px;
-        cursor: pointer;
-        // position: relative;
-
-        &:hover {
-            background: var(--van-primary-color-light);
-            opacity: 0.8;
-        }
-        .common_close {
-            width: 13px;
-            height: 13px;
-            margin-left: 7px;
-        }
-
-        &:hover .common_close {
-            display: block;
-        }
-    }
+  &:not(:empty) {
+    margin-top: 10px;
+  }
 }
+
+.common_content {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: 30px;
+  padding: 4px 8px 4px 12px;
+  box-sizing: border-box;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--vl-primary);
+  background: var(--vl-primary-soft);
+  border-radius: 999px;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.common_close {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
 }
 </style>

@@ -500,3 +500,11 @@ onMounted(() => {
   }
 }
 </style>
+
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+.eventBuilt_page.eventBuilt_page {
+  @include vl-form-page;
+}
+</style>

@@ -143,3 +143,20 @@ defineExpose({ form, vmFormRef, appObj, selectedOptions_1, options })
   padding: 4px 0 10px;
 }
 </style>
+
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+.eventItem.eventItem {
+  padding: 14px 16px 16px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
+
+  @include vl-form-fields;
+
+  .locationBox {
+    margin-left: 0;
+    padding: 0;
+  }
+}
+</style>
