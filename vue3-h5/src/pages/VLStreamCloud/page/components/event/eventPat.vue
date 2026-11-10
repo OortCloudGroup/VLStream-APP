@@ -542,7 +542,6 @@ onUnmounted(() => {
   top: 6px;
   right: 34px;
   position: absolute;
-  opacity: 0.55;
   transform: rotate(-8deg);
 }
 
