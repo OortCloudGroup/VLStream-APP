@@ -228,3 +228,12 @@ const openDetail = (item) => {
   right: 12px;
 }
 </style>
+
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+/* 状态 / 类型标签与设备卡片模式保持一致：白色胶囊 + 状态圆点 */
+.device-card.device-card {
+  @include vl-chips;
+}
+</style>

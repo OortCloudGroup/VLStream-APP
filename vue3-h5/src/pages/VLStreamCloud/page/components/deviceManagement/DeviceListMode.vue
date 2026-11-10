@@ -257,3 +257,10 @@ const onAdd = () => {
 }
 </style>
 
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+.list-wrap.list-wrap {
+  @include vl-device-table;
+}
+</style>

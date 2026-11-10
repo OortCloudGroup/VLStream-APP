@@ -22,8 +22,9 @@
         <img class="search-icon" src="@/assets/img/VLStreamCloud/ss2.png" alt="" />
         <van-field
           v-model="searchKeyword"
-          placeholder=""
+          :placeholder="$t('请输入搜索关键词')"
           class="search-input"
+          clearable
         />
       </div>
 
@@ -549,3 +550,186 @@ const onConfirm = () => {
 }
 </style>
 
+<style lang="scss" scoped>
+/* 筛选面板：胶囊搜索框 + 分段切换 + 级联列 + 双按钮底栏 */
+.filter-panel.filter-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: calc(8px + var(--vl-safe-top, 0px)) 0 0;
+  box-sizing: border-box;
+  background: #ffffff;
+
+  .filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    padding: 4px 16px 8px;
+  }
+
+  .header-title {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 800;
+    color: var(--vl-ink);
+  }
+
+  .header-actions {
+    gap: 16px;
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    margin: 4px 16px 12px;
+    padding: 0 14px;
+    background: var(--vl-surface);
+    border: 0;
+    border-radius: 999px;
+  }
+
+  .search-icon {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    padding: 0;
+    background: transparent;
+    font-size: 14px;
+
+    &::after {
+      display: none;
+    }
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 0 16px 12px;
+    border: 0;
+  }
+
+  .filter-tab {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 32px;
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--vl-text-2);
+    background: var(--vl-surface);
+    border-radius: 999px;
+
+    &.active {
+      color: var(--vl-primary);
+      font-weight: 600;
+      background: var(--vl-primary-soft);
+    }
+  }
+
+  .tab-icon {
+    font-size: 12px;
+  }
+
+  .filter-body {
+    flex: 1;
+    min-height: 0;
+    padding: 0 16px;
+    overflow-y: auto;
+    border-top: 1px solid var(--vl-line);
+  }
+
+  .tree-columns {
+    display: flex;
+    height: 100%;
+  }
+
+  .tree-column {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 0;
+    overflow-y: auto;
+    border-right: 1px solid var(--vl-line);
+
+    &:last-child {
+      border-right: 0;
+    }
+  }
+
+  .tree-item {
+    margin: 0 6px 2px;
+    padding: 9px 10px;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--vl-ink);
+    border-radius: 10px;
+    word-break: break-all;
+
+    &.active {
+      color: var(--vl-primary);
+      font-weight: 600;
+      background: var(--vl-primary-soft);
+    }
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 0;
+  }
+
+  .tag-chip {
+    height: 32px;
+    margin: 0;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    color: var(--vl-ink);
+    background: var(--vl-surface);
+    border: 0;
+    border-radius: 999px;
+
+    &.active {
+      color: #ffffff;
+      font-weight: 600;
+      background: var(--vl-primary);
+    }
+  }
+
+  .placeholder {
+    padding: 48px 0;
+    text-align: center;
+    font-size: 13px;
+    color: var(--vl-text-3);
+  }
+
+  .filter-footer {
+    display: flex;
+    gap: 10px;
+    margin: 0;
+    padding: 12px 16px 16px;
+    border-top: 1px solid var(--vl-line);
+  }
+
+  .reset-btn,
+  .confirm-btn {
+    flex: 1;
+    height: 44px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+}
+</style>

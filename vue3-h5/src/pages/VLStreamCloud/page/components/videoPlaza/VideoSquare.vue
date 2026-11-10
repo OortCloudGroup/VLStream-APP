@@ -1025,3 +1025,12 @@ const openDetail = (item: any) => {
   right: 12px;
 }
 </style>
+
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+/* 设备列表标签与其它设备卡片保持一致 */
+.card-footer.card-footer {
+  @include vl-chips;
+}
+</style>

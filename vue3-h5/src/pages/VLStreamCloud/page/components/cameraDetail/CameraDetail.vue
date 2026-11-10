@@ -254,8 +254,15 @@ onBeforeUnmount(stopPlayer)
 }
 
 .retry-btn {
+  height: 32px;
+  margin-top: 4px;
+  padding: 0 16px;
+  font-size: 13px;
   color: #fff;
-  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: transparent;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .tab-header {

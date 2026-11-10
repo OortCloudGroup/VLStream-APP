@@ -355,3 +355,35 @@ const onBack = () => {
   font-size: 16px;
 }
 </style>
+
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+.algo-dispatch.algo-dispatch {
+  @include vl-device-table(24px minmax(0, 1fr) minmax(0, 1.4fr) 56px);
+
+  .col.checkbox {
+    display: flex;
+    align-items: center;
+  }
+
+  .list-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 4px 10px;
+  }
+
+  .list-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--vl-ink);
+  }
+
+  .all-push {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--vl-primary);
+  }
+}
+</style>
