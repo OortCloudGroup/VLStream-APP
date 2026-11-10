@@ -1,0 +1,1222 @@
+/*
+ * VLStream 页面级样式模式（mixin）
+ * 事件 / 工单 / 详情 / 表单等页面沿用了同一批类名，统一在这里定义视觉规范，
+ * 各页面在 scoped 样式末尾、于根选择器内 @include，保证卡片、信息行、底栏、表单观感一致。
+ */
+
+/* 信息行：图标 + 标签 + 内容，标签定宽对齐，内容自动换行 */
+@mixin vl-info-rows($row: '.task-desc') {
+  #{$row} {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 0 0 10px;
+    margin: 0;
+    position: relative;
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+  }
+
+  .info-lable {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 400;
+    color: var(--vl-text-2);
+    white-space: nowrap;
+
+    > img {
+      width: 16px;
+      height: 16px;
+      margin: 0 6px 0 0;
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+  }
+
+  .info-content {
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 500;
+    color: var(--vl-ink);
+    word-break: break-all;
+  }
+
+  /* 设备标签：行内小胶囊，不换行 */
+  .device_tag {
+    display: inline-block;
+    margin: 0 0 0 6px;
+    padding: 0 8px;
+    font-size: 11px;
+    line-height: 18px;
+    font-weight: 500;
+    color: var(--vl-primary);
+    background: var(--vl-primary-soft);
+    border-radius: 999px;
+    white-space: nowrap;
+    vertical-align: 1px;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  /* 定位箭头：行尾圆形小按钮，不再压住文字 */
+  .event_arrow {
+    position: static;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    padding: 5px;
+    margin: -2px 0 0;
+    box-sizing: border-box;
+    background: #ffffff;
+    border-radius: 50%;
+  }
+}
+
+/* 列表卡片：浅灰圆角面板 + 标题行 + 信息行 + 右上角状态章 */
+@mixin vl-list-card($item: '.task-item', $title: '.task-title', $row: '.task-desc', $status: '.task-status') {
+  #{$item} {
+    display: block;
+    position: relative;
+    width: auto;
+    margin: 0 0 12px;
+    padding: 16px;
+    background: var(--vl-surface);
+    border: 0;
+    border-radius: var(--vl-radius);
+    box-shadow: none;
+  }
+
+  #{$title} {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 12px;
+    padding: 0 56px 12px 0;
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 700;
+    color: var(--vl-ink);
+    border-bottom: 1px solid var(--vl-line);
+
+    .van-icon-arrow {
+      position: absolute;
+      top: 19px;
+      right: 14px;
+      font-size: 14px;
+      color: var(--vl-text-3);
+    }
+  }
+
+  @include vl-info-rows($row);
+
+  #{$status} {
+    position: absolute;
+    z-index: 1;
+    top: 4px;
+    right: 34px;
+    opacity: 1;
+    transform: rotate(-8deg);
+    pointer-events: none;
+
+    img {
+      width: 46px;
+      height: 46px;
+      display: block;
+    }
+  }
+}
+
+/* 分段胶囊切换（全部 / 待确认 / 已确认） */
+@mixin vl-segment($header: '.task-tab-header', $item: '.task-tab-item') {
+  #{$header} {
+    display: flex;
+    height: 40px;
+    margin: 12px 0 14px;
+    padding: 4px;
+    box-sizing: border-box;
+    background: var(--vl-surface);
+    border-radius: 999px;
+  }
+
+  #{$item} {
+    flex: 1;
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--vl-text-2);
+    border-radius: 999px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &.active {
+      color: #ffffff;
+      font-weight: 700;
+      background: var(--vl-primary);
+      box-shadow: 0 4px 10px rgba(255, 106, 0, 0.24);
+    }
+  }
+}
+
+/* 空状态 */
+@mixin vl-empty($sel: '.no_data') {
+  #{$sel} {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    padding: 56px 0 24px;
+
+    img {
+      width: 150px;
+      height: auto;
+      opacity: 0.9;
+    }
+
+    span {
+      margin: 10px 0 0;
+      font-size: 13px;
+      color: var(--vl-text-3);
+      text-align: center;
+    }
+  }
+}
+
+/* 详情页：信息卡片 + 分区标题 + 媒体宫格 + 固定底部操作栏
+   用法：.task-container.task-container { @include vl-detail-page; }（双类名抬高优先级以覆盖页面旧样式） */
+@mixin vl-detail-page {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--vl-bg);
+  overflow: hidden;
+
+  .task-content {
+    flex: 1;
+    height: auto;
+    min-height: 0;
+    padding: 12px 16px calc(96px + env(safe-area-inset-bottom));
+    overflow-y: auto;
+    box-sizing: border-box;
+    background: var(--vl-bg);
+  }
+
+  .task-item {
+    display: block;
+    position: relative;
+    margin: 0 0 12px;
+    padding: 16px;
+    background: var(--vl-surface);
+    border: 0;
+    border-radius: var(--vl-radius);
+    box-shadow: none;
+  }
+
+  .task-info {
+    width: 100%;
+    padding: 0;
+  }
+
+  @include vl-info-rows('.task-desc');
+
+  .task-desc {
+    padding-bottom: 12px;
+  }
+
+  /* 首两行给右上角状态章让位 */
+  .task-info > .task-desc:nth-child(-n + 2) {
+    padding-right: 56px;
+  }
+
+  /* 媒体类信息：标签在上，内容在下 */
+  .task-desc2 {
+    display: block;
+    padding: 0 0 12px;
+    margin: 0;
+
+    > .info-lable {
+      margin-bottom: 8px;
+    }
+
+    > .info-content {
+      display: block;
+    }
+  }
+
+  .empty-value {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--vl-text-3);
+  }
+
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 0;
+  }
+
+  .image-item,
+  .imageVideo {
+    position: relative;
+    width: auto;
+    height: auto;
+    aspect-ratio: 1;
+    margin: 0;
+    border-radius: var(--vl-radius-sm);
+    overflow: hidden;
+    background: var(--vl-surface-2);
+
+    :deep(img),
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  .imageVideo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--vl-text-2);
+    background: #ffffff;
+    border: 1px dashed var(--vl-line);
+
+    img {
+      width: 24px;
+      height: 24px;
+      opacity: 0.6;
+    }
+  }
+
+  .video-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .event-video {
+    width: 100%;
+    border-radius: var(--vl-radius-sm);
+    background: #000000;
+    display: block;
+  }
+
+  .task-status {
+    position: absolute;
+    z-index: 1;
+    top: 10px;
+    right: 12px;
+    opacity: 1;
+    transform: rotate(-8deg);
+    pointer-events: none;
+
+    img {
+      width: 52px;
+      height: 52px;
+      display: block;
+    }
+  }
+
+  /* 分区标题：粗体小标题，去掉竖条 */
+  .task-title-container {
+    display: flex;
+    align-items: center;
+    margin: 20px 4px 10px;
+    padding: 0;
+
+    .blue-line {
+      display: none;
+    }
+
+    .task-title {
+      margin: 0;
+      padding: 0;
+      font-size: 16px;
+      line-height: 22px;
+      font-weight: 700;
+      color: var(--vl-ink);
+      border: 0;
+    }
+  }
+
+  .feedback-textarea {
+    width: 100%;
+    min-height: 96px;
+    margin-top: 8px;
+    padding: 12px;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--vl-ink);
+    background: #ffffff;
+    border: 1px solid transparent;
+    border-radius: var(--vl-radius-sm);
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      border-color: var(--vl-primary);
+    }
+
+    &::placeholder {
+      color: var(--vl-text-3);
+    }
+  }
+
+  @include vl-bottom-bar('.submit-btn-container');
+}
+
+/* 固定底部操作栏：毛玻璃白底、细分隔线、适配安全区 */
+@mixin vl-bottom-bar($sel) {
+  #{$sel} {
+    position: fixed;
+    z-index: 20;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
+    display: flex;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--vl-line);
+    box-shadow: none;
+
+    .van-button {
+      flex: 1;
+      width: auto;
+      height: 46px;
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+}
+
+/* 表单字段：标题行 + 必填星号 + 白底圆角输入块（供表单页与其子组件复用） */
+@mixin vl-form-fields {
+  /* 字段标题行 */
+  .eventItem_c {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 24px;
+    margin: 0;
+    padding: 0;
+
+    > img:not(.arrow-icon) {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      opacity: 0.6;
+      flex-shrink: 0;
+    }
+
+    > .title {
+      flex: 1;
+      margin: 0;
+      padding: 0;
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 600;
+      color: var(--vl-ink);
+    }
+
+    > .red {
+      order: 3;
+      margin-right: auto;
+    }
+
+    .arrow-icon {
+      width: 16px;
+      height: 16px;
+      margin: 0 0 0 auto;
+      opacity: 0.5;
+    }
+  }
+
+  .eventItem_c_right {
+    margin-left: auto;
+  }
+
+  .red {
+    flex-shrink: 0;
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--vl-danger);
+  }
+
+  /* 字段内容区 */
+  .e_r {
+    position: relative;
+    width: auto;
+    margin: 10px 0 0;
+    padding: 0;
+    border: 0;
+
+    > .red {
+      position: absolute;
+      z-index: 1;
+      top: 10px;
+      left: 10px;
+    }
+
+    > .red + .van-field,
+    > .red + .van-cell {
+      padding-left: 22px;
+    }
+  }
+
+  .titleBox {
+    flex: 1;
+    margin: 0;
+  }
+
+  :deep(.van-field),
+  :deep(.van-cell.location) {
+    width: 100%;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 1px solid transparent;
+    border-radius: var(--vl-radius-sm);
+    font-size: 14px;
+    line-height: 20px;
+    transition: border-color 0.2s ease;
+
+    &::after {
+      display: none;
+    }
+
+    &:focus-within {
+      border-color: var(--vl-primary);
+    }
+  }
+
+  :deep(.van-field__control) {
+    font-size: 14px;
+    color: var(--vl-ink);
+  }
+
+  :deep(.van-radio-group) {
+    gap: 10px 20px;
+  }
+
+  :deep(.van-radio__label) {
+    font-size: 14px;
+    color: var(--vl-ink);
+  }
+}
+
+/* 表单页（新建事件 / 添加反馈）：每个字段组是一张卡片，输入框为白底圆角块
+   用法：.eventBuilt_page.eventBuilt_page { @include vl-form-page; } */
+@mixin vl-form-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--vl-bg);
+  overflow: hidden;
+
+  .eventBox {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    margin: 0;
+    padding: 12px 16px calc(96px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
+    overflow-y: auto;
+    background: var(--vl-bg);
+  }
+
+  .eventItem {
+    display: block;
+    width: auto;
+    margin: 0 0 12px;
+    padding: 14px 16px 16px;
+    box-sizing: border-box;
+    background: var(--vl-surface);
+    border: 0;
+    border-radius: var(--vl-radius);
+
+    &.Top {
+      margin-top: 0;
+    }
+  }
+
+  @include vl-form-fields;
+
+  /* 图片上传宫格 */
+  .coverBox {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .uploadBox,
+  .img1.d {
+    position: relative;
+    width: auto;
+    height: auto;
+    aspect-ratio: 1;
+    margin: 0;
+    border-radius: var(--vl-radius-sm);
+    overflow: hidden;
+  }
+
+  .uploadBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px;
+    box-sizing: border-box;
+    font-size: 11px;
+    line-height: 14px;
+    text-align: center;
+    color: var(--vl-text-2);
+    background: #ffffff;
+    border: 1px dashed #d1d1d6;
+
+    img {
+      width: 22px;
+      height: 22px;
+      margin: 0;
+      opacity: 0.6;
+    }
+  }
+
+  .img1 {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .del_img {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+  }
+
+  /* 常用语：横向换行的小胶囊 */
+  .addBtnBox {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .addBtn,
+  .tag {
+    width: auto;
+    height: 28px;
+    margin: 0;
+    padding: 0 12px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    line-height: 28px;
+    border-radius: 999px;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .addBtn {
+    color: var(--vl-ink);
+    font-weight: 500;
+    background: #ffffff;
+    border: 1px solid var(--vl-line);
+  }
+
+  .tag {
+    color: var(--vl-primary);
+    background: var(--vl-primary-soft);
+    border: 0;
+  }
+
+  /* 人员 / 车辆选择 */
+  .user_box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+
+    .add {
+      width: 36px;
+      height: 36px;
+      margin: 0;
+      padding: 9px;
+      box-sizing: border-box;
+      background: #ffffff;
+      border: 1px dashed #d1d1d6;
+      border-radius: 50%;
+    }
+  }
+
+  .user_item {
+    position: relative;
+    height: 36px;
+    margin: 0;
+    padding: 0 28px 0 4px;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--vl-ink);
+    background: #ffffff;
+    border-radius: 999px;
+
+    .user_img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    .del_img {
+      top: 9px;
+      right: 6px;
+      background: #c7c7cc;
+    }
+  }
+
+  @include vl-bottom-bar('.primaryBox');
+
+  .eventItem.primaryBox {
+    border-radius: 0;
+  }
+}
+
+/* 时间线记录（反馈记录）：左侧圆点连线，右侧卡片 */
+@mixin vl-timeline($item: '.info-item') {
+  #{$item} {
+    position: relative;
+    width: auto;
+    margin: 0 0 12px 18px;
+    padding: 14px 16px;
+    background: var(--vl-surface);
+    border: 0;
+    border-radius: var(--vl-radius);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: -18px;
+      width: 9px;
+      height: 9px;
+      box-sizing: border-box;
+      background: #ffffff;
+      border: 2px solid var(--vl-primary);
+      border-radius: 50%;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 34px;
+      bottom: -28px;
+      left: -14px;
+      width: 1px;
+      background: var(--vl-line);
+    }
+
+    &.last::after,
+    &:last-child::after {
+      display: none;
+    }
+  }
+}
+
+/* 分区表单（分析申请 / 新增治理）：去掉通栏分隔线，每个分区是一张浅灰卡片
+   用法：.analysis-application.analysis-application { @include vl-section-form('.application-content'); } */
+@mixin vl-section-form($content) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--vl-bg);
+  overflow: hidden;
+
+  #{$content} {
+    flex: 1;
+    min-height: 0;
+    padding: 12px 16px calc(96px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
+    overflow-y: auto;
+    background: var(--vl-bg);
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: transparent;
+  }
+
+  .divider,
+  .half-pixel-line {
+    display: none;
+  }
+
+  /* 一级字段与分区统一成卡片 */
+  .form > .van-field,
+  .form > .van-cell,
+  .time-range-section,
+  .mode-row,
+  .section,
+  .common_expressions {
+    width: auto;
+    margin: 0;
+    padding: 14px 16px;
+    box-sizing: border-box;
+    background: var(--vl-surface);
+    border: 0;
+    border-radius: var(--vl-radius);
+
+    &::after {
+      display: none;
+    }
+  }
+
+  .form > .van-field,
+  .form > .van-cell {
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  .field-icon,
+  .section-icon,
+  .image-title-icon,
+  .required-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    object-fit: contain;
+    opacity: 0.6;
+    vertical-align: -4px;
+  }
+
+  .image-header {
+    justify-content: flex-start !important;
+  }
+
+  .section-header,
+  .image-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 28px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .section-label,
+  .image-title,
+  .mode-label {
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    line-height: 22px;
+    font-weight: 600;
+    color: var(--vl-ink);
+  }
+
+  .section-title {
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--vl-text-2);
+  }
+
+  /* 添加按钮：白色小圆钮 */
+  .section-add {
+    width: 28px;
+    height: 28px;
+    padding: 7px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border-radius: 50%;
+  }
+
+  /* 已选项：白色胶囊 + 删除 */
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+
+    &:not(:empty) {
+      margin-top: 10px;
+    }
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    height: 30px;
+    margin: 0;
+    padding: 0 8px 0 12px;
+    box-sizing: border-box;
+    font-size: 13px;
+    color: var(--vl-ink);
+    background: #ffffff;
+    border: 0;
+    border-radius: 999px;
+  }
+
+  .tag-delete {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    opacity: 0.55;
+    flex-shrink: 0;
+  }
+
+  /* 时间范围：两个白底块 + 中间细箭头 */
+  .time-range-section {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+
+    > .section-icon {
+      display: none;
+    }
+  }
+
+  .time-range-item {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    background: #ffffff;
+    border-radius: var(--vl-radius-sm);
+  }
+
+  .time-label-row {
+    margin: 0 0 2px;
+  }
+
+  .time-fields {
+    gap: 2px;
+  }
+
+  .time-field,
+  :deep(.time-field.van-cell) {
+    padding: 0;
+    background: transparent;
+    font-size: 13px;
+    line-height: 22px;
+
+    &::after {
+      display: none;
+    }
+  }
+
+  :deep(.time-field .van-field__control) {
+    font-weight: 500;
+    color: var(--vl-ink);
+  }
+
+  :deep(.time-field .van-cell__right-icon) {
+    display: none;
+  }
+
+  .time-arrow {
+    flex-shrink: 0;
+    align-self: center;
+    width: 12px;
+    height: 1px;
+    margin: 0;
+    background: #c7c7cc;
+
+    &::before,
+    &::after {
+      display: none;
+    }
+  }
+
+  /* 图片上传 */
+  .image-cover {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 10px 0 0;
+    padding: 0;
+  }
+
+  .uploadBox,
+  .img1.d {
+    position: relative;
+    width: auto;
+    height: auto;
+    aspect-ratio: 1;
+    margin: 0;
+    border-radius: var(--vl-radius-sm);
+    overflow: hidden;
+  }
+
+  .uploadBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px;
+    box-sizing: border-box;
+    font-size: 11px;
+    line-height: 14px;
+    text-align: center;
+    color: var(--vl-text-2);
+    background: #ffffff;
+    border: 1px dashed #d1d1d6;
+
+    img {
+      width: 22px;
+      height: 22px;
+      margin: 0;
+      opacity: 0.6;
+    }
+  }
+
+  .img1 {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .del_img {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+  }
+
+  /* 多行描述 */
+  .form > .taskDesc {
+    min-height: 120px;
+    align-items: flex-start;
+  }
+
+  @include vl-bottom-bar('.submit-section');
+}
+
+/* 状态 / 属性胶囊：白底，首个带状态圆点（在线绿 / 离线灰） */
+@mixin vl-chips {
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 24px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--vl-ink);
+    background: #ffffff;
+    border: 0;
+    border-radius: 999px;
+  }
+
+  .chip:first-child::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--vl-success);
+  }
+
+  .chip.offline {
+    color: var(--vl-text-2);
+    background: #ffffff;
+
+    &::before {
+      background: #c7c7cc;
+    }
+  }
+}
+
+/* 设备表格：名称 / ID / 状态定宽对齐，ID 用等宽数字，状态为圆点胶囊 */
+@mixin vl-device-table($cols: minmax(0, 1fr) minmax(0, 1.5fr) 56px) {
+  .table-card {
+    background: var(--vl-surface);
+    border-radius: var(--vl-radius);
+    overflow: hidden;
+  }
+
+  .table-head,
+  .table-row {
+    display: grid;
+    grid-template-columns: $cols;
+    align-items: center;
+    column-gap: 10px;
+    padding: 0 14px;
+  }
+
+  .table-head {
+    height: 40px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--vl-text-2);
+    background: var(--vl-surface-2);
+  }
+
+  .table-row {
+    position: relative;
+    min-height: 56px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: transparent;
+    border: 0;
+
+    & + .table-row::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 14px;
+      right: 14px;
+      height: 1px;
+      background: var(--vl-line);
+    }
+
+    &:active {
+      background: var(--vl-surface-2);
+    }
+  }
+
+  .col {
+    flex: none;
+    width: auto;
+    min-width: 0;
+    padding: 0;
+    text-align: left;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--vl-ink);
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    word-break: break-all;
+  }
+
+  .table-head .col {
+    font-size: 12px;
+    color: var(--vl-text-2);
+  }
+
+  .table-row .col.name,
+  .table-row .col:first-child:not(.checkbox) {
+    font-weight: 600;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .table-row .col.id,
+  .table-row .col:nth-child(2):not(.name) {
+    font-size: 12px;
+    color: var(--vl-text-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .col:last-child {
+    text-align: right;
+  }
+
+  .status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 22px;
+    padding: 0 8px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--vl-ink);
+    background: #ffffff;
+    border: 0;
+    border-radius: 999px;
+
+    &::after {
+      display: none;
+    }
+
+    &::before {
+      content: '';
+      position: static;
+      flex-shrink: 0;
+      width: 6px;
+      height: 6px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--vl-success);
+      transform: none;
+    }
+
+    &.offline {
+      color: var(--vl-text-2);
+
+      &::before {
+        background: #c7c7cc;
+      }
+    }
+  }
+}
