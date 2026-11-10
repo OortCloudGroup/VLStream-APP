@@ -399,3 +399,87 @@ const eventBuiltFn = () => {
   }
 }
 </style>
+
+<style lang="scss" scoped>
+.feedbackRecord-page.feedbackRecord-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--vl-bg);
+  overflow: hidden;
+
+  .content {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    padding: 0;
+    overflow-y: auto;
+    background: var(--vl-bg);
+  }
+
+  :deep(.van-tabs__wrap) {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+
+  :deep(.van-tabs__nav) {
+    background: var(--vl-bg);
+  }
+
+  :deep(.van-tabs__wrap) {
+    border-bottom: 1px solid var(--vl-line);
+  }
+
+  :deep(.van-tab__panel) {
+    padding: 12px 16px 24px;
+  }
+
+  /* 添加反馈引导卡 */
+  .eventBuiltBox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: auto;
+    height: auto;
+    margin: 0 0 16px;
+    padding: 16px;
+    background: var(--vl-primary-soft);
+    border: 0;
+    border-radius: var(--vl-radius);
+
+    .t1 {
+      font-size: 15px;
+      line-height: 22px;
+      font-weight: 700;
+      color: var(--vl-ink);
+    }
+
+    .t2 {
+      margin-top: 2px;
+      font-size: 12px;
+      line-height: 18px;
+      color: var(--vl-text-2);
+    }
+
+    .btn {
+      position: static;
+      flex-shrink: 0;
+      width: auto;
+      height: 34px;
+      margin: 0;
+      padding: 0 14px;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffffff;
+      background: var(--vl-primary);
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+  }
+}
+</style>
