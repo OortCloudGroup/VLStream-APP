@@ -7,18 +7,16 @@
  * @Copyright 奥尔特云(深圳)智慧科技 aPaaS-front-team. All rights reserved.
 !-->
 <template>
-  <div class="page_container">
+  <div class="page_container versions_page">
     <nav-header-banner :title="$t('文档说明')" />
     <div class="edition_home_body">
-      <div style="width: 84.4%;margin: 0px 7.8%;">
-        <div v-for="(item, index) in list" :key="index">
-          <div style="display: flex;flex-direction: column;justify-content: center;justify-content: space-around;">
-            <span style="font-size: 18px;height: 50px;display: flex;align-items: center;">{{ item?.version }}{{ $t('版本介绍') }}</span>
-            <div style="display: flex;flex-direction: column;height: 50px;justify-content: space-around;">
-              <span style="font-size: 12px;color: #666666;">- {{ item?.ver_description }}</span>
-            </div>
-          </div>
-          <van-divider v-if="index+1 !==list.length" style="margin: 8px 0;border-bottom: 1px solid;" />
+      <div v-for="(item, index) in list" :key="index" class="version_card">
+        <div class="version_head">
+          <span class="version_no">{{ item?.version }}</span>
+          <span class="version_title">{{ $t('版本介绍') }}</span>
+        </div>
+        <div class="version_desc">
+          {{ item?.ver_description || $t('暂无数据') }}
         </div>
       </div>
     </div>
@@ -44,9 +42,61 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .edition_home_body {
-        height: calc(100vh - 48px);
-        overflow: scroll;
-        background-color: #fff;
-    }
+.versions_page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--vl-bg);
+}
+
+.edition_home_body {
+  flex: 1;
+  min-height: 0;
+  padding: 12px 16px calc(24px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+
+.version_card {
+  margin-bottom: 12px;
+  padding: 16px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
+}
+
+.version_head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.version_no {
+  padding: 2px 10px;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 700;
+  color: var(--vl-primary);
+  background: var(--vl-primary-soft);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.version_title {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--vl-ink);
+}
+
+.version_desc {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 22px;
+  color: var(--vl-text-2);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
 </style>
