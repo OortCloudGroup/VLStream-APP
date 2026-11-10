@@ -445,3 +445,23 @@ onUnmounted(() => {
   }
 }
 </style>
+
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+.order-container.order-container {
+  .work-content {
+    padding: 0 16px;
+  }
+
+  .work-list {
+    height: calc(100% - 66px);
+    padding-bottom: 16px;
+    box-sizing: border-box;
+  }
+
+  @include vl-segment('.order-tab-header', '.order-tab-item');
+  @include vl-list-card('.order-item', '.order-title', '.order-desc', '.order-status');
+  @include vl-empty;
+}
+</style>

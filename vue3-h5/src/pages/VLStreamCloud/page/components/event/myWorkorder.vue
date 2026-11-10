@@ -1,7 +1,7 @@
 <template>
   <div class="mymaintenance-page">
-    <nav-header-banner exit :title="$t('我的工单')" class="header-banner">
-      <van-icon name="search" size="24" color="#ffffff" style="margin-right: 8px;" @click="toggleSearch" />
+    <nav-header-banner :title="$t('我的工单')" class="header-banner">
+      <van-icon name="search" size="22" color="#1c1c1e" style="margin-right: 16px;" @click="toggleSearch" />
     </nav-header-banner>
     <div class="content">
       <div class="event-pat-container">
@@ -28,7 +28,7 @@ const toggleSearch = () => {
 }
 
 .mymaintenance-page {
-  background-color: #F6F5F8;
+  background-color: var(--vl-bg);
   position: relative;
   height: 100%;
   width: 100%;

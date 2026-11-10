@@ -1039,3 +1039,11 @@ onMounted(() => {
     }
 }
 </style>
+
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+.task-container.task-container {
+  @include vl-detail-page;
+}
+</style>

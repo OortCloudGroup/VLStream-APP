@@ -610,3 +610,23 @@ onUnmounted(() => {
   }
 }
 </style>
+
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+.task-container.task-container {
+  .task-content {
+    padding: 0;
+  }
+
+  .task-list {
+    height: calc(100% - 66px);
+    padding-bottom: 16px;
+    box-sizing: border-box;
+  }
+
+  @include vl-segment;
+  @include vl-list-card;
+  @include vl-empty;
+}
+</style>
