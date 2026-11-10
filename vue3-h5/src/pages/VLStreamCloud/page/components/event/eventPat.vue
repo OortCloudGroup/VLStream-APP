@@ -203,6 +203,7 @@ const pageSize = ref(10)
 const taskStatus = ref(0) // 默认显示全部任务，可切换为2、1
 const mod_status = ref(0) // 事件状态 1:待确认 2:已确认 0:全部(默认) 只有mod_type=2时,才有效
 let allTasks = ref([])
+let requestSeq = 0 // 列表请求序号，用于丢弃切换筛选后才返回的旧响应
 let mod_type = ref(props.event === undefined || props.event === null ? undefined : Number(props.event)) // 事件类型 1:事件拍传 2:主动安全
 const showSearch = ref(false) // 搜索框显示状态
 const searchValue = ref('') // 搜索关键词
@@ -253,9 +254,18 @@ const event_listFn = async() => {
   if (searchValue.value) {
     data['keyword'] = searchValue.value
   }
-  let res = props.my ? await myevent_list(data) : await event_list(data)
+  const seq = ++requestSeq
+  let res
+  try {
+    res = props.my ? await myevent_list(data) : await event_list(data)
+  } catch (error) {
+    if (seq === requestSeq) loading.value = false
+    return
+  }
+  // 期间已切换筛选/刷新：旧响应不能再并入当前列表
+  if (seq !== requestSeq) return
+  loading.value = false
   if (res.code === 200) {
-    loading.value = false
     count.value = res.data.count || 0
     if (res.data.list) {
       allTasks.value = [...allTasks.value, ...res.data.list]
