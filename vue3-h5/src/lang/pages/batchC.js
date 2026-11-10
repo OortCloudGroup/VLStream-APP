@@ -50,6 +50,7 @@ export default {
   '提交时间：': 'Submitted At: ',
   '待完成': 'Pending',
   '待确认': 'To Confirm',
+  '已确认': 'Confirmed',
   '未完成': 'Not Completed',
   '处置记录': 'Handling Records',
   '反馈信息': 'Feedback',

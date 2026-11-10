@@ -30,7 +30,7 @@
           {{ $t('待确认') }}
         </div>
         <div :class="['task-tab-item', { active: mod_status === 2 }]" @click="taskStatusFn(2,'mod_status')">
-          {{ $t('已完成') }}
+          {{ $t('已确认') }}
         </div>
       </div>
       <!-- 任务列表 -->
@@ -152,7 +152,7 @@
                     </div>
                   </div>
                   <div class="task-status">
-                    <img v-if="task.status === 2" src="@/assets/img/eventMana/e_dqr.png" />
+                    <img v-if="isPendingConfirm(task)" src="@/assets/img/eventMana/e_dqr.png" />
                     <img v-else src="@/assets/img/eventMana/e_yqr.png" />
                   </div>
                 </template>
@@ -183,6 +183,9 @@ import bus from '@/utils/bus'
 
 // 事件列表标题：去掉尾部 _detected 后缀
 const eventTitle = (name) => String(name || '').replace(/_detected$/, '')
+
+// 主动安全事件的确认状态以 mod_status 为准（0:待确认，其余为已确认），与 tab 筛选口径一致
+const isPendingConfirm = (task) => Number(task.mod_status) === 0
 
 // 定义props
 const props = defineProps({

@@ -110,7 +110,7 @@
           </div>
           <!-- 图标状态-->
           <div class="task-status">
-            <img v-if="taskData.status === 2" src="@/assets/img/eventMana/e_dqr.png" />
+            <img v-if="Number(taskData.mod_status) === 0" src="@/assets/img/eventMana/e_dqr.png" />
             <img v-else src="@/assets/img/eventMana/e_yqr.png" />
           </div>
         </div>
