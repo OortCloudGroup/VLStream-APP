@@ -11,19 +11,34 @@
     <nav-header-banner :title="$t('联系我们')" />
     <div class="contactUS_body">
       <div class="contact_group">
-        <a class="contact_item" href="mailto:zhanglimin@oortcloudsmart.com">
+        <div class="contact_item">
           <span class="contact_icon"><van-icon name="service-o" /></span>
           <span class="contact_main">
             <span class="contact_label">{{ $t('技术支持：') }}</span>
             <span class="contact_value">zhanglimin@oortcloudsmart.com</span>
           </span>
-          <van-icon class="contact_arrow" name="arrow" />
-        </a>
-        <a class="contact_item" href="mailto:zhanglimin@oortcloudsmart.com">
+        </div>
+        <div class="contact_item">
           <span class="contact_icon"><van-icon name="setting-o" /></span>
           <span class="contact_main">
             <span class="contact_label">{{ $t('运维支持：') }}</span>
             <span class="contact_value">zhanglimin@oortcloudsmart.com</span>
+          </span>
+        </div>
+      </div>
+      <div class="contact_group">
+        <a
+          v-for="link in links"
+          :key="link.url"
+          class="contact_item is-link"
+          :href="link.url"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="contact_icon"><van-icon :name="link.icon" /></span>
+          <span class="contact_main">
+            <span class="contact_label">{{ link.label }}</span>
+            <span class="contact_value">{{ link.url }}</span>
           </span>
           <van-icon class="contact_arrow" name="arrow" />
         </a>
@@ -43,7 +58,11 @@ export default {
   components: { NavHeaderBanner },
   data() {
     return {
-      appInfo: config.appInfo
+      appInfo: config.appInfo,
+      links: [
+        { label: this.$t('官方网站'), icon: 'browsing-history-o', url: 'https://vls.oortcloudsmart.com/zh/' },
+        { label: 'GitHub', icon: 'cluster-o', url: 'https://github.com/OortCloudGroup/VLStream-Cloud' }
+      ]
     }
   }
 }
@@ -70,6 +89,10 @@ export default {
   background: var(--vl-surface);
   border-radius: var(--vl-radius);
   overflow: hidden;
+
+  & + & {
+    margin-top: 12px;
+  }
 }
 
 .contact_item {
@@ -91,7 +114,7 @@ export default {
     background: var(--vl-line);
   }
 
-  &:active {
+  &.is-link:active {
     background: var(--vl-surface-2);
   }
 }

@@ -52,6 +52,7 @@ export default {
   '待确认': 'To Confirm',
   '已确认': 'Confirmed',
   '版本': 'Version',
+  '官方网站': 'Website',
   '未完成': 'Not Completed',
   '处置记录': 'Handling Records',
   '反馈信息': 'Feedback',
