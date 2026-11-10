@@ -1580,3 +1580,57 @@ onMounted(() => {
 }
 </style>
 
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+.add-govern.add-govern {
+  @include vl-section-form('.add_content');
+
+  /* 循环周期：分段胶囊 */
+  .timeButBox {
+    display: flex;
+    width: 100%;
+    margin: 0 0 12px;
+    padding: 3px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border-radius: 999px;
+  }
+
+  .timeBut {
+    flex: 1;
+    width: auto;
+    margin: 0;
+    font-size: 13px;
+    line-height: 30px;
+    color: var(--vl-text-2);
+    background: transparent;
+    border-radius: 999px;
+  }
+
+  .butActive {
+    color: #ffffff;
+    font-weight: 600;
+    background: var(--vl-primary);
+  }
+
+  .timeSelectBox {
+    width: 100%;
+    background: #ffffff;
+    border: 0;
+    border-radius: var(--vl-radius-sm);
+    overflow: hidden;
+  }
+
+  .tipBox {
+    margin: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--vl-text-2);
+    background: var(--vl-surface);
+    border: 0;
+    border-radius: 10px;
+  }
+}
+</style>

@@ -950,3 +950,11 @@ onMounted(() => {
   color: var(--vl-accent);
 }
 </style>
+
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+.analysis-application.analysis-application {
+  @include vl-section-form('.application-content');
+}
+</style>
