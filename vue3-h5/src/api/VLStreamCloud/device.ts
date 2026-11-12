@@ -40,16 +40,15 @@ function commonFunc<T, K>(interfaceName: string, data: T, method = 'post', isPar
 // 设备管理API接口
 
 /**
- * 获取设备列表（分页）
+ * 获取设备列表（分页，对齐平台端 /vlsDeviceInfo/page）
+ * 注意：后端 /page 的 SQL 不做条件过滤（deviceName/tag 等参数服务端忽略），
+ * 仅 current/size 分页生效，标签/关键字过滤需在前端完成
  * @param {Object} params - 查询参数
  * @param {number} params.current - 当前页码
  * @param {number} params.size - 每页大小
- * @param {string} params.keyword - 搜索关键字（设备名称或设备ID）
- * @param {string} params.status - 设备状态
- * @param {string} params.tag - 标签
  */
 export function getDeviceList(params) {
-  return commonFunc('/vlsDeviceInfo/list', params, 'GET')
+  return commonFunc('/vlsDeviceInfo/page', params, 'GET')
 }
 
 /**
@@ -343,11 +342,13 @@ export function importDevices(formData) {
 }
 
 /**
- * 摄像头算法下发（算法ID + 设备ID逗号串）
+ * 摄像头算法下发（对齐平台：POST /vlsDeviceInfo/{algorithmId}/algorithms）
+ * deviceIds/modelType 为 @RequestParam 查询参数绑定，须走 query 而非 body
  * @param {number} algorithmId 算法ID
- * @param {string} deviceIdsStr 设备ID逗号分隔字符串
+ * @param {string} deviceIdsStr 设备序列号（WVP 行 deviceId）逗号分隔字符串
+ * @param {string} modelType 模型类型，默认 om
  */
-export function dispatchAlgorithmToDevices(algorithmId, deviceIdsStr) {
-  return commonFunc(`/vlsDeviceInfo/${algorithmId}/algorithms`, { deviceIds: deviceIdsStr }, 'POST')
+export function dispatchAlgorithmToDevices(algorithmId, deviceIdsStr, modelType = 'om') {
+  return commonFunc(`/vlsDeviceInfo/${algorithmId}/algorithms`, { deviceIds: deviceIdsStr, modelType }, 'POST', true)
 }
 

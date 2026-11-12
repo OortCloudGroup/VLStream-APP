@@ -3,18 +3,12 @@
     <nav-header-banner :title="$t('算法下发')" :is-call-back="true" @call-back="onBack" />
 
     <div class="dispatch-content">
-      <!-- 顶部筛选条 -->
-      <div class="filter-row">
-        <div
-          v-for="item in filterTabs"
-          :key="item.value"
-          class="filter-item"
-          @click="onFilter(item.value as FilterType)"
-        >
-          {{ $t(item.label) }}
-          <van-icon name="arrow-down" />
-        </div>
-      </div>
+      <!-- 关键字搜索：WVP VLStream 设备列表无标签/设备树维度，统一在前端过滤 -->
+      <van-search
+        v-model="keyword"
+        :placeholder="$t('请输入设备名称/设备ID')"
+        class="device-search"
+      />
 
       <!-- 列表标题 -->
       <div class="list-header-bar">
@@ -25,56 +19,69 @@
         </div>
       </div>
 
-      <!-- 表头 -->
-      <div class="table-header">
-        <div class="col checkbox">
-          <van-checkbox :model-value="isAllChecked" shape="square" @click.stop="toggleAll" />
-        </div>
-        <div class="col">
-          {{ $t('设备名称') }}
-        </div>
-        <div class="col">
-          {{ $t('设备ID') }}
-        </div>
-        <div class="col">
-          {{ $t('状态') }}
-        </div>
-      </div>
-
-      <!-- 表体 -->
-      <van-checkbox-group v-model="checkedIds">
-        <div
-          v-for="dev in devices"
-          :key="dev.id"
-          class="table-row"
-        >
+      <!-- 设备列表：与设备管理页一致的 table-card 风格，数据源为 WVP VLStream 协议设备 -->
+      <div class="table-card">
+        <div class="table-head">
           <div class="col checkbox">
-            <van-checkbox :name="dev.id" shape="square" />
+            <van-checkbox :model-value="isAllChecked" shape="square" @click.stop="toggleAll" />
           </div>
           <div class="col name">
-            {{ dev.deviceName }}
+            {{ $t('设备名称') }}
           </div>
           <div class="col id">
-            {{ dev.deviceId }}
+            {{ $t('设备ID') }}
           </div>
-          <div class="col status">
-            <div
-              :class="(dev.status === 1 || dev.status === '1') ? 'success' : 'default'"
-              class="status-tag"
-            >
-              {{ (dev.status === 1 || dev.status === '1') ? $t('在线') : $t('离线') }}
-            </div>
+          <div class="col">
+            {{ $t('状态') }}
           </div>
         </div>
-      </van-checkbox-group>
-    </div>
 
-    <!-- 顶部筛选弹出面板 -->
-    <VideoFilterPanel
-      v-model:show="showFilterPanel"
-      :default-tab="filterType"
-      @confirm="onFilterConfirm"
-    />
+        <van-checkbox-group v-model="checkedIds">
+          <div
+            v-for="dev in filteredDevices"
+            :key="dev.id"
+            class="table-row"
+            @click="onToggleDevice(dev)"
+          >
+            <div class="col checkbox">
+              <van-checkbox :name="String(dev.deviceId)" shape="square" @click.stop />
+            </div>
+            <div class="col name">
+              {{ dev.deviceName }}
+            </div>
+            <div class="col id">
+              {{ dev.deviceId }}
+            </div>
+            <div class="col">
+              <van-tag
+                v-if="dev.online === true"
+                type="success"
+                plain
+                class="status-tag online"
+              >
+                {{ $t('在线') }}
+              </van-tag>
+              <van-tag v-else type="default" plain class="status-tag offline">
+                {{ $t('离线') }}
+              </van-tag>
+            </div>
+          </div>
+        </van-checkbox-group>
+
+        <!-- 加载中 -->
+        <div v-if="loading" class="list-state">
+          <van-loading size="24px" vertical>
+            {{ $t('正在加载摄像头…') }}
+          </van-loading>
+        </div>
+
+        <!-- 空态 -->
+        <div v-else-if="!filteredDevices.length" class="no_data">
+          <img src="@/assets/img/daily_activity/no_data.png" />
+          <span>{{ $t('暂无数据') }}</span>
+        </div>
+      </div>
+    </div>
 
     <!-- 底部按钮 -->
     <div class="footer-bar">
@@ -89,11 +96,9 @@
 import { computed, onMounted, ref } from 'vue'
 import { showToast } from 'vant'
 import { useI18n } from 'vue-i18n'
-import { getDeviceList } from '@/api/VLStreamCloud/device'
-import { dispatchAlgorithmToDevices } from '@/api/VLStreamCloud/algorithm'
+import { getWvpVlsDeviceList } from '@/api/VLStreamCloud/wvp'
+import { dispatchAlgorithmToDevices } from '@/api/VLStreamCloud/device'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
-import VideoFilterPanel from '../Filter/VideoFilterPanel.vue'
-import { useUserStore } from '@/store/modules/useraPaas'
 
 const emit = defineEmits(['close'])
 
@@ -104,40 +109,37 @@ const props = defineProps<{
   algorithmId?: string | number
 }>()
 
-type FilterType = 'tree' | 'group' | 'tag'
-
-const filterTabs = [
-  { label: '设备树', value: 'tree' },
-  // { label: '分组', value: 'group' },
-  { label: '标签', value: 'tag' }
-]
-
-// 设备列表
+// WVP VLStream 协议设备列表
 const devices = ref<any[]>([])
-// 已勾选的设备 ID
-const checkedIds = ref<number[]>([])
-const store = useUserStore()
+const loading = ref(false)
+// 关键字（前端过滤设备名称/设备ID）
+const keyword = ref('')
+// 已勾选的设备序列号（WVP 行 deviceId，下发接口要求的取值口径）
+const checkedIds = ref<string[]>([])
 
-// 顶部筛选相关
-const showFilterPanel = ref(false)
-const filterType = ref<FilterType>('tree')
-const tagName = ref<string | null>(null)
+// 关键字在设备名称/设备ID上做前端匹配
+const filteredDevices = computed(() => {
+  const kw = keyword.value.trim().toLowerCase()
+  if (!kw) return devices.value
+  return devices.value.filter(dev =>
+    String(dev.deviceName || '').toLowerCase().includes(kw) ||
+    String(dev.deviceId || '').toLowerCase().includes(kw)
+  )
+})
 
-// 调用接口获取设备列表（支持 tag 过滤）
 const fetchDevices = async() => {
-  const params: any = {
-    accessToken: store.userInfo?.accessToken,
-    current: 1,
-    size: 500
-  }
-  if (tagName.value) {
-    params.tag = tagName.value
-  }
-  const res: any = await getDeviceList(params)
-  if (res && res.code === 200 && res.data && Array.isArray(res.data.records)) {
-    devices.value = res.data.records
-  } else {
+  loading.value = true
+  try {
+    const res: any = await getWvpVlsDeviceList({ pageNum: 1, pageSize: 200 })
+    if (res && res.code === 200 && Array.isArray(res.rows)) {
+      devices.value = res.rows
+    } else {
+      devices.value = []
+    }
+  } catch (e) {
     devices.value = []
+  } finally {
+    loading.value = false
   }
 }
 
@@ -145,50 +147,48 @@ onMounted(() => {
   fetchDevices()
 })
 
-// 打开筛选面板
-const onFilter = (type: FilterType) => {
-  filterType.value = type
-  showFilterPanel.value = true
-}
+const isAllChecked = computed(() => {
+  const visible = filteredDevices.value
+  if (!visible.length) return false
+  return visible.every(dev => checkedIds.value.includes(String(dev.deviceId)))
+})
 
-// 接收筛选面板返回的筛选结果
-const onFilterConfirm = (filters: any) => {
-  if (filters.filterType === 'tag' && filters.filterValue) {
-    tagName.value = filters.filterValue
-  } else if (filters.filterType === 'tree' && filters.filterValue) {
-    tagName.value = filters.filterValue
-  } else {
-    tagName.value = null
-  }
-  showFilterPanel.value = false
-  fetchDevices()
-}
-
-const isAllChecked = computed(
-  () =>
-    devices.value.length > 0 &&
-    checkedIds.value.length === devices.value.length
-)
-
+// 全选/取消全选只作用于当前可见（过滤后）的设备
 const toggleAll = () => {
+  const visible = filteredDevices.value
+  if (!visible.length) return
   if (isAllChecked.value) {
-    checkedIds.value = []
+    const visibleIds = new Set(visible.map(dev => String(dev.deviceId)))
+    checkedIds.value = checkedIds.value.filter(id => !visibleIds.has(id))
   } else {
-    checkedIds.value = devices.value.map(d => d.id)
+    const merged = new Set(checkedIds.value)
+    visible.forEach(dev => merged.add(String(dev.deviceId)))
+    checkedIds.value = [...merged]
+  }
+}
+
+// 点击整行切换勾选（checkbox 自身点击由 vant 处理，仅阻止冒泡避免二次切换）
+const onToggleDevice = (dev: any) => {
+  const id = String(dev.deviceId)
+  if (checkedIds.value.includes(id)) {
+    checkedIds.value = checkedIds.value.filter(item => item !== id)
+  } else {
+    checkedIds.value = [...checkedIds.value, id]
   }
 }
 
 // 全部下发
 const onDispatchAll = async() => {
-  if (!devices.value.length) {
+  if (!filteredDevices.value.length) {
     showToast({ type: 'fail', message: t('暂无可下发设备') })
     return
   }
-  checkedIds.value = devices.value.map(d => d.id)
+  checkedIds.value = filteredDevices.value.map(dev => String(dev.deviceId))
   await onDispatch()
 }
 
 // 下发算法到选中的设备
+// 对齐平台：POST /vlsDeviceInfo/{algorithmId}/algorithms，deviceIds 为设备序列号逗号串
 const onDispatch = async() => {
   if (!props.algorithmId) {
     showToast({ type: 'fail', message: t('缺少算法ID') })
@@ -199,13 +199,7 @@ const onDispatch = async() => {
     return
   }
 
-  const deviceIdsStr = checkedIds.value.join(',')
-  const body = {
-    algorithmId: props.algorithmId,
-    deviceIds: deviceIdsStr
-  }
-
-  const res: any = await dispatchAlgorithmToDevices(body)
+  const res: any = await dispatchAlgorithmToDevices(props.algorithmId, checkedIds.value.join(','))
   if (res && res.code === 200) {
     showToast({ type: 'success', message: res.msg })
   }
@@ -231,28 +225,16 @@ const onBack = () => {
   padding-bottom: 12px;
 }
 
-.filter-row {
-  display: flex;
-  padding: 13px 16px;
-  line-height: 18px;
-  font-weight: 500;
-  color: #333333;
-  font-size: 14px;
-}
-
-.filter-item {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
+.device-search {
+  background: transparent;
+  padding: 8px 12px 0;
 }
 
 .list-header-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 16px 8px;
+  padding: 8px 16px 0;
   font-size: 14px;
   color: #374151;
 }
@@ -268,62 +250,101 @@ const onBack = () => {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color:#1a53ff;
-  font-size:12px;
-  img{
+  color: #1a53ff;
+  font-size: 12px;
+
+  img {
     width: 16px;
     height: 16px;
   }
 }
 
-.list-icon {
-  font-size: 16px;
+.table-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  margin: 12px 12px 0;
 }
 
-.table-header {
+.table-head {
   display: grid;
-  grid-template-columns: 44px 1.4fr 1.3fr 0.9fr;
-  padding: 10px 16px;
-  color:#333333;
-  font-size:14px;
-  background:#fafafa;
-  margin: 0 16px;
+  grid-template-columns: 40px 1.3fr 1.2fr 0.8fr;
+  padding: 10px 12px;
+  background: #fafafa;
+  line-height: 18px;
+  color: #333333;
+  font-size: 14px;
 }
 
 .table-row {
   display: grid;
-  grid-template-columns: 44px 1.4fr 1.3fr 0.9fr;
-  padding: 14px 16px;
-  border-bottom: 1px solid #f3f4f6;
+  grid-template-columns: 40px 1.3fr 1.2fr 0.8fr;
+  padding: 16px 12px;
+  border-top: 1px solid rgba(235, 237, 240, 1);
   background: #ffffff;
-  font-size:14px;
-  color:#333333;
-  margin: 0 16px;
-}
+  color: #333333;
+  font-size: 14px;
 
-.col {
-  display: flex;
-  align-items: center;
+  .col {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .col.checkbox {
+    overflow: visible;
+  }
 }
 
 .status-tag {
-  display: flex;
-  align-items: center;
   border-radius: 4px;
   padding: 0 6px;
-  line-height:18px;
   font-size: 12px;
-  text-align: center;
+  line-height: 18px;
 }
 
-.success{
-  background:rgba(1, 196, 102, 0.12);
-  color:#01c466;
+.status-tag.online {
+  color: rgba(0, 186, 82, 1);
+  border-color: rgba(0, 186, 82, 0.15);
+  background: rgba(0, 186, 82, 0.08);
 }
 
-.default{
-  background:rgba(153, 153, 153, 0.12);
-  color:#999999;
+.status-tag.offline {
+  color: rgba(153, 153, 153, 1);
+  border-color: rgba(153, 153, 153, 0.15);
+  background: rgba(153, 153, 153, 0.08);
+}
+
+.list-state {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+  color: #999999;
+}
+
+// 暂无数据（同 VideoPlaybackList.vue）
+.no_data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  width: 100%;
+
+  img {
+    width: 162px;
+    height: auto;
+  }
+
+  span {
+    margin: 4px 0;
+    font-size: 16px;
+    color: #999;
+    text-align: center;
+  }
 }
 
 .footer-bar {
@@ -335,4 +356,3 @@ const onBack = () => {
   font-size: 16px;
 }
 </style>
-

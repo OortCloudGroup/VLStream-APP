@@ -319,11 +319,14 @@ export class CameraRtcPlayer {
       stream.getAudioTracks().forEach(track => {
         track.enabled = true
       })
+      // 静音并发策略（应用市场审核要求）：预览流默认静音播放，
+      // 播放前将音量置 0，与其他音频流（如后台音乐）并发，不抢占音频焦点；
+      // 用户通过播放器控件手动解除静音时系统才申请焦点。
+      this.videoElement.muted = true
+      this.videoElement.volume = 0
       const playing = this.videoElement.play()
       if (playing?.then) {
-        playing.then(() => {
-          this.videoElement.muted = false
-        }).catch(() => {
+        playing.catch(() => {
           this.videoElement.controls = true
         })
       }
