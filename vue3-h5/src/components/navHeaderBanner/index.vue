@@ -292,7 +292,7 @@ $main_color: #1156a6;
 }
 
 .nav_banner_container_full {
-  height: 68px;
+  height: calc(68px + var(--vl-safe-top, 0px));
   justify-content: flex-end!important;
 }
 

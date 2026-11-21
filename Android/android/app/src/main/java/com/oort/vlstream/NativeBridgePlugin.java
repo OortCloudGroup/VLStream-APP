@@ -2,6 +2,8 @@ package com.oort.vlstream;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.text.TextUtils;
+import android.util.Base64;
 import android.view.Window;
 import android.webkit.WebView;
 
@@ -16,7 +18,17 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.Iterator;
 
 /**
  * VLStreamCloud 自研业务 Plugin。
@@ -142,6 +154,152 @@ public class NativeBridgePlugin extends Plugin {
         JSObject ret = new JSObject();
         ret.put("gateway", AppConfig.getGateway());
         call.resolve(ret);
+    }
+
+    /**
+     * 原生 multipart 文件上传：绕开 WebView CORS。后端网关不支持 OPTIONS 预检
+     * （返回 405 且无 CORS 头），WebView 内 XHR 带 accessToken/appId 等自定义
+     * header 会被预检拦死（http_status=0）。原生直传与旧 cordova-plugin-file-transfer
+     * 行为一致。
+     * 参数：serverUrl / fileKey / fileName / headers / params，
+     * 文件内容二选一：base64（dataURL 或裸 base64）或 filePath（webPath/file 路径）。
+     * resolve：{ status, body }；失败 reject code=3（对齐 FileTransferError）。
+     */
+    @PluginMethod
+    public void uploadFile(PluginCall call) {
+        final String serverUrl = call.getString("serverUrl");
+        final String fileKey = orDefault(call.getString("fileKey"), "file");
+        final String fileName = orDefault(call.getString("fileName"), "file");
+        final JSObject headers = call.getObject("headers");
+        final JSObject params = call.getObject("params");
+
+        byte[] fileData = null;
+        String base64 = call.getString("base64");
+        if (!TextUtils.isEmpty(base64)) {
+            try {
+                String b64 = base64.contains(",") ? base64.substring(base64.indexOf(',') + 1) : base64;
+                fileData = Base64.decode(b64, Base64.DEFAULT);
+            } catch (Throwable t) {
+                fileData = null;
+            }
+        }
+        if ((fileData == null || fileData.length == 0) && !TextUtils.isEmpty(call.getString("filePath"))) {
+            fileData = readWebPathFile(call.getString("filePath"));
+        }
+
+        if (TextUtils.isEmpty(serverUrl)) {
+            call.reject("uploadFile: invalid serverUrl");
+            return;
+        }
+        final byte[] data = fileData;
+        if (data == null || data.length == 0) {
+            call.reject("uploadFile: file content unavailable (base64/filePath missing or unreadable)");
+            return;
+        }
+
+        final String urlStr = serverUrl;
+        new Thread(() -> {
+            String boundary = "vlupload" + System.currentTimeMillis();
+            HttpURLConnection conn = null;
+            try {
+                ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                if (params != null) {
+                    Iterator<String> keys = params.keys();
+                    while (keys.hasNext()) {
+                        String k = keys.next();
+                        buf.write(("--" + boundary + "\r\n").getBytes(StandardCharsets.UTF_8));
+                        buf.write(("Content-Disposition: form-data; name=\"" + k + "\"\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+                        buf.write((params.optString(k, "") + "\r\n").getBytes(StandardCharsets.UTF_8));
+                    }
+                }
+                buf.write(("--" + boundary + "\r\n").getBytes(StandardCharsets.UTF_8));
+                buf.write(("Content-Disposition: form-data; name=\"" + fileKey + "\"; filename=\"" + fileName + "\"\r\n").getBytes(StandardCharsets.UTF_8));
+                buf.write(("Content-Type: " + mimeFor(fileName) + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+                buf.write(data);
+                buf.write(("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
+                byte[] body = buf.toByteArray();
+
+                URL url = new URL(urlStr);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setConnectTimeout(15000);
+                conn.setReadTimeout(60000);
+                conn.setDoOutput(true);
+                conn.setUseCaches(false);
+                conn.setFixedLengthStreamingMode(body.length);
+                conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+                if (headers != null) {
+                    Iterator<String> keys = headers.keys();
+                    while (keys.hasNext()) {
+                        String k = keys.next();
+                        conn.setRequestProperty(k, headers.optString(k, ""));
+                    }
+                }
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(body);
+                    os.flush();
+                }
+                int status = conn.getResponseCode();
+                InputStream is = (status >= 200 && status < 300) ? conn.getInputStream() : conn.getErrorStream();
+                ByteArrayOutputStream resp = new ByteArrayOutputStream();
+                if (is != null) {
+                    byte[] chunk = new byte[8192];
+                    int n;
+                    while ((n = is.read(chunk)) > 0) resp.write(chunk, 0, n);
+                    try { is.close(); } catch (Throwable ignore) {}
+                }
+                JSObject ret = new JSObject();
+                ret.put("status", status);
+                ret.put("body", new String(resp.toByteArray(), StandardCharsets.UTF_8));
+                call.resolve(ret);
+            } catch (Throwable t) {
+                call.reject("uploadFile: " + (t.getMessage() == null ? t.getClass().getSimpleName() : t.getMessage()), "3");
+            } finally {
+                if (conn != null) conn.disconnect();
+            }
+        }).start();
+    }
+
+    private static String orDefault(String v, String fallback) {
+        return TextUtils.isEmpty(v) ? fallback : v;
+    }
+
+    /** 把 takePhoto 的 webPath（https://localhost/_capacitor_file_/… 或 file://…）转为 POSIX 路径并读取。 */
+    private static byte[] readWebPathFile(String webPath) {
+        try {
+            String path = webPath;
+            int idx = path.indexOf("_capacitor_file_");
+            if (idx >= 0) {
+                path = path.substring(idx + "_capacitor_file_".length());
+            }
+            if (path.startsWith("file://")) {
+                path = path.substring("file://".length());
+            }
+            String decoded = URLDecoder.decode(path, "UTF-8");
+            File f = new File(decoded);
+            if (!f.exists() || !f.isFile()) return null;
+            FileInputStream fis = new FileInputStream(f);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] chunk = new byte[8192];
+            int n;
+            while ((n = fis.read(chunk)) > 0) out.write(chunk, 0, n);
+            fis.close();
+            return out.toByteArray();
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /** 按文件名后缀给 Content-Type（覆盖业务常用类型，其余 octet-stream）。 */
+    private static String mimeFor(String fileName) {
+        String lower = fileName == null ? "" : fileName.toLowerCase();
+        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
+        if (lower.endsWith(".png")) return "image/png";
+        if (lower.endsWith(".gif")) return "image/gif";
+        if (lower.endsWith(".webp")) return "image/webp";
+        if (lower.endsWith(".mp4")) return "video/mp4";
+        if (lower.endsWith(".pdf")) return "application/pdf";
+        return "application/octet-stream";
     }
 
     /** 返回应用信息。 */
