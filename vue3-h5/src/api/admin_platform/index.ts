@@ -366,6 +366,12 @@ export function myPcList(data) {
   return commonFunc('client/module/mypclist', data)
 }
 
+// 新用户所在租户可能未开通本应用，平台返回 not found；由调用方静默降级，不弹全局提示
 export function idbysecretdetail(data) {
-  return commonFunc('supplier-platform/app/idbysecretdetail', data)
+  return request({
+    url: config.platformURL + config.gateWay + 'apaas-admin-platform/supplier-platform/app/idbysecretdetail',
+    method: 'post',
+    data: data,
+    silentError: true
+  } as any)
 }

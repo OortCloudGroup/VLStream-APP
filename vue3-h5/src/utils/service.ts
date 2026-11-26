@@ -102,7 +102,8 @@ function createService() {
             location.reload()
           } else {
             dropVlstreamTokenOn401(`${response.config?.url || ''}`, response.data.code)
-            if (response.data.msg) showToast(response.data.msg)
+            // silentError：调用方自行处理失败（如登录后非必需的应用信息），不弹全局提示
+            if (response.data.msg && !(response.config as any)?.silentError) showToast(response.data.msg)
           }
         }
       }
@@ -113,14 +114,15 @@ function createService() {
       let errMessage = error.message
       const errorBody = error.response?.data
       dropVlstreamTokenOn401(`${error.config?.url || ''}`, httpStatusCode || errorBody?.code)
+      const silent = !!(error.config as any)?.silentError
       if (errorBody && errorBody.code) {
         errMessage = errorBody.code + errorBody.msg
         errorBody.msg = errorBody.msg || errorBody.message
-        errorBody.msg && showToast(errorBody.msg)
+        errorBody.msg && !silent && showToast(errorBody.msg)
         if (errorBody.msg?.includes('accessToken无效') || errorBody.msg?.includes('无效的accesstoken') || errorBody.msg?.includes('token失效')) {
           useGoWhere().goWhere()
         }
-      } else if (errMessage) {
+      } else if (errMessage && !silent) {
         showToast(errMessage)
       }
       if (httpStatusCode === 404) {
