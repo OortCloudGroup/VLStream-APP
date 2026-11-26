@@ -14,6 +14,9 @@
       </div>
 
       <div class="table-body">
+        <div v-if="loaded && !filteredRows.length" class="table-empty">
+          {{ mineOnly ? $t('还没有添加设备，点击右下角 + 添加') : $t('暂无数据') }}
+        </div>
         <div
           v-for="row in filteredRows"
           :key="row.id"
@@ -72,6 +75,7 @@ import EditDevice from '../deviceManagement/EditDevice.vue'
 import { getDeviceList } from '@/api/VLStreamCloud/device'
 import { getWvpVlsDeviceList } from '@/api/VLStreamCloud/wvp'
 import { resolveWvpDeviceRow } from '@/utils/wvpDevice'
+import { ensureVlstreamUserId } from '@/utils/vlstreamAuth'
 import { useUserStore } from '@/store/modules/useraPaas'
 import config from '@/config'
 
@@ -83,6 +87,11 @@ const props = defineProps({
   keyword: {
     type: String,
     default: ''
+  },
+  // 只显示当前用户添加的设备（按 VLStream 本地用户 ID 匹配 createUser）
+  mineOnly: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -94,10 +103,15 @@ const isLocalAuth = config.authMode === 'local'
 const { t } = useI18n()
 
 const rows = ref([])
+const loaded = ref(false)
+const myUserId = ref('')
 
 // 后端 /vlsDeviceInfo/page 的 SQL 不做条件过滤，标签/关键字统一在前端匹配
 const filteredRows = computed(() => {
   let list = rows.value
+  if (props.mineOnly) {
+    list = myUserId.value ? list.filter(row => String(row.createUser || '') === myUserId.value) : []
+  }
   if (props.tagName) {
     list = list.filter(row => String(row.tag || '') === String(props.tagName))
   }
@@ -122,7 +136,11 @@ const fetchDevices = async() => {
     if (res && res.code === 200 && Array.isArray(res.rows)) {
       rows.value = res.rows.map(normalizeWvpRow)
     }
+    loaded.value = true
     return
+  }
+  if (props.mineOnly && !myUserId.value) {
+    myUserId.value = await ensureVlstreamUserId()
   }
   const params = {
     accessToken: store.userInfo?.accessToken,
@@ -133,6 +151,7 @@ const fetchDevices = async() => {
   if (res.code === 200 && res.data && Array.isArray(res.data.records)) {
     rows.value = res.data.records
   }
+  loaded.value = true
 }
 
 onMounted(() => {
@@ -183,6 +202,13 @@ const onAdd = () => {
 <style lang="scss" scoped>
 .list-wrap {
   position: relative;
+}
+
+.table-empty {
+  padding: 32px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--vl-text-3);
 }
 
 .table-card {

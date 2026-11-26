@@ -8,9 +8,9 @@
 
     <div class="my-content">
       <!-- 用户信息卡片 -->
-      <div class="profile-card">
-        <div class="avatar" @click="onChangeAvatar">
-          <img v-if="customAvatar" :src="customAvatar" class="avatar-img" alt="" />
+      <div class="profile-card" @click="onProfileClick">
+        <div class="avatar" @click.stop="onAvatarClick">
+          <img v-if="avatarSrc" :src="avatarSrc" class="avatar-img" alt="" />
           <div v-else class="avatar-img avatar-generated" :style="{ background: avatarColor }">
             {{ avatarLetter }}
           </div>
@@ -24,6 +24,7 @@
             {{ displayDept }}
           </div>
         </div>
+        <LineIcon v-if="!isLocalAuth" name="chevron" :size="18" class="menu-arrow" />
       </div>
 
       <!-- 菜单列表 -->
@@ -94,24 +95,32 @@ const { t } = useI18n()
 // 用户信息
 const store = useUserStore()
 const router = useRouter()
-const displayName = computed(() => store.userInfo?.userName || '--')
+// 单租户集群没有 apaas-sso 的个人信息接口，资料编辑、密码、我的设备只在多租户提供
+const isLocalAuth = config.authMode === 'local'
+const displayName = computed(() => store.userInfo?.userName || store.userInfo?.user_name || '--')
 const displayPhone = computed(() => store.userInfo?.phone || '--')
 const displayDept = computed(() => store.userInfo?.deptName || '--')
 
 // 菜单配置
 const menuItems = computed(() => [
+  ...(isLocalAuth ? [] : [
+    { key: 'devices', title: t('我的设备'), icon: 'device' },
+    { key: 'password', title: t('登录密码'), icon: 'lock' }
+  ]),
   { key: 'help', title: t('帮助'), icon: 'help' },
   { key: 'about', title: t('关于我们'), icon: 'info' },
   { key: 'settings', title: t('设置'), icon: 'settings' }
 ])
 
-// ========= 头像（默认由用户名生成，支持本地更换） =========
+// ========= 头像 =========
+// 多租户：用平台资料里的头像（在“个人信息”里上传更换）；单租户：默认由用户名生成，支持本地更换
 // 黑白主题：头像统一用深浅不同的中性色
 const AVATAR_COLORS = ['#ff6a00', '#f2780c', '#e8590c', '#ff8a33']
 const avatarStorageKey = computed(() => `vlstream_avatar_${store.userInfo?.userName || 'default'}`)
 const customAvatar = ref(localStorage.getItem(avatarStorageKey.value) || '')
+const avatarSrc = computed(() => (isLocalAuth ? customAvatar.value : (store.userInfo?.photo || '')))
 const avatarLetter = computed(() => {
-  const name = (store.userInfo?.userName || '').trim()
+  const name = (store.userInfo?.userName || store.userInfo?.user_name || '').trim()
   return name ? name.charAt(0).toUpperCase() : 'U'
 })
 const avatarColor = computed(() => {
@@ -129,7 +138,15 @@ const avatarActions = computed(() => (customAvatar.value
   ? [{ name: t('更换头像'), key: 'change' }, { name: t('恢复默认'), key: 'reset' }]
   : [{ name: t('更换头像'), key: 'change' }]))
 
-const onChangeAvatar = () => {
+const onProfileClick = () => {
+  if (!isLocalAuth) router.push('/profileEdit')
+}
+
+const onAvatarClick = () => {
+  if (!isLocalAuth) {
+    router.push('/profileEdit')
+    return
+  }
   showAvatarActions.value = true
 }
 
@@ -182,6 +199,14 @@ const settingsActions = computed(() => [
 ])
 
 const onMenuClick = (item) => {
+  if (item.key === 'devices') {
+    router.push('/myDevices')
+    return
+  }
+  if (item.key === 'password') {
+    router.push('/passwordEdit')
+    return
+  }
   if (item.key === 'help') {
     router.push('/contactUS')
     return

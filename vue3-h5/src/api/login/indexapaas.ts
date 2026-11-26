@@ -189,3 +189,30 @@ export function authConfigList(data: any) {
 export function generateCaptcha(data: any) {
   return commonFunc('sso/v1/generateCaptcha', data, 'post')
 }
+
+// ---- 我的：个人信息与密码（与 apaas-web 个人中心一致）----
+
+/** 编辑个人信息：user_name / photo / ex_data 等，未传的 ex_data 字段会被清空，需带上原值 */
+export function userEdit(data: any) {
+  return commonFunc('sso/v1/userEdit', data, 'post')
+}
+
+/** 获取密码加密公钥（resetPassword / initPassword 使用） */
+export function getPublicKey(data: any) {
+  return commonFunc('sso/v1/getPublicKey', data, 'post')
+}
+
+/** 初设密码（账号尚无登录密码时，如验证码注册的新用户），需同时设定登录账号 */
+export function initPassword(data: any) {
+  return commonFunc('sso/v1/initPassword', data, 'post')
+}
+
+/** 租户密码策略 */
+export function getPasswordPolicy(data: any) {
+  return commonFunc('passwordPolicy/v1/get', data, 'post')
+}
+
+/** 按租户密码策略校验新密码，返回 { valid, errors } */
+export function validatePasswordPolicy(data: any) {
+  return commonFunc('passwordPolicy/v1/validate', data, 'post')
+}

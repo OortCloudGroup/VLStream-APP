@@ -90,6 +90,24 @@ const routes = [
     }
   },
   {
+    path: '/profileEdit',
+    name: 'profileEdit',
+    meta: { title: '个人信息' },
+    component: () => import('@/pages/VLStreamCloud/page/my/profileEdit.vue')
+  },
+  {
+    path: '/passwordEdit',
+    name: 'passwordEdit',
+    meta: { title: '登录密码' },
+    component: () => import('@/pages/VLStreamCloud/page/my/passwordEdit.vue')
+  },
+  {
+    path: '/myDevices',
+    name: 'myDevices',
+    meta: { title: '我的设备' },
+    component: () => import('@/pages/VLStreamCloud/page/my/myDevices.vue')
+  },
+  {
     path: '/myWorkorder',
     name: 'myWorkorder',
     meta: { title: '我的工单' },

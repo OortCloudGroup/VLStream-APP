@@ -46,7 +46,7 @@
             v-model="username"
             class="login_field"
             left-icon="manager-o"
-            :placeholder="$t('请输入用户名')"
+            :placeholder="isLocalAuth ? $t('请输入用户名') : $t('请输入账号/手机号/邮箱')"
             clearable
             @blur="checkCaptcha"
           />
