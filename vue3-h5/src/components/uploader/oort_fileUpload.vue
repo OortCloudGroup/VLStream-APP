@@ -32,8 +32,8 @@
 </template>
 <script>
 import { uploadFile } from '@/api/fastdfs'
-import config from '@/config/index.js'
-import { showLoadingToast, closeToast } from 'vant'
+import { uploadUrl, uploadHeaders, normalizeUploadedUrl } from '@/config/index.js'
+import { showLoadingToast, closeToast, showFailToast } from 'vant'
 import bus from '@/utils/bus'
 import { getToken } from '@/utils/cache'
 export default {
@@ -61,7 +61,7 @@ export default {
     },
     uploadURL: {
       type: String,
-      default: config.platformURL + config.gateWay + 'apaas-fastdfsservice/fastdfs/v1/uploadFile'
+      default: () => uploadUrl()
     }
   },
   data() {
@@ -149,7 +149,7 @@ export default {
       return new Promise(resolve => {
         let ft = new window.FileTransfer()
         let options = new window.FileUploadOptions()
-        options.headers = { accessToken: getToken(), ...config.headers }
+        options.headers = uploadHeaders(getToken())
         // 对应后台的字段
         options.fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1)
         // 对应后台的字段
@@ -162,21 +162,21 @@ export default {
             try {
               let res = JSON.parse(msg.response)
               if (res.code === 200) {
-                this.imgUrl = res.data.url
+                this.imgUrl = normalizeUploadedUrl(res.data.url)
                 // this.upImage(res.data.url)
                 this.uploadPhoto(res.data.duration, options.fileName)
                 resolve(res)
               } else {
                 resolve(res)
-                console.log(res)
+                showFailToast(res.msg || this.$t('上传失败 uploadFile'))
               }
             } catch (e) {
-              alert(this.$t('上传失败 uploadFile'))
+              showFailToast(this.$t('上传失败 uploadFile'))
             }
           },
           () => {
             closeToast()
-            // console.log(err)
+            showFailToast(this.$t('上传失败 uploadFile'))
           },
           options
         )
@@ -200,9 +200,10 @@ export default {
       formD.append('file', file.file)
       uploadFile(formD).then(res => {
         this.fileList.splice(detail.index, 1)
-        this.imgUrl = res.data.url
+        const fileUrl = normalizeUploadedUrl(res.data.url)
+        this.imgUrl = fileUrl
         const newFile = {
-          url: res.data.url,
+          url: fileUrl,
           fileType: file.file.type,
           suffix: this.getSuffix(this.imgUrl),
           name: file.file.name,

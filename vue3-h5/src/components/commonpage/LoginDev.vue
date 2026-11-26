@@ -75,8 +75,14 @@
       </van-button>
     </div>
 
-    <div class="footer_tip">
-      {{ $t('登录即表示同意平台服务条款') }}
+    <!-- 华为审核 7.5 项要求：默认不勾选的空白复选框 + 用户主动勾选同意，禁止"登录即表示同意"式默认同意表述 -->
+    <div class="privacy_agree">
+      <span class="agree_box" :class="{ checked: agreePrivacy }" @click="agreePrivacy = !agreePrivacy">
+        <van-icon v-if="agreePrivacy" name="success" />
+      </span>
+      <span class="agree_text">
+        {{ $t('我已阅读并同意') }}<span class="policy_link" @click="openPrivacyPolicy">《{{ $t('用户协议和隐私政策') }}》</span>
+      </span>
     </div>
 
     <!-- 租户选择弹窗 -->
@@ -180,6 +186,10 @@ const autoLogin = ref(false)
 const showPwd = ref(false)
 const loading = ref(false)
 
+// 隐私政策勾选状态：新装/审核环境（localStorage 为空）默认不勾选；
+// 用户勾选并登录成功后持久化，下次进入自动勾选，保证"下次自动登录"链路可用
+const agreePrivacy = ref(window.localStorage.getItem('privacyAgreed') === 'true')
+
 import { useUserStore } from '@/store/modules/useraPaas'
 import Config from '@/config'
 const store = useUserStore()
@@ -196,7 +206,19 @@ const refreshCaptcha = () => {
   timeStamp.value = new Date().getTime()
 }
 
+// 华为应用市场隐私审核要求：注册/登录界面需能明确阅读隐私政策。
+// 与「我的 → 关于 → 隐私政策」(aboutPage.vue) 使用同一公网页址。
+const PRIVACY_POLICY_URL = 'https://oortcloudsmart.com/privacypolicy_vlstream.html'
+const openPrivacyPolicy = () => {
+  window.location.href = PRIVACY_POLICY_URL
+}
+
 const loginBtn = async() => {
+  if (!agreePrivacy.value) {
+    showToast(t('请先阅读并勾选同意用户协议和隐私政策'))
+    return
+  }
+  window.localStorage.setItem('privacyAgreed', 'true')
   if (!username.value) {
     showToast(t('请输入用户名'))
     return
@@ -443,13 +465,48 @@ $text_sub: #8a8f99;
   opacity: 0.9;
 }
 
-.footer_tip {
-  margin-top: 28px;
+.privacy_agree {
+  margin-top: 20px;
   margin-bottom: auto;
-  font-size: 12px;
-  color: #b3b8c2;
+  display: flex;
+  align-items: flex-start;
   position: relative;
   z-index: 1;
+  padding: 0 4px;
+}
+
+.agree_box {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  border-radius: 50%;
+  border: 1.5px solid #cfd4de;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.checked {
+    background: $brand;
+    border-color: $brand;
+  }
+}
+
+.agree_text {
+  margin-left: 8px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #b3b8c2;
+}
+
+.policy_link {
+  color: $brand;
+  cursor: pointer;
 }
 
 /* 租户选择弹窗 */

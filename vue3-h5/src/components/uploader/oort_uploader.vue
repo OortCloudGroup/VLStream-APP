@@ -40,8 +40,8 @@
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { uploadFile } from '@/api/fastdfs'
-import config from '@/config/index.js'
-import { showLoadingToast } from 'vant'
+import config, { uploadUrl, uploadHeaders, normalizeUploadedUrl } from '@/config/index.js'
+import { showLoadingToast, showFailToast } from 'vant'
 import bus from '@/utils/bus'
 import getQueryUrlString from '@/utils/getQueryUrlString'
 import { getToken } from '@/utils/cache'
@@ -71,7 +71,7 @@ const props = defineProps({
   }
 })
 
-const uploadURL = ref(config.platformURL + config.gateWay + 'apaas-fastdfsservice/fastdfs/v1/uploadFile')
+const uploadURL = ref(uploadUrl())
 
 const emit = defineEmits(['update:show', 'getImgUrl'])
 
@@ -243,7 +243,7 @@ const uploadLocalFilePath = (localPath) => {
   return new Promise(resolve => {
     let ft = new window.FileTransfer()
     let options = new window.FileUploadOptions()
-    options.headers = { accessToken: getToken(), ...config.headers }
+    options.headers = uploadHeaders(getToken())
     // 对应后台的字段
     console.log('--options.headers--', options.headers)
     options.fileName = localPath.substr(localPath.lastIndexOf('/') + 1)
@@ -257,15 +257,18 @@ const uploadLocalFilePath = (localPath) => {
         try {
           let res = JSON.parse(msg.response)
           if (res.code === 200) {
+            if (res.data && res.data.url) res.data.url = normalizeUploadedUrl(res.data.url)
             res.data.options = options
             resolve(res)
+          } else {
+            showFailToast(res.msg || t('上传失败 uploadFile'))
           }
         } catch (e) {
-          alert(t('上传失败 uploadFile'))
+          showFailToast(t('上传失败 uploadFile'))
         }
       },
-      (e) => {
-        console.error('error', e)
+      (_e) => {
+        showFailToast(t('上传失败 uploadFile'))
       },
       options
     )

@@ -58,7 +58,7 @@ import { useField } from '~@/components/form-designer/form-widget/field-widget/f
 import FormItemWrapper from '~@/components/form-designer/form-widget/field-widget/form-item-wrapper'
 import OortFileUpload from '@/components/uploader/oort_fileUpload'
 import { deepClone } from '~@/utils/util'
-import config from '@/config/index'
+import { uploadUrl } from '@/config/index'
 
 export default {
   componentName: 'FieldWidget',
@@ -99,7 +99,7 @@ export default {
     const { i18nt } = useI18n()
 
     const data = reactive({
-      defaultUploadURL: config.platformURL + config.gateWay + 'apaas-fastdfsservice/fastdfs/v1/uploadFile',
+      defaultUploadURL: uploadUrl(),
       showUploaderFile: false,
       accept: '*/*',
       ImagePreview: {},

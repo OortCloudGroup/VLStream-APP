@@ -102,3 +102,6 @@ app/src/main/res/xml/config.xml
 
 # oh-my-claudecode 运行时状态
 .omc/
+
+# 正式签名凭据（本地留存，勿提交）
+/keystore.properties

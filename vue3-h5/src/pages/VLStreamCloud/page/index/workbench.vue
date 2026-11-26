@@ -273,30 +273,17 @@ const startClock = () => {
   clockTimer = setInterval(updateNow, 1000)
 }
 
-const getCurrentPosition = () => new Promise((resolve, reject) => {
-  if (!navigator.geolocation) {
-    reject(new Error('Geolocation not supported'))
-    return
-  }
-  navigator.geolocation.getCurrentPosition(
-    position => resolve(position.coords),
-    error => reject(error),
-    { enableHighAccuracy: false, timeout: 5000, maximumAge: 600000 }
-  )
-})
+// 天气使用固定默认坐标（北京），不再调用 navigator.geolocation 获取定位。
+// 原因：华为应用市场隐私审核判定"首页非位置业务场景提前申请位置权限"违规——
+// 页面挂载即触发定位会由原生壳弹出系统位置授权框（用户未主动点击任何位置相关功能）。
+// 应用无位置相关业务，天气为装饰性展示，默认坐标即可满足；Android 端亦已移除位置权限声明。
+const DEFAULT_WEATHER_LATITUDE = 39.9042
+const DEFAULT_WEATHER_LONGITUDE = 116.4074
 
 const fetchWeather = async() => {
   try {
-    let latitude = 39.9042
-    let longitude = 116.4074
-
-    try {
-      const coords = await getCurrentPosition()
-      latitude = coords.latitude
-      longitude = coords.longitude
-    } catch (error) {
-      // 使用默认坐标（北京）
-    }
+    const latitude = DEFAULT_WEATHER_LATITUDE
+    const longitude = DEFAULT_WEATHER_LONGITUDE
 
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m`
     const response = await fetch(url)

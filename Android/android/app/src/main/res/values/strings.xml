@@ -4,4 +4,8 @@
     <string name="title_activity_main">VLStream</string>
     <string name="package_name">com.oort.vlstream</string>
     <string name="custom_url_scheme">com.oort.vlstream</string>
+    <!-- 首启隐私政策同意页（华为应用市场审核要求） -->
+    <string name="privacy_consent_title">用户协议与隐私政策</string>
+    <string name="privacy_consent_disagree">不同意</string>
+    <string name="privacy_consent_agree">同意并继续</string>
 </resources>

@@ -20,6 +20,14 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        // 隐私合规兜底：正常启动路径由 PrivacyConsentActivity(Launcher) 拦截，
+        // 但若外部经 intent 直接拉起 MainActivity（如 deep link / adb），此处补一道校验，
+        // 未同意前不加载任何 H5 内容，转回隐私同意页。
+        if (!PrivacyConsentActivity.isAgreed(this)) {
+            PrivacyConsentActivity.launch(this);
+            finish();
+            return;
+        }
         // 自研业务 plugin 必须在 super.onCreate 之前注册
         registerPlugin(NativeBridgePlugin.class);
         super.onCreate(savedInstanceState);

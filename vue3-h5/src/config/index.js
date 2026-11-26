@@ -108,6 +108,45 @@ export function applyVlEnv(name) {
   return config.vlEnv
 }
 
+/**
+ * 通用文件上传端点（App 拍照/相册、VForm 附件、头像共用）。
+ * single：平台 fastdfs 不路由，走 vls-server 新接口（PUBLIC_FILE_UPLOAD_API.md），
+ *          multipart 字段 file，Authorization: Bearer <token>，响应 data.url。
+ * multi：沿用原 apaas-fastdfsservice（平台集群服务正常）。
+ */
+export function uploadUrl() {
+  if (config.authMode === 'local') {
+    return `${config.URL}${config.gateWay}vls-server/system/oss/upload`
+  }
+  return `${config.platformURL}${config.gateWay}apaas-fastdfsservice/fastdfs/v1/uploadFile`
+}
+
+/**
+ * 上传请求头：single 的新接口要 Authorization: Bearer，
+ * 旧的 accessToken/appId 等头保留（服务端兼容，不影响）。
+ */
+export function uploadHeaders(token) {
+  const headers = { ...config.headers, accessToken: token || '' }
+  if (config.authMode === 'local') {
+    headers.Authorization = token ? `Bearer ${token}` : ''
+  }
+  return headers
+}
+
+/**
+ * single 新接口返回的 data.url 可能是内网/错误地址（如 http://host:443/system/oss/public/{id}），
+ * 按当前网关重写为可公网访问的地址；multi 或已是完整 http URL 则原样返回。
+ */
+export function normalizeUploadedUrl(url) {
+  if (!url || typeof url !== 'string') return url
+  if (config.authMode !== 'local') return url
+  const m = url.match(/\/system\/oss\/public\/([^/?#]+)/)
+  if (m) {
+    return `${config.URL}${config.gateWay}vls-server/system/oss/public/${m[1]}`
+  }
+  return url
+}
+
 applyVlEnv(import.meta.env.VITE_VL_ENV || DEFAULT_VL_ENV)
 
 export default config

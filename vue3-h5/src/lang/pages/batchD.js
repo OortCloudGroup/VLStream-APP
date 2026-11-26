@@ -26,7 +26,9 @@ export default {
   '视频流云平台': 'Video Streaming Cloud Platform',
   '账号登录': 'Account Login',
   '下次自动登录': 'Auto-login next time',
-  '登录即表示同意平台服务条款': 'By logging in, you agree to the platform Terms of Service',
+  '我已阅读并同意': 'I have read and agree to the',
+  '请先阅读并勾选同意用户协议和隐私政策': 'Please read and check to agree to the User Agreement and Privacy Policy first',
+  '用户协议和隐私政策': 'User Agreement and Privacy Policy',
   '请选择登录租户': 'Select a tenant to log in',
   '该账号关联了多个租户': 'This account is linked to multiple tenants'
 }

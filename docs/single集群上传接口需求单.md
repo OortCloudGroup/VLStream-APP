@@ -1,9 +1,10 @@
 # VLStream single 集群图片上传通路缺失 — 后端/运维需求单
 
-> 日期：2026-11-20（2026-11-21 复测更新）
+> 日期：2026-11-20（2026-11-21 复测更新；2026-11-24 后端已上线并完成前端对接，见第八节）
 > 提出方：App 端（iOS/Android/HarmonyOS 三端共用的 vue3-h5 前端）
 > 影响：single（单租户）环境下 **所有** 图片上传功能不可用（智能分析申请、事件反馈、头像等），三端一致；**Web 端同样受影响**
 > 附注：已上架的鸿蒙版 1.0.2 同样受影响
+> **状态更新（2026-11-24）：后端已上线 `POST /bus/vls-server/system/oss/upload`（见 `PUBLIC_FILE_UPLOAD_API.md`），前端已完成对接并构建入三端包，模拟器端到端验证 HTTP 200 + code 200。本需求单的问题已闭环（仅 `VLSTREAM_PUBLIC_FILES_BASE_URL` 返回地址需前端兼容，已处理）。**
 
 ---
 
@@ -168,3 +169,35 @@ curl -X POST "https://vls.oortcloudsmart.com/bus/apaas-fastdfsservice/fastdfs/v1
 ### 交接方式
 
 - 把本需求单 + `VlsCommonUploadController.java` 一起发给 vls-stream 后端负责人即可；也可以在内部 GitLab 的 vls-stream 仓库上直接提 MR（代码已按该仓库现有代码风格/包路径写好，可原样提交）。
+
+---
+
+## 九、闭环记录（2026-11-24）
+
+### 后端已交付
+
+接口文档：`~/Downloads/PUBLIC_FILE_UPLOAD_API.md`，实际端点：
+
+```
+POST https://vlstream.oortcloudsmart.com:2443/bus/vls-server/system/oss/upload
+Authorization: Bearer <VLS_TOKEN>
+multipart 字段 file（≤50 MiB）
+→ {"code":200,"msg":"操作成功","data":{"fileId":"...","fileName":"...","size":70,"url":"..."}}
+```
+
+下载：`GET /bus/vls-server/system/oss/public/{fileId}`（匿名可访问）。
+
+### 前端对接（vue3-h5，已构建入三端）
+
+- `src/config/index.js` 新增 `uploadUrl()` / `uploadHeaders()` / `normalizeUploadedUrl()`：
+  - single：`.../vls-server/system/oss/upload` + `Authorization: Bearer`；multi：保持原平台 fastdfs
+  - **服务端返回 url 为 `http://host:443/system/oss/public/{id}`（缺 `/bus/vls-server` 前缀，直接访问 502）**——前端 `normalizeUploadedUrl()` 按当前网关重写为可下载地址（对应文档第 90 行 `VLSTREAM_PUBLIC_FILES_BASE_URL` 配置未生效；建议后端仍配置该变量，前端兼容为兜底）
+- 改造点：`api/fastdfs/index.ts`、`oort_fileUpload.vue`、`oort_uploader.vue`、VForm `m-file-upload-widget.vue`
+- 失败提示：两个上传组件原静默失败改为 `showFailToast`（覆盖 2.1(a) 拒审现象）
+- 构建：`npm run build` → `dist`（index-751f6802.js）→ 三端已同步（iOS cap sync 后手动补回 `NativeBridgePlugin` 登记；Android cap sync；HarmonyOS 手动复制到 rawfile/www）
+
+### 验证证据
+
+1. curl 端到端：SM2 登录 → token → 上传 → `code:200` + fileId → 修正 url 后 GET 返回 200/70 字节 ✅
+2. 模拟器（iPhone 17 Pro，build 7 包 + 新 dist）：探针 hook 原生桥，自动登录后上传 → `NB-RES status=200 body={"code":200,...}` ✅
+3. 失败路径：未登录上传 → `{"code":401}`；App 内走 failCb → toast（代码已改）

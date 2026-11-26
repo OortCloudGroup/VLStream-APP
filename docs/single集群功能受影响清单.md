@@ -68,3 +68,13 @@ App 审批模块（`api/processui/approval.ts`，工作台/事件审批页引用
 2. **零 XHR 漏网**：全程无任何 `XHR-UPLOAD` 记录，没有页面走 WebView XHR 上传（CORS 问题已在原生通道层根治）。
 3. **前端侧无其他死点**：登录、页面导航、原生桥调用、回调接收全部正常；唯一死点就是服务器路由缺失。
 4. 隐含推论：只要后端上线新上传接口 + 前端切换端点，1-8 项功能全部恢复，无需逐页面验证。
+
+---
+
+## 六、状态更新（2026-11-24）：上传类已全部修复
+
+后端上线 `POST /bus/vls-server/system/oss/upload`（`PUBLIC_FILE_UPLOAD_API.md`），前端已按 authMode 切换端点（single 走新接口 + Bearer；multi 保持 fastdfs），并构建入三端包。本清单第一节 1-8 项上传功能全部恢复；模拟器端到端验证 HTTP 200 + code 200。
+
+- 失败提示已补（两个上传组件的 failCb 改为 showFailToast），不会再出现审核员视角的「无响应」。
+- 第二节审批工单 `workflow/process/*` 47 字节非 JSON 问题**仍待后端排查**（与上传无关）。
+- 第三节降级项不变。
