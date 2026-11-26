@@ -17,8 +17,13 @@
  */
 ;(function (root) {
   // —— 运行环境检测 ——
+  // ⚠️ Capacitor 8 已移除 Capacitor.isNative 布尔属性（改为 isNativePlatform()），
+  //    只判 isNative 会导致原生壳内 cap() 恒为 null → takePhoto/appExit 等全部静默失效。
   const cap = function () {
-    return (typeof root !== 'undefined') && root.Capacitor && root.Capacitor.isNative ? root.Capacitor : null
+    if (typeof root === 'undefined' || !root.Capacitor) return null
+    if (root.Capacitor.isNative) return root.Capacitor
+    if (typeof root.Capacitor.isNativePlatform === 'function' && root.Capacitor.isNativePlatform()) return root.Capacitor
+    return null
   }
   const isNative = function () {
     return !!cap()
@@ -296,6 +301,49 @@
     const headers = options.headers || {}
     const params = options.params || {}
     const fileName = options.fileName || guessFileName(filePath)
+
+    // —— 原生上传通道（首选）——
+    // 后端网关不支持 CORS 预检（OPTIONS 405 且无 CORS 头），WebView 内 XHR
+    // 带 accessToken/appId 等自定义 header 必被拦（http_status=0）。
+    // 原生 URLSession/HttpURLConnection 直传不受 CORS 约束，与旧
+    // cordova-plugin-file-transfer（原生实现）行为一致。
+    const bridge = (typeof root.Capacitor === 'object' && root.Capacitor.Plugins)
+      ? root.Capacitor.Plugins.NativeBridge : null
+    if (bridge && typeof bridge.uploadFile === 'function') {
+      const payload = {
+        serverUrl: serverUrl,
+        fileKey: fileKey,
+        fileName: decodeURIComponent(fileName),
+        headers: headers,
+        params: params
+      }
+      if (fileDataMap[filePath]) {
+        payload.base64 = fileDataMap[filePath]
+      } else if (filePath) {
+        payload.filePath = filePath
+      } else {
+        failCb && failCb(new FileTransferError(1))
+        return
+      }
+      bridge.uploadFile(payload).then(function (res) {
+        const status = res && typeof res.status === 'number' ? res.status : 0
+        if (status >= 200 && status < 300) {
+          winCb && winCb({ response: (res && res.body) || '', responseCode: status, bytesSent: 0 })
+        } else {
+          const e = new FileTransferError(3)
+          e.http_status = status
+          e.body = (res && res.body) || ''
+          failCb && failCb(e)
+        }
+      }).catch(function (err) {
+        const e = new FileTransferError(3)
+        e.body = (err && err.message) || ''
+        failCb && failCb(e)
+      })
+      return
+    }
+
+    // —— WebView 内回退（浏览器环境）：XHR + FormData ——
 
     const doUpload = function (blob) {
       if (!blob) {

@@ -1,4 +1,6 @@
+# 允许执行 install/postinstall 构建脚本的依赖（pnpm 10 安全机制）
+# 原文件为未填完的占位内容，导致 pnpm 报 "packages field missing or empty"，已修正为布尔值
 allowBuilds:
-  '@parcel/watcher': set this to true or false
-  core-js: set this to true or false
-  esbuild: set this to true or false
+  '@parcel/watcher': true
+  core-js: true
+  esbuild: true

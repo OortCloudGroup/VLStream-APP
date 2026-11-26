@@ -7,8 +7,6 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>VLStreamCloud</string>
-	<key>CFBundleDisplayName</key>
 	<string>VLStream</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
@@ -36,11 +34,27 @@
 	<!-- 定位（@capacitor/geolocation，二期） -->
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>VLStream 需要获取您的位置以提供地图与定位服务</string>
-	<!-- 允许 http 明文访问（兼容调试/旧网关） -->
+	<!-- ATS：生产后端均为 HTTPS（:2443）。已移除全局 NSAllowsArbitraryLoads（App Store 审核高风险），
+	     改为仅对已知业务域名放行。若后端使用公开可信证书，可删除对应的 NSExceptionAllowsInsecureHTTPLoads。 -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>workup.oortcloudsmart.com</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<false/>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<key>vlstream.oortcloudsmart.com</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<false/>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
 	</dict>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
@@ -65,10 +79,6 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>armv7</string>
-	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

@@ -34,17 +34,23 @@ public class NativeBridgePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "getAppInfo", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "tokenOverdue", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setStatusBar", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "setImmersiveMode", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "setImmersiveMode", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "uploadFile", returnType: CAPPluginReturnPromise)
     ]
 
     /// JS 全局对象名：window.__VL_STATIC__
     private static let jsStaticVar = "__VL_STATIC__"
+
+    /// 本插件注入的 document-start 脚本，safe-area 重同步时单独移除/重建，
+    /// 不能 removeAllUserScripts（会连带删掉 Capacitor 自己的桥接脚本）
+    private var bootUserScript: WKUserScript?
 
     // MARK: - Lifecycle
 
     public override func load() {
         super.load()
         injectDocumentStartScript()
+        resyncSafeAreaWhenReady()
     }
 
     /// 在 WKWebView 上注入 document-start 脚本（早于业务脚本执行）。
@@ -64,6 +70,56 @@ public class NativeBridgePlugin: CAPPlugin, CAPBridgedPlugin {
                                       injectionTime: .atDocumentStart,
                                       forMainFrameOnly: true)
         webView.configuration.userContentController.addUserScript(userScript)
+        bootUserScript = userScript
+    }
+
+    /// load() 在 App 启动极早期执行，此时首个 foregroundActive scene 常未就绪，
+    /// statusBarHeightCssPx() 会得到 0（真机冷启动必现；模拟器/热启动时序不同
+    /// 往往正常），导致 H5 的 --vl-safe-top=0、二级页头部顶进状态栏。
+    /// 这里在主线程轮询等待真实高度就绪，拿到后 eval 修正当前页面：
+    ///   - 写 window.__safeAreaTop 与 CSS 变量 --vl-safe-top（立即生效，无需刷新）
+    ///   - 写入 localStorage 兜底：bootScript 在原生值不可用时读取它，
+    ///     保证后续 reload/导航也拿到正确高度（不触碰 user scripts，
+    ///     避免 removeAllUserScripts 误删 Capacitor 桥接脚本）
+    private func resyncSafeAreaWhenReady() {
+        var attempts = 0
+        func attempt() {
+            let top = statusBarHeightCssPx()
+            if top <= 0 {
+                attempts += 1
+                if attempts < 40 {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: attempt)
+                }
+                return
+            }
+            // 高度就绪后还必须等主文档加载完成：过早 eval 会落在导航中的
+            // 空白文档上下文里被执行丢失，localStorage 同样写不进去
+            guard let webView = self.bridge?.webView,
+                  !webView.isLoading,
+                  let scheme = webView.url?.scheme,
+                  scheme == "capacitor" || scheme == "ionic" else {
+                attempts += 1
+                if attempts < 120 {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: attempt)
+                }
+                return
+            }
+            let js = """
+            (function(){try{
+            localStorage.setItem('__vlSafeTop','\(top)');
+            window.__safeAreaTop=\(top);
+            document.documentElement.style.setProperty('--vl-safe-top','\(top)px');
+            }catch(e){}})();
+            """
+            self.bridge?.eval(js: js)
+            // 幂等重复 eval 几次，覆盖 SPA 晚挂载或意外 context 切换
+            for delay in [0.6, 1.4, 2.5] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                    self?.bridge?.eval(js: js)
+                }
+            }
+        }
+        DispatchQueue.main.async(execute: attempt)
     }
 
     /// 状态栏高度（CSS px = pt）。WKWebView 全屏铺满、状态栏透明，
@@ -113,7 +169,8 @@ public class NativeBridgePlugin: CAPPlugin, CAPBridgedPlugin {
         window.global.is_phone=true;
         window.global.is_harmony=false;
         window.\(jsStaticVar)={"vlEnv":\(Self.quote(vlEnv)),"gateway":\(Self.quote(gateway)),"appInfo":\(appInfoJson)};
-        window.__safeAreaTop=\(safeAreaTop);
+        var nativeSafeTop=\(safeAreaTop);
+        window.__safeAreaTop=nativeSafeTop>0?nativeSafeTop:(parseFloat(localStorage.getItem('__vlSafeTop'))||0);
         }catch(e){console.error('[NativeBridgePlugin] inject failed',e);}})();
         """
     }
@@ -183,11 +240,102 @@ public class NativeBridgePlugin: CAPPlugin, CAPBridgedPlugin {
     /// enabled=true：隐藏系统状态栏，视频铺满整屏；
     /// enabled=false：恢复状态栏显示。
     @objc func setImmersiveMode(_ call: CAPPluginCall) {
-        let enabled = call.getBoolean("enabled") ?? false
+        let enabled = call.getBool("enabled") ?? false
         DispatchQueue.main.async { [weak self] in
             self?.bridge?.statusBarVisible = enabled ? false : true
         }
         call.resolve()
+    }
+
+    // MARK: - Native multipart upload
+
+    private static let uploadBoundary = "vlupload\(Int(Date().timeIntervalSince1970 * 1000))"
+
+    /// 原生 multipart 文件上传：绕开 WebView CORS（后端网关不支持 OPTIONS 预检，
+    /// WebView 内 XHR 带 accessToken/appId 等自定义 header 会被预检 405 拦死）。
+    /// 参数：serverUrl / fileKey / fileName / headers / params，
+    /// 文件内容二选一：base64（dataURL 或裸 base64）或 filePath（webPath/file 路径）。
+    /// resolve：{ status: Int, body: String }；失败 reject code=3（对齐 FileTransferError.CONNECTION_ERR）。
+    @objc func uploadFile(_ call: CAPPluginCall) {
+        guard let serverUrl = call.getString("serverUrl"), let url = URL(string: serverUrl) else {
+            call.reject("uploadFile: invalid serverUrl")
+            return
+        }
+
+        let fileKey = call.getString("fileKey") ?? "file"
+        let fileName = call.getString("fileName") ?? "file"
+        let headers = call.getObject("headers") as? [String: String] ?? [:]
+        let params = call.getObject("params") as? [String: String] ?? [:]
+
+        var fileData: Data?
+        if let b64raw = call.getString("base64"), !b64raw.isEmpty {
+            let b64 = b64raw.hasPrefix("data:") ? String(b64raw.split(separator: ",", maxSplits: 1).last ?? "") : b64raw
+            fileData = Data(base64Encoded: b64, options: .ignoreUnknownCharacters)
+        } else if let webPath = call.getString("filePath"), !webPath.isEmpty {
+            fileData = Self.contents(ofWebPath: webPath)
+        }
+
+        guard let data = fileData, !data.isEmpty else {
+            call.reject("uploadFile: file content unavailable (base64/filePath missing or unreadable)")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 60
+        request.setValue("multipart/form-data; boundary=\(Self.uploadBoundary)", forHTTPHeaderField: "Content-Type")
+        headers.forEach { k, v in request.setValue(v, forHTTPHeaderField: k) }
+
+        var body = Data()
+        params.forEach { k, v in
+            body.append(Data("--\(Self.uploadBoundary)\r\n".utf8))
+            body.append(Data("Content-Disposition: form-data; name=\"\(k)\"\r\n\r\n".utf8))
+            body.append(Data("\(v)\r\n".utf8))
+        }
+        body.append(Data("--\(Self.uploadBoundary)\r\n".utf8))
+        body.append(Data("Content-Disposition: form-data; name=\"\(fileKey)\"; filename=\"\(fileName)\"\r\n".utf8))
+        body.append(Data("Content-Type: \(Self.mimeType(for: fileName))\r\n\r\n".utf8))
+        body.append(data)
+        body.append(Data("\r\n--\(Self.uploadBoundary)--\r\n".utf8))
+        request.httpBody = body
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                call.reject("uploadFile: \(error.localizedDescription)", "3", nil, ["code": 3])
+                return
+            }
+            let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+            let bodyText = String(data: data ?? Data(), encoding: .utf8) ?? ""
+            call.resolve(["status": status, "body": bodyText])
+        }.resume()
+    }
+
+    /// 把 takePhoto 返回的 webPath（capacitor://localhost/_capacitor_file_/… 或 file://…）
+    /// 转成 POSIX 路径并读取内容。
+    private static func contents(ofWebPath webPath: String) -> Data? {
+        var path = webPath
+        if let range = path.range(of: "_capacitor_file_") {
+            path = String(path[range.upperBound...])
+        }
+        if path.hasPrefix("file://") {
+            path = String(path.dropFirst("file://".count))
+        }
+        let decoded = path.removingPercentEncoding ?? path
+        return FileManager.default.contents(atPath: decoded)
+    }
+
+    /// 按文件名后缀给 Content-Type（只覆盖业务用到的类型，其余 octet-stream）。
+    private static func mimeType(for fileName: String) -> String {
+        let ext = (fileName as NSString).pathExtension.lowercased()
+        switch ext {
+        case "jpg", "jpeg": return "image/jpeg"
+        case "png": return "image/png"
+        case "gif": return "image/gif"
+        case "webp": return "image/webp"
+        case "mp4": return "video/mp4"
+        case "pdf": return "application/pdf"
+        default: return "application/octet-stream"
+        }
     }
 
     // MARK: - Color helpers

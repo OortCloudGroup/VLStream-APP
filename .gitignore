@@ -23,3 +23,25 @@ node_modules/
 *.log
 *.tmp
 err.txt
+
+# macOS 垃圾文件
+.DS_Store
+
+# WorkBuddy 会话工作目录
+.workbuddy/
+
+# iOS 本地构建产物与 SPM 缓存（build / build-dev / build-sim 等派生数据目录）
+iOS/ios/App/build*/
+iOS/ios/App/App.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+
+# 自动化工具运行时状态：含浏览器 profile 的登录态/Cookie/History，绝不可提交
+.tools/
+
+# 安装包构建产物（Android/android/.gitignore 的 *.apk 不覆盖 docs/ 等目录，此处全局兜底）
+*.apk
+*.aab
+*.ipa
+
+# Release 签名密钥（debug.jks 是测试签名，需保留）
+Android/android/app/keystore/*.jks
+!Android/android/app/keystore/debug.jks

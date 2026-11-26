@@ -8,5 +8,9 @@
 .externalNativeBuild
 .cxx
 local.properties
-app/keystore/*.jks
-!app/keystore/debug.jks
+# 密钥实际位于 android/app/keystore/，原规则 app/keystore/*.jks 路径不匹配导致 release 密钥漏出
+android/app/keystore/*.jks
+!android/app/keystore/debug.jks
+
+# 正式签名凭据（仅本机留存，勿提交）
+/keystore.properties

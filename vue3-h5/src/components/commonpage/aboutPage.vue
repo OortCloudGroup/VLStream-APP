@@ -21,9 +21,11 @@ Created by 兰舰 on 2019/12/12  17:14
       <div class="about_group">
         <van-cell :title="$t('版本说明')" is-link to="/versionsPage" />
         <van-cell :title="$t('联系我们')" is-link to="/contactUS" />
+        <van-cell :title="$t('隐私政策')" is-link @click="openPrivacyPolicy" />
       </div>
       <div v-if="appDetail" class="about_footer">
         {{ $t('开发公司：') }}{{ appDetail.develop_unit }}
+        <a class="about_icp" href="https://beian.miit.gov.cn/" target="_blank">粤ICP备19160414号-8A</a>
       </div>
     </div>
   </div>
@@ -78,6 +80,10 @@ export default {
         new window.VConsole()
       }
       this.clickCount++
+    },
+    openPrivacyPolicy() {
+      // 隐私政策公网页址（与 App Store Connect 登记一致）
+      window.location.href = 'https://oortcloudsmart.com/privacypolicy_vlstream.html'
     }
   }
 }
@@ -165,5 +171,12 @@ export default {
   font-size: 12px;
   line-height: 18px;
   color: var(--vl-text-3);
+}
+
+.about_icp {
+  display: block;
+  margin-top: 4px;
+  color: var(--vl-text-3);
+  text-decoration: none;
 }
 </style>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VLStream 隐私政策</title>
+<meta name="description" content="VLStream iOS/iPadOS 客户端隐私政策" />
+<style>
+  :root{
+    --brand:#2563eb;
+    --brand-soft:#eff4ff;
+    --text:#1f2933;
+    --muted:#667085;
+    --line:#e5e7eb;
+    --bg:#ffffff;
+    --code-bg:#f4f6f8;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:16px;
+    line-height:1.85;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:780px;
+    margin:0 auto;
+    padding:28px 20px 64px;
+  }
+  h1{
+    font-size:26px;
+    line-height:1.4;
+    margin:0 0 18px;
+    padding-bottom:14px;
+    border-bottom:3px solid var(--brand);
+    color:var(--text);
+  }
+  h2{
+    font-size:20px;
+    margin:38px 0 14px;
+    padding-left:12px;
+    border-left:4px solid var(--brand);
+    line-height:1.5;
+  }
+  h3{
+    font-size:16.5px;
+    margin:22px 0 10px;
+    color:#111827;
+  }
+  p{margin:12px 0;}
+  ul,ol{padding-left:22px;margin:12px 0;}
+  li{margin:7px 0;}
+  a{color:var(--brand);text-decoration:none;word-break:break-all;}
+  a:hover{text-decoration:underline;}
+  strong{color:#0f172a;}
+  code{
+    background:var(--code-bg);
+    padding:2px 6px;
+    border-radius:4px;
+    font-family:"SFMono-Regular",Consolas,Menlo,monospace;
+    font-size:14px;
+    color:#c2185b;
+  }
+  .note{
+    background:var(--brand-soft);
+    border:1px solid #cdddfb;
+    border-radius:10px;
+    padding:14px 18px;
+    margin:18px 0;
+    color:#243b6b;
+    font-size:14.5px;
+    line-height:1.7;
+  }
+  .note strong{color:#1e3a8a;}
+  .meta{
+    background:#f8fafc;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px 18px;
+    font-size:14px;
+    color:var(--muted);
+    line-height:1.75;
+  }
+  .meta p{margin:4px 0;}
+  .tip{
+    border-left:4px solid #f59e0b;
+    background:#fffbeb;
+    padding:10px 16px;
+    border-radius:0 8px 8px 0;
+    color:#92400e;
+    font-size:14px;
+    margin:10px 0;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:16px 0;
+    font-size:14px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:8px;
+  }
+  th,td{
+    border:1px solid var(--line);
+    padding:10px 12px;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:#f1f5f9;color:#111827;font-weight:600;}
+  tr:nth-child(even) td{background:#fafbfc;}
+  .contact-card{
+    background:#f8fafc;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px 20px;
+    margin:16px 0;
+  }
+  .contact-card p{margin:6px 0;}
+  footer{
+    margin-top:46px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.7;
+  }
+  @media (max-width:600px){
+    body{font-size:15.5px;}
+    h1{font-size:22px;}
+    h2{font-size:18px;}
+    .wrap{padding:20px 16px 48px;}
+    table{display:block;overflow-x:auto;white-space:nowrap;}
+    th,td{white-space:normal;}
+  }
+  @media print{
+    body{font-size:12px;}
+    .wrap{max-width:100%;}
+    h1,h2,h3{break-after:avoid;}
+    table,tr,td,th{page-break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>VLStream 隐私政策</h1>
+
+  <div class="meta">
+    <p><strong>版本：</strong>v1.0　｜　<strong>最后更新：</strong>2026-10-29　｜　<strong>生效日期：</strong>2026-11-01（以实际发布为准）</p>
+    <p><strong>适用范围：</strong>本政策适用于 VLStream 在 iOS / iPadOS 平台发布的官方客户端（以下简称"本 App"）。本 App 是一款视频监控与流媒体管理客户端，用于查看接入设备的实时视频、历史回放、设备定位轨迹，并进行设备管理与消息接收。</p>
+  </div>
+
+  <p class="note"><strong>摘要（全文请见以下各章）：</strong>本 App 不含任何第三方统计或广告 SDK，<strong>不进行跨应用追踪</strong>；我们仅收集账号登录、设备接入与视频监控功能所必需的最小信息（账号标识、位置、照片/视频、设备与系统信息）；密码在传输前经国密 SM2 算法加密；视频流与用户数据保存在您所属租户的自有服务端。</p>
+
+  <h2>一、我们如何收集和使用您的信息</h2>
+  <p>我们遵循"最小必要"原则收集信息。以下是本 App 实际涉及的数据类型与用途。</p>
+
+  <h3>1.1 您主动提供的信息（账号信息 / 用户标识）</h3>
+  <ul>
+    <li><strong>登录凭证</strong>：您登录时提交的账号与密码。密码在提交前经 <strong>SM2 国密算法加密</strong> 后传输，我们及网络中的任何第三方均无法获取您的明文密码；登录成功后下发的访问令牌（Token）用于后续业务请求的身份校验，仅保存在本机会话中。</li>
+    <li><strong>租户/组织信息</strong>：您所属的企业或租户标识，用于将您路由至对应的业务服务端并隔离数据。</li>
+    <li><strong>个人资料</strong>：您在"个人中心"主动填写的昵称、头像、联系方式等，仅用于账号展示与组织通讯录功能。</li>
+  </ul>
+
+  <h3>1.2 位置信息（使用期间）</h3>
+  <ul>
+    <li>当您使用<strong>地图查看设备位置、轨迹回放、附近设备</strong>等功能时，本 App 会在您使用期间请求<strong>模糊/精确定位权限（仅前台）</strong>，用于在地图上标注您的当前位置。</li>
+    <li>本 App <strong>不会在后台持续追踪您的位置</strong>，不使用 significant-change 或后台定位模式；您的位置信息仅用于本地地图渲染与您主动提交的位置上报，<strong>不用于广告或用户画像</strong>。</li>
+  </ul>
+
+  <h3>1.3 照片、视频与相机</h3>
+  <ul>
+    <li><strong>相机</strong>：用于扫描设备二维码添加设备、拍摄照片/视频作为工单或消息附件上传。</li>
+    <li><strong>相册（读取）</strong>：当您选择本地图片/视频上传时，我们仅在您主动选择的范围内读取所选文件。</li>
+    <li><strong>相册（写入）</strong>：当您保存监控截图或回放片段到本机相册时使用。</li>
+    <li><strong>视频流</strong>：设备实时视频与历史回放画面通过加密通道（HTTPS/WSS）从您的租户服务端拉取播放，<strong>本 App 不录制、不上传您的屏幕内容</strong>，仅在您主动点击"抓拍/录像"时按上述相册规则处理。</li>
+  </ul>
+
+  <h3>1.4 设备与系统信息</h3>
+  <p>为保障连接稳定性与功能适配，本 App 会读取：</p>
+  <ul>
+    <li>设备型号、系统版本、语言与时区；</li>
+    <li>网络类型（Wi‑Fi / 蜂窝）与基础连接状态（不读取具体浏览内容）；</li>
+    <li>消息推送所需的系统推送凭证（如启用推送）。</li>
+  </ul>
+
+  <h3>1.5 我们不收集的信息</h3>
+  <ul>
+    <li><strong>不收集</strong>广告标识符（IDFA），不接入任何广告、统计或埋点 SDK；</li>
+    <li><strong>不收集</strong>您的浏览记录、通讯录（组织通讯录由服务端下发且仅限您所属组织）、健康、金融等敏感类别信息；</li>
+    <li><strong>不进行</strong>跨 App / 网站的用户追踪（NSPrivacyTracking = false）。</li>
+  </ul>
+
+  <h2>二、我们如何使用信息</h2>
+  <p>我们收集的信息仅用于：</p>
+  <ol>
+    <li>账号登录认证、会话维持与安全风控；</li>
+    <li>提供视频监控、设备管理、地图轨迹、消息通知等核心功能；</li>
+    <li>附件/抓拍内容的上传与存储（按您的主动操作）；</li>
+    <li>故障排查与服务质量保障。</li>
+  </ol>
+  <p>我们<strong>不会</strong>将您的信息用于广告定向投放、用户画像或算法推荐，也<strong>不会</strong>出售您的个人信息。</p>
+
+  <h2>三、信息的共享与披露</h2>
+  <p>本 App <strong>未集成任何第三方数据采集 SDK</strong>。您的数据仅存储与流转于您所属租户授权的自有服务端体系内：</p>
+  <table>
+    <thead>
+      <tr><th>服务组件</th><th>用途</th><th>涉及数据</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>业务网关（奥尔特云自有服务器）</td><td>登录认证、设备管理、消息等业务接口</td><td>账号凭证、业务数据</td>
+      </tr>
+      <tr>
+        <td>流媒体信令服务（WSS）</td><td>实时视频播放的信令协商</td><td>会话信息（不含视频内容本身）</td>
+      </tr>
+      <tr>
+        <td>文件存储服务</td><td>您主动上传的图片/视频附件</td><td>您所选的文件内容</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>除以下情形外，我们不会向任何第三方共享您的个人信息：</p>
+  <ol>
+    <li>获得您的明确同意；</li>
+    <li>法律法规要求或司法机关、监管部门的合法调取；</li>
+    <li>涉及并购、重组等导致信息控制方变更时，我们将以显著方式通知您，并由新控制方继续履行本政策义务。</li>
+  </ol>
+
+  <h2>四、数据存储与安全</h2>
+  <ul>
+    <li><strong>传输层</strong>：所有业务请求经 HTTPS 加密传输；密码经 SM2 国密算法加密后提交；视频信令经 WSS（TLS）加密。</li>
+    <li><strong>存储层</strong>：登录令牌仅保存在本机会话存储中，退出登录即清除；本 App 不在本地持久化存储视频内容。</li>
+    <li>服务端采取访问控制、租户数据隔离等合理措施保护数据安全，但请您理解互联网环境不存在绝对安全。</li>
+  </ul>
+
+  <h2>五、数据保留期限</h2>
+  <ul>
+    <li>账号信息：在您账号存续期内保留，注销后【30】个工作日内删除或匿名化；</li>
+    <li>登录令牌：会话结束或退出登录即失效清除；</li>
+    <li>您上传的附件与监控录像：按您所属租户的服务端存储策略保留，您可通过 App 内删除功能或联系管理员删除。</li>
+  </ul>
+
+  <h2>六、您的权利</h2>
+  <p>您对自己的个人信息享有以下权利，可通过第十章联系方式行使：</p>
+  <ol>
+    <li><strong>访问与更正</strong>：在"个人中心"查阅、更正您的账号资料；</li>
+    <li><strong>删除</strong>：删除您上传的附件，或注销账号并删除关联个人信息；</li>
+    <li><strong>撤回同意</strong>：随时在系统设置中关闭相机、相册、定位权限（关闭后对应功能不可用，但不影响其他功能）；</li>
+    <li><strong>注销</strong>：通过 App 内「我的 → 设置 → 注销账号」入口拨打客服电话，或直接致电客服注销账号。</li>
+  </ol>
+  <p>我们将在收到请求后【15】个工作日内响应并处理。</p>
+
+  <h2>七、未成年人保护</h2>
+  <p>本 App 为企业级视频监控与设备管理工具，主要面向企业用户。我们<strong>不主动收集</strong>未满 14 周岁未成年人的个人信息；若发现误收集，将尽快删除。若您是监护人，发现未成年人使用了本服务，可联系我们处理。</p>
+
+  <h2>八、数据存储地域</h2>
+  <p>您的账号与业务数据存储于<strong>中华人民共和国境内的自有服务器</strong>，本 App 不涉及向境外传输个人信息。</p>
+
+  <h2>九、隐私清单与权限披露（Apple 要求）</h2>
+  <p>为符合 Apple App Store 的隐私要求，本 App 随包附带 <code>PrivacyInfo.xcprivacy</code> 隐私清单，并声明以下要点：</p>
+  <ul>
+    <li><strong>访问的 API（含理由）</strong>：用户默认设置（UserDefaults，应用自身配置）、文件时间戳（本地离线包与缓存管理）、系统启动时间（性能统计）、磁盘空间（缓存空间管理）——均为 App 功能实现所必需。</li>
+    <li><strong>收集的数据类型</strong>：位置（粗略/使用期间）、照片或视频、用户 ID——均<strong>与用户身份关联</strong>、用于 App 功能（AppFunctionality）、<strong>不用于追踪</strong>。</li>
+    <li><strong>不用于跨 App/网站追踪</strong>（NSPrivacyTracking = false）。</li>
+  </ul>
+  <p>本 App 请求的系统权限及用途如下：</p>
+  <table>
+    <thead>
+      <tr><th>权限</th><th>触发场景</th><th>用途说明</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>相机</td><td>扫码添加设备、拍摄附件</td><td>扫描二维码、拍摄照片/视频上传</td></tr>
+      <tr><td>相册（读取）</td><td>选择图片/视频上传</td><td>仅读取您主动选择的文件</td></tr>
+      <tr><td>相册（写入）</td><td>保存监控截图/回放片段</td><td>将您主动保存的内容写入相册</td></tr>
+      <tr><td>定位（使用期间）</td><td>地图页面</td><td>在地图上展示您的当前位置</td></tr>
+    </tbody>
+  </table>
+
+  <h2>十、其他基本信息</h2>
+  <div class="tip"><strong>运营主体信息依据公司主体填具；ICP 备案号以工信部备案系统公示为准。</strong></div>
+  <ul>
+    <li><strong>运营主体（控制者）</strong>：奥尔特云（深圳）智慧科技有限公司</li>
+    <li><strong>注册地址</strong>：深圳市罗湖区东门街道立新社区人民北路 3131 号水产大厦 17K</li>
+    <li><strong>联系方式（隐私事务专员）</strong>：
+      <ul>
+        <li>邮箱：aomomo@qq.com</li>
+        <li>电话：13723775143（工作日 9:00-18:00，节假日除外）</li>
+        <li>通信地址：同注册地址</li>
+      </ul>
+    </li>
+    <li><strong>ICP 备案 / 增值电信业务许可证编号</strong>：粤ICP备19160414号-8A</li>
+    <li><strong>App 相关信息</strong>：
+      <ul>
+        <li>应用名称：VLStream</li>
+        <li>应用包名：com.oort.vlstream（iOS）</li>
+        <li>开发者：奥尔特云（深圳）智慧科技有限公司</li>
+        <li>应用版本：以 App Store 上架版本为准</li>
+      </ul>
+    </li>
+    <li><strong>本政策生效日期</strong>：2026-11-01（如提前/延后请以实际发布为准）</li>
+    <li><strong>更新与通知</strong>：本政策变更时，我们将在 App 内弹窗或官网公告方式通知；若变更涉及核心权益，将征求您的同意。</li>
+    <li><strong>争议解决与法律适用</strong>：本政策适用中华人民共和国法律；如发生争议，双方应友好协商，协商不成的，提交运营主体所在地（深圳市罗湖区）有管辖权的人民法院诉讼解决。</li>
+    <li><strong>举报与投诉渠道</strong>：若您认为我们处理个人信息违反法律法规，可向 App Store、国家互联网信息办公室或公安机关等监管部门、消费者协会投诉，也可通过上方邮箱与我们联系。</li>
+  </ul>
+
+  <h2>十一、联系我们</h2>
+  <div class="contact-card">
+    <p>如对本政策有任何疑问、投诉、建议，或需行使您的个人信息权利，请通过以下方式联系我们：</p>
+    <p><strong>公司名称：</strong>奥尔特云（深圳）智慧科技有限公司</p>
+    <p><strong>注册地址：</strong>深圳市罗湖区东门街道立新社区人民北路 3131 号水产大厦 17K</p>
+    <p><strong>联系电话：</strong>13723775143（工作日 9:00-18:00，节假日除外）</p>
+    <p><strong>电子邮箱：</strong><a href="mailto:aomomo@qq.com">aomomo@qq.com</a></p>
+    <p><strong>个人信息保护负责人：</strong>可通过上述电话或邮件转接联系</p>
+  </div>
+  <p>我们将在收到您的请求后 7 个工作日内给出初步回复，15 个工作日内完成处理并告知结果。如您对我们的回复或处理结果不满意，可向国家互联网信息办公室、公安机关等监管部门投诉，或依法向人民法院提起诉讼。</p>
+
+  <footer>
+    <p>本隐私政策依据《中华人民共和国个人信息保护法》《网络安全法》及 Apple App Store 审核指南编制，供 VLStream 提交与公示使用。内容已与 App 内 <code>PrivacyInfo.xcprivacy</code> 隐私清单对齐（位置/照片或视频/用户 ID，均为 App 功能目的、不追踪）；最终发布前请由法务核对公司主体信息与数据实践的一致性。</p>
+  </footer>
+
+</div>
+</body>
+</html>
