@@ -20,7 +20,7 @@
             <span class="name">{{ displayName }}</span>
             <span class="phone">{{ displayPhone }}</span>
           </div>
-          <div class="dept">
+          <div v-if="displayDept" class="dept">
             {{ displayDept }}
           </div>
         </div>
@@ -89,6 +89,7 @@ import { useUserStore } from '@/store/modules/useraPaas'
 import { getAppLocale, setAppLocale } from '@/lang/index'
 import config from '@/config'
 import LineIcon from '@/pages/VLStreamCloud/page/components/LineIcon.vue'
+import { getUserInfo } from '@/api/login/indexapaas'
 
 const { t } = useI18n()
 
@@ -98,8 +99,34 @@ const router = useRouter()
 // 单租户集群没有 apaas-sso 的个人信息接口，资料编辑、密码、我的设备只在多租户提供
 const isLocalAuth = config.authMode === 'local'
 const displayName = computed(() => store.userInfo?.userName || store.userInfo?.user_name || '--')
-const displayPhone = computed(() => store.userInfo?.phone || '--')
-const displayDept = computed(() => store.userInfo?.deptName || '--')
+// 手机号中间四位打码展示
+const displayPhone = computed(() => {
+  const phone = String(store.userInfo?.phone || '')
+  if (!phone) return '--'
+  return /^\d{7,}$/.test(phone) ? phone.slice(0, 3) + '****' + phone.slice(-4) : phone
+})
+const displayDept = computed(() => store.userInfo?.deptName || '')
+
+// 登录接口只返回名字，手机号、部门、头像从平台资料补齐（脱敏手机号用于展示）
+const refreshProfile = async() => {
+  if (isLocalAuth || !store.token) return
+  try {
+    const res = await getUserInfo({ accessToken: store.token })
+    const data = res && res.code === 200 ? res.data : null
+    if (!data) return
+    const ex = data.user_detail?.ex_data || {}
+    const deptName = (data.dept_list || []).map(x => x.deptinfo?.dept_name || x.dept_name).filter(Boolean).join(' / ')
+    store.setUserInfo({
+      userName: data.user_name || store.userInfo?.userName,
+      phone: ex.phone || data.phone || '',
+      deptName,
+      photo: data.photo || ''
+    })
+  } catch (e) {
+    // 拉取失败保留登录时的信息
+  }
+}
+refreshProfile()
 
 // 菜单配置
 const menuItems = computed(() => [
