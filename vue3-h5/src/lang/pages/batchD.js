@@ -51,5 +51,13 @@ export default {
   '安全验证': 'Security check',
   '拖动下方滑块完成拼图': 'Drag the slider to complete the puzzle',
   '向右滑动完成拼图': 'Slide right to complete the puzzle',
-  '验证图片加载失败，请点击刷新': 'Failed to load the image. Tap refresh to retry'
+  '验证图片加载失败，请点击刷新': 'Failed to load the image. Tap refresh to retry',
+  '验证码登录': 'Code login',
+  '密码登录': 'Password login',
+  '邮箱登录': 'Email login',
+  '手机号登录': 'Phone login',
+  '请输入手机号': 'Enter phone number',
+  '请输入正确的手机号': 'Enter a valid phone number',
+  '请输入邮箱': 'Enter email',
+  '请输入正确的邮箱': 'Enter a valid email'
 }

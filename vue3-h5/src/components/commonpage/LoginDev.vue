@@ -1,10 +1,13 @@
 <!--
   LoginDev 登录面板（现代化重设计）。
   多租户（业务逻辑与 T-OORT.SH/login-page 保持一致）：
-    getLoginV2（apaas-sso sso/v2/getLoginCode）→ getUserTenants
+    登录方式由平台配置 apaas-sso frontConf/v1/config.json 决定（isOpenOtherLoginWay + loginWaySort），
+    移动端支持：账号密码(1) / 手机验证码(6) / 邮箱验证码(9)；微信扫码等需要 PC 的方式与 login-page 移动视口一致不展示。
+    getLoginV2（sso/v2/getLoginCode）→ getUserTenants
     → 单租户直登 / 未要求选择时自动登录最近租户 / 弹窗选择（同密码直登、不同密码再输密码走 fastLogin）
     → loginSSO；返回 441 时进入双因子（短信/邮箱验证码，fastLogin 第二步）。
-  单租户（Config.authMode === 'local'）：getLogin 一步完成（vls-server/blade-auth/token），无验证码与租户选择。
+    验证码 5 分钟内重复发送需先通过滑块。
+  单租户（Config.authMode === 'local'）：只有账号密码，getLogin 一步完成（vls-server/blade-auth/token）。
   @Author 兰舰 (UI redesign)
 -->
 <template>
@@ -17,56 +20,116 @@
       </div>
     </div>
 
-    <!-- 表单卡片：账号密码 -->
+    <!-- 表单卡片：第一步登录 -->
     <div v-if="!isTwoFactor" class="form_card">
       <div class="form_card_title">
-        {{ $t('账号登录') }}
+        {{ currentWayTitle }}
       </div>
 
-      <div class="field_group">
-        <van-field
-          v-model="username"
-          class="login_field"
-          left-icon="manager-o"
-          :placeholder="$t('请输入用户名')"
-          clearable
-          @blur="checkCaptcha"
-        />
-        <van-field
-          v-model="password"
-          class="login_field"
-          left-icon="lock"
-          :type="showPwd ? 'text' : 'password'"
-          :placeholder="$t('请输入密码')"
-          :right-icon="showPwd ? 'eye-o' : 'closed-eye'"
-          @click-right-icon="showPwd = !showPwd"
-        />
-      </div>
-
-      <!-- 图形验证码（后端要求时出现） -->
-      <div v-if="captchaID" class="captcha_row">
-        <van-field
-          v-model="code"
-          class="login_field captcha_field"
-          left-icon="shield-o"
-          :placeholder="$t('请输入图形验证码')"
-        />
-        <img
-          class="captcha_img"
-          :src="codePngUrl + captchaID + '.png?' + timeStamp"
-          alt="验证码"
-          @click="refreshCaptcha"
-        />
-      </div>
-
-      <div class="aux_row">
-        <div class="auto_login" @click="autoLogin = !autoLogin">
-          <span class="auto_login_box" :class="{ checked: autoLogin }">
-            <van-icon v-if="autoLogin" name="success" />
-          </span>
-          <span class="auto_login_text">{{ $t('下次自动登录') }}</span>
+      <!-- 登录方式切换（平台开启了多种方式时出现） -->
+      <div v-if="loginWays.length > 1" class="way_tabs">
+        <div
+          v-for="item in loginWays"
+          :key="item.key"
+          class="way_tab"
+          :class="{ active: loginWay === item.way }"
+          @click="changeLoginWay(item.way)"
+        >
+          {{ $t(item.label) }}
         </div>
       </div>
+
+      <!-- 账号密码 -->
+      <template v-if="loginWay === 1">
+        <div class="field_group">
+          <van-field
+            v-model="username"
+            class="login_field"
+            left-icon="manager-o"
+            :placeholder="$t('请输入用户名')"
+            clearable
+            @blur="checkCaptcha"
+          />
+          <van-field
+            v-model="password"
+            class="login_field"
+            left-icon="lock"
+            :type="showPwd ? 'text' : 'password'"
+            :placeholder="$t('请输入密码')"
+            :right-icon="showPwd ? 'eye-o' : 'closed-eye'"
+            @click-right-icon="showPwd = !showPwd"
+          />
+        </div>
+
+        <!-- 图形验证码（后端要求时出现） -->
+        <div v-if="captchaID" class="captcha_row">
+          <van-field
+            v-model="code"
+            class="login_field captcha_field"
+            left-icon="shield-o"
+            :placeholder="$t('请输入图形验证码')"
+          />
+          <img
+            class="captcha_img"
+            :src="codePngUrl + captchaID + '.png?' + timeStamp"
+            alt="验证码"
+            @click="refreshCaptcha"
+          />
+        </div>
+
+        <div class="aux_row">
+          <div class="auto_login" @click="autoLogin = !autoLogin">
+            <span class="auto_login_box" :class="{ checked: autoLogin }">
+              <van-icon v-if="autoLogin" name="success" />
+            </span>
+            <span class="auto_login_text">{{ $t('下次自动登录') }}</span>
+          </div>
+        </div>
+      </template>
+
+      <!-- 手机号 / 邮箱 + 验证码 -->
+      <template v-else>
+        <div class="field_group">
+          <van-field
+            v-if="loginWay === 6"
+            v-model="phone"
+            class="login_field"
+            left-icon="phone-o"
+            type="tel"
+            maxlength="11"
+            :placeholder="$t('请输入手机号')"
+            clearable
+          />
+          <van-field
+            v-else
+            v-model="email"
+            class="login_field"
+            left-icon="envelop-o"
+            type="email"
+            :placeholder="$t('请输入邮箱')"
+            clearable
+          />
+        </div>
+        <div class="captcha_row">
+          <van-field
+            v-model="loginCode"
+            class="login_field captcha_field"
+            left-icon="shield-o"
+            type="digit"
+            maxlength="8"
+            :placeholder="$t('请输入验证码')"
+          />
+          <van-button
+            class="code_btn"
+            :disabled="countdownOf(wayCodeType) > 0 || codeSending"
+            :loading="codeSending"
+            @click="sendWayCode"
+          >
+            {{ countdownOf(wayCodeType) > 0 ? countdownOf(wayCodeType) + 's' : $t('获取验证码') }}
+          </van-button>
+        </div>
+        <div class="aux_row" />
+      </template>
 
       <van-button
         class="login_btn"
@@ -102,11 +165,11 @@
         />
         <van-button
           class="code_btn"
-          :disabled="codeCountdown > 0 || codeSending"
+          :disabled="countdownOf(selectedType) > 0 || codeSending"
           :loading="codeSending"
           @click="sendTwoFaCode"
         >
-          {{ codeCountdown > 0 ? codeCountdown + 's' : $t('获取验证码') }}
+          {{ countdownOf(selectedType) > 0 ? countdownOf(selectedType) + 's' : $t('获取验证码') }}
         </van-button>
       </div>
       <div v-else class="twofa_desc">
@@ -262,7 +325,7 @@
 
 <script setup>
 
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
 import { getSafeAreaTop } from '@/utils/safeArea'
 
 import OortPopup from '@/components/popup/oort_popup'
@@ -278,6 +341,7 @@ import {
   generateCaptcha
 } from '@/api/login/indexapaas.ts'
 import { getClientPublicIp } from '@/utils/getClientPublicIp'
+import { loadLoginPlatformConfig, parseLoginWaySort } from '@/utils/loginPlatformConfig'
 import JSEncrypt from 'jsencrypt'
 import { showToast } from 'vant'
 import { useI18n } from 'vue-i18n'
@@ -295,6 +359,47 @@ const isLocalAuth = Config.authMode === 'local'
 const safeAreaTop = ref('0px')
 const computeSafeAreaTop = () => {
   safeAreaTop.value = getSafeAreaTop() + 'px'
+}
+
+/* ---------------- 登录方式（平台配置驱动，同 login-page） ---------------- */
+// way：1 账号密码 / 6 手机验证码 / 9 邮箱验证码（编号沿用 login-page）
+const WAY_CONFIG = [
+  { key: 'mobileVerificationCode', way: 6, label: '验证码登录', title: '手机号登录', defaultOrder: 1 },
+  { key: 'account', way: 1, label: '密码登录', title: '账号登录', defaultOrder: 2 },
+  { key: 'emailVerificationCode', way: 9, label: '邮箱登录', title: '邮箱登录', defaultOrder: 3 }
+]
+const isOpenOtherLoginWay = ref({})
+const loginWaySortMap = ref({})
+const loginWay = ref(1)
+
+const loginWays = computed(() => {
+  if (isLocalAuth) return WAY_CONFIG.filter(item => item.way === 1)
+  const open = isOpenOtherLoginWay.value
+  const sortOf = item => loginWaySortMap.value[item.key] || 0
+  return WAY_CONFIG
+    .filter(item => item.key === 'account' || open[item.key])
+    .sort((a, b) => {
+      const sa = sortOf(a)
+      const sb = sortOf(b)
+      if (sa && sb) return sa - sb || a.defaultOrder - b.defaultOrder
+      if (sa) return -1
+      if (sb) return 1
+      return a.defaultOrder - b.defaultOrder
+    })
+})
+const currentWayTitle = computed(() => t((WAY_CONFIG.find(item => item.way === loginWay.value) || WAY_CONFIG[1]).title))
+
+/** 默认方式：已开启且排序最小的（微信扫码等移动端不可用的不参与） */
+const initDefaultLoginWay = () => {
+  loginWay.value = loginWays.value[0]?.way || 1
+}
+
+const changeLoginWay = (way) => {
+  if (loginWay.value === way) return
+  loginWay.value = way
+  loginCode.value = ''
+  captchaID.value = ''
+  code.value = ''
 }
 
 /* ---------------- 账号密码 ---------------- */
@@ -325,6 +430,39 @@ const checkCaptcha = () => {
   }).catch(() => {})
 }
 
+/* ---------------- 手机 / 邮箱验证码登录 ---------------- */
+const phone = ref('')
+const email = ref('')
+const loginCode = ref('')
+const isValidPhone = value => /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/.test(value)
+const isValidEmail = value => /^([a-z0-9_.-]+)@([\da-z.-]+)\.([a-z.]{2,6})$/.test(value)
+// 验证码类型：1 短信 / 7 邮箱（发送与计时按类型区分）
+const wayCodeType = computed(() => (loginWay.value === 6 ? 1 : 7))
+
+/** 校验当前方式的手机号/邮箱，不合法时提示并返回空 */
+const checkWayIdentifier = () => {
+  const isPhone = loginWay.value === 6
+  const value = (isPhone ? phone.value : email.value).trim()
+  let error = ''
+  if (!value) {
+    error = isPhone ? '请输入手机号' : '请输入邮箱'
+  } else if (isPhone ? !isValidPhone(value) : !isValidEmail(value)) {
+    error = isPhone ? '请输入正确的手机号' : '请输入正确的邮箱'
+  }
+  if (error) {
+    showToast(t(error))
+    return ''
+  }
+  return value
+}
+
+const sendWayCode = () => {
+  const identifier = checkWayIdentifier()
+  if (!identifier) return
+  requestCode(wayCodeType.value, identifier)
+}
+
+/* ---------------- 提交 ---------------- */
 const tempToken = ref('')
 const account = ref('')
 
@@ -333,7 +471,22 @@ const finishLogin = () => {
   emits('loginSuccess')
 }
 
-const loginBtn = async() => {
+/** 第一步拿到临时 token 后进入选租户；失败时刷新图形验证码 */
+const afterFirstStep = async(res, identifier) => {
+  if (res.code === 200) {
+    tempToken.value = res.data.token
+    account.value = identifier
+    await getTenantInfo()
+    return
+  }
+  if (loginWay.value === 1) {
+    code.value = ''
+    refreshCaptcha()
+    captchaID.value = res.data?.CaptchaID || ''
+  }
+}
+
+const loginByAccount = async() => {
   if (!username.value) {
     showToast(t('请输入用户名'))
     return
@@ -354,10 +507,10 @@ const loginBtn = async() => {
   } else {
     window.sessionStorage.removeItem('autoLogin')
   }
-  loading.value = true
 
   if (isLocalAuth) {
-    store.getLogin({ loginId: username.value, password: password.value }).then((res) => {
+    try {
+      const res = await store.getLogin({ loginId: username.value, password: password.value })
       if (res.code === 200) {
         // 单租户一步登录：本地令牌即业务令牌，没有租户选择这一步
         finishLogin()
@@ -365,33 +518,53 @@ const loginBtn = async() => {
         // 本地认证走裸 axios，没有 service.ts 的统一错误提示，这里补上
         showToast(res.msg)
       }
-    }).catch((error) => {
+    } catch (error) {
       showToast(error?.response?.data?.msg || error?.message || t('登录失败'))
-    }).finally(() => {
-      loading.value = false
-    })
+    }
     return
   }
 
   // 多租户：统一密码登录（identity_type 0），拿临时 token 再选租户
+  const res = await store.getLoginV2({
+    identity_type: 0,
+    identifier: username.value,
+    credential: password.value,
+    code: code.value,
+    captchaID: captchaID.value,
+    client: 'pcweb',
+    select_type: 1
+  })
+  await afterFirstStep(res, username.value)
+}
+
+const loginByCode = async() => {
+  const identifier = checkWayIdentifier()
+  if (!identifier) return
+  if (!loginCode.value) {
+    showToast(t('请输入验证码'))
+    return
+  }
+  const isSms = loginWay.value === 6
+  // 手机验证码 identity_type 1；邮箱验证码 identity_type 8（与 login-page 一致）
+  const res = await store.getLoginV2({
+    identity_type: isSms ? 1 : 8,
+    config_code: isSms ? configCode.sms : configCode.email,
+    identifier,
+    credential: loginCode.value,
+    client: 'pcweb',
+    select_type: 1
+  })
+  await afterFirstStep(res, identifier)
+}
+
+const loginBtn = async() => {
+  if (loading.value) return
+  loading.value = true
   try {
-    const res = await store.getLoginV2({
-      identity_type: 0,
-      identifier: username.value,
-      credential: password.value,
-      code: code.value,
-      captchaID: captchaID.value,
-      client: 'pcweb',
-      select_type: 1
-    })
-    if (res.code === 200) {
-      tempToken.value = res.data.token
-      account.value = username.value
-      await getTenantInfo()
+    if (loginWay.value === 1) {
+      await loginByAccount()
     } else {
-      code.value = ''
-      refreshCaptcha()
-      captchaID.value = res.data?.CaptchaID || ''
+      await loginByCode()
     }
   } catch (e) {
     // service.ts 已统一 toast
@@ -501,13 +674,8 @@ const confirmPwd = () => {
   })
 }
 
-/* ---------------- 双因子（441） ---------------- */
-const isTwoFactor = ref(false)
-const selectedType = ref(1)
-const selectedIdentifier = ref('')
-const twoFaCode = ref('')
-
-// 短信/邮箱认证配置编码（configList 按 types 取默认配置）
+/* ---------------- 认证配置编码 ---------------- */
+// 短信/邮箱等认证的 config_code：优先平台配置 common.authConfig，缺的再按 types 查 configList
 const configCode = { sms: '', email: '', wx: '', dingding: '' }
 const typeKeyMap = { 1: 'sms', 4: 'wx', 5: 'dingding', 7: 'email' }
 const initAuthConfigCode = async() => {
@@ -530,6 +698,12 @@ const initAuthConfigCode = async() => {
   }))
 }
 
+/* ---------------- 双因子（441） ---------------- */
+const isTwoFactor = ref(false)
+const selectedType = ref(1)
+const selectedIdentifier = ref('')
+const twoFaCode = ref('')
+
 const enterTwoFactor = async(data) => {
   isTwoFactor.value = true
   tempToken.value = data.auth_token
@@ -540,7 +714,6 @@ const enterTwoFactor = async(data) => {
 const exitTwoFactor = () => {
   isTwoFactor.value = false
   twoFaCode.value = ''
-  stopCodeTimer()
 }
 
 const getLabel = (type) => {
@@ -609,13 +782,47 @@ const selectOtherLogin = async(item) => {
   twoFaCode.value = ''
   selectedType.value = item.identity_type
   selectedIdentifier.value = item.identifier
-  stopCodeTimer()
-  if (item.identity_type === 1 || item.identity_type === 7) {
+  // 倒计时中说明刚发过，不重复发送
+  if ((item.identity_type === 1 || item.identity_type === 7) && !countdownOf(item.identity_type)) {
     await sendTwoFaCode()
   }
 }
 
-/* 验证码发送：real_user_info 为 RSA 密文 { user_ip, timestamp, device_info } */
+const sendTwoFaCode = () => {
+  if (!selectedIdentifier.value) return
+  requestCode(selectedType.value, selectedIdentifier.value)
+}
+
+const handle2FALogin = () => {
+  if (!twoFaCode.value) {
+    showToast(t('请输入验证码'))
+    return
+  }
+  const isSms = selectedType.value === 1
+  // 邮箱在第二步的 identity_type 是 8（与 login-page 一致）
+  const loginStepEnd = selectedType.value === 7 ? 8 : selectedType.value
+  loading.value = true
+  store.getFastLogin({
+    identity_type: loginStepEnd,
+    config_code: isSms ? configCode.sms : configCode.email,
+    identifier: selectedIdentifier.value,
+    credential: twoFaCode.value,
+    select_type: 1,
+    auth_token: tempToken.value,
+    current_step: 2,
+    login_step: [0, loginStepEnd]
+  }).then((res) => {
+    if (res.code === 200) {
+      store.applyLoginResult(res.data)
+      finishLogin()
+    }
+  }).catch(() => {}).finally(() => {
+    loading.value = false
+  })
+}
+
+/* ---------------- 验证码发送（登录与双因子共用） ---------------- */
+/* real_user_info 为 RSA 密文 { user_ip, timestamp, device_info } */
 const LOGIN_RSA_PUBLIC_KEY =
   'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAzd2eYqgC6A3CvQN982C7s3xo2zjL97b0lHkfcAFEy50YHg+g5QD6RbvZt0NTQVOoC5Vv867lp0UBrwAslNCjt92QyxKkGLU+10UClkCJsiHpxy/J7AOOpS0wMGao80uWN94EZEsP/FKFfGNz3lJcZRtg4TGCMgXQGlKxBcYJDor/zK/06asTBGp4IxvTDAKTuMP+u88y5nQTUpKPnPstwmiLfqZLOSE3y4kIA7VC98GxPY8SqLZ7b9HzLSNoZNXKvA9US7A2F8/A97b8tExXsGPOodMQzrLFVr840ZV2WgpxJHqobqYReGhGMN4JdjfGlUvHyhYaCyOcSWalWuLh18cDQkum8yUrw5Tki8r8VPDTEZhsOXcq46cMr4437HGYeDA2ib7TOArFq1d0DD9Z0DAsjNfhgqqIP9A9kXrs6JIRrkz82skco2WQ5NUdpLT3yaAiXTxmFaajQGVIhFG24VL8CTloRo3FZmy9vMlUseCKmhfCBFbhUG9r7HOuhkO+jY4yfItE8BIrClbkQBAzMBMTuRM84VQQ4MnYlbdT3uSt5Qw5WmGIxsAKk93o8Hyhrg/OX8FCwntw2h5AjGDGn/H5H0TDAp8vX0NJgh4xhOpNT8pshuX7W1vcqr42sqOjM/mbRPV3s+tT4ynY0xQLuqp0P7GW3fu0fT0/OeHPwcsCAwEAAQ=='
 const DEVICE_INFO_STORAGE_KEY = 'login_stable_device_info'
@@ -637,30 +844,36 @@ const buildRealUserInfo = async() => {
   })) || ''
 }
 
+// 短信与邮箱各自倒计时（同 login-page 的 phoneCodeCountdown / emailCodeCountdown）
 const codeSending = ref(false)
-const codeCountdown = ref(0)
-let codeTimer = null
-const stopCodeTimer = () => {
-  if (codeTimer) clearInterval(codeTimer)
-  codeTimer = null
-  codeCountdown.value = 0
+const countdowns = reactive({ 1: 0, 7: 0 })
+const codeTimers = {}
+const countdownOf = type => countdowns[type] || 0
+const stopCodeTimer = (type) => {
+  if (codeTimers[type]) clearInterval(codeTimers[type])
+  codeTimers[type] = null
+  countdowns[type] = 0
 }
-const startCodeTimer = () => {
-  stopCodeTimer()
-  codeCountdown.value = 60
-  codeTimer = setInterval(() => {
-    codeCountdown.value--
-    if (codeCountdown.value <= 0) stopCodeTimer()
+const startCodeTimer = (type) => {
+  stopCodeTimer(type)
+  countdowns[type] = 60
+  codeTimers[type] = setInterval(() => {
+    countdowns[type]--
+    if (countdowns[type] <= 0) stopCodeTimer(type)
   }, 1000)
 }
 
 /*
  * 滑块验证（与 login-page 一致）：本页 5 分钟内已成功发送过验证码时，
  * 再次发送必须先通过滑块，请求带 captcha_type=1 / slide_id / xpos；首次发送不需要。
+ * 发送记录按真实用户来源（IP+设备）计，换号码不重置。
  */
 const CODE_SLIDER_INTERVAL_MS = 5 * 60 * 1000
 let lastCodeSentAt = 0
 const shouldRequireSlider = () => !!lastCodeSentAt && Date.now() - lastCodeSentAt < CODE_SLIDER_INTERVAL_MS
+
+// 等待滑块通过后要发送的目标
+const pendingCode = { type: 1, identifier: '' }
 
 const slideVisible = ref(false)
 const slideRef = ref(null)
@@ -703,34 +916,28 @@ const getSlideCaptcha = async() => {
   }
 }
 
-const openSlideVerify = async() => {
-  slideVisible.value = true
-  await getSlideCaptcha()
-}
-
 const onSliderPosition = (x) => {
-  doSendCode({ captcha_type: 1, slide_id: slideId.value, xpos: x })
+  doSendCode(pendingCode.type, pendingCode.identifier, { captcha_type: 1, slide_id: slideId.value, xpos: x })
 }
 
 /** 实际发送；captcha 为滑块参数，带上时由结果驱动滑块成功/失败状态 */
-const doSendCode = async(captcha) => {
+const doSendCode = async(type, identifier, captcha) => {
   codeSending.value = true
   let ok = false
   try {
-    const isSms = selectedType.value === 1
     const base = {
       send_type: 'login',
       real_user_info: await buildRealUserInfo(),
       ...(captcha || {})
     }
-    const res = isSms
-      ? await sendLoginSmsCode({ ...base, config_code: configCode.sms, mobile: selectedIdentifier.value })
-      : await sendLoginEmailCode({ ...base, config_code: configCode.email, email: selectedIdentifier.value })
+    const res = type === 1
+      ? await sendLoginSmsCode({ ...base, config_code: configCode.sms, mobile: identifier })
+      : await sendLoginEmailCode({ ...base, config_code: configCode.email, email: identifier })
     ok = res.code === 200
     if (ok) {
       lastCodeSentAt = Date.now()
       showToast(t('验证码已发送'))
-      startCodeTimer()
+      startCodeTimer(type)
     }
   } catch (e) {
     // service.ts 已统一 toast
@@ -744,66 +951,53 @@ const doSendCode = async(captcha) => {
   return ok
 }
 
-const sendTwoFaCode = async() => {
-  if (codeSending.value || codeCountdown.value > 0 || !selectedIdentifier.value) return
+/** 发送入口：需要滑块时先弹出滑块，通过后再发 */
+const requestCode = async(type, identifier) => {
+  if (codeSending.value || countdownOf(type) > 0 || !identifier) return
   if (shouldRequireSlider()) {
-    await openSlideVerify()
+    pendingCode.type = type
+    pendingCode.identifier = identifier
+    slideVisible.value = true
+    await getSlideCaptcha()
     return
   }
-  await doSendCode()
+  await doSendCode(type, identifier)
 }
 
-const handle2FALogin = () => {
-  if (!twoFaCode.value) {
-    showToast(t('请输入验证码'))
-    return
+/* ---------------- 初始化 ---------------- */
+const restoreAutoLogin = () => {
+  if (!window.sessionStorage.getItem('autoLogin')) return
+  try {
+    const tempObj = JSON.parse(window.sessionStorage.getItem('autoLogin'))
+    loginWay.value = 1
+    username.value = tempObj.username
+    password.value = tempObj.password
+    autoLogin.value = true
+    loginBtn()
+  } catch (e) {
+    // ignore
   }
-  const isSms = selectedType.value === 1
-  // 邮箱在第二步的 identity_type 是 8（与 login-page 一致）
-  const loginStepEnd = selectedType.value === 7 ? 8 : selectedType.value
-  loading.value = true
-  store.getFastLogin({
-    identity_type: loginStepEnd,
-    config_code: isSms ? configCode.sms : configCode.email,
-    identifier: selectedIdentifier.value,
-    credential: twoFaCode.value,
-    select_type: 1,
-    auth_token: tempToken.value,
-    current_step: 2,
-    login_step: [0, loginStepEnd]
-  }).then((res) => {
-    if (res.code === 200) {
-      store.applyLoginResult(res.data)
-      stopCodeTimer()
-      finishLogin()
-    }
-  }).catch(() => {}).finally(() => {
-    loading.value = false
-  })
 }
 
-onMounted(() => {
+onMounted(async() => {
   computeSafeAreaTop()
-  if (!isLocalAuth) {
-    // 预取公网 IP 与认证配置，减少双因子发送验证码的等待
-    getClientPublicIp().catch(() => {})
-    initAuthConfigCode()
+  if (isLocalAuth) {
+    restoreAutoLogin()
+    return
   }
-  if (window.sessionStorage.getItem('autoLogin')) {
-    try {
-      const tempObj = JSON.parse(window.sessionStorage.getItem('autoLogin'))
-      username.value = tempObj.username
-      password.value = tempObj.password
-      autoLogin.value = true
-      loginBtn()
-    } catch (e) {
-      // ignore
-    }
-  }
+  // 预取公网 IP，减少首次发验证码等待
+  getClientPublicIp().catch(() => {})
+  const common = await loadLoginPlatformConfig()
+  isOpenOtherLoginWay.value = common.isOpenOtherLoginWay || {}
+  loginWaySortMap.value = parseLoginWaySort(common.loginWaySort)
+  initDefaultLoginWay()
+  restoreAutoLogin()
+  await initAuthConfigCode()
 })
 
 onBeforeUnmount(() => {
-  stopCodeTimer()
+  stopCodeTimer(1)
+  stopCodeTimer(7)
   slideVisible.value = false
 })
 
@@ -1182,5 +1376,32 @@ $text_sub: var(--vl-text-2);
 
 .pwd_confirm_btn {
   margin-top: 18px;
+}
+
+/* 登录方式切换（分段选择） */
+.way_tabs {
+  display: flex;
+  padding: 4px;
+  margin: -8px 0 18px;
+  border-radius: 999px;
+  background: var(--vl-surface);
+}
+
+.way_tab {
+  flex: 1;
+  height: 34px;
+  line-height: 34px;
+  text-align: center;
+  border-radius: 999px;
+  font-size: 14px;
+  color: $text_sub;
+  transition: all 0.2s ease;
+
+  &.active {
+    background: #fff;
+    color: $text_main;
+    font-weight: 700;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
 }
 </style>

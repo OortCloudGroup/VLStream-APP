@@ -22,7 +22,7 @@ import { bundleManager } from '@kit.AbilityKit';
 import { MainWindowHolder } from '../common/MainWindowHolder';
 
 // 后端环境名：multi=多租户生产 / single=单租户，域名预设表在 H5（vue3-h5/src/config/index.js）
-const APP_VL_ENV: string = 'single';
+const APP_VL_ENV: string = 'multi';
 // 业务网关覆盖地址（不带末尾斜杠）；留空表示沿用 H5 的环境预设，仅现场部署需要覆盖时填写
 const APP_GATEWAY: string = '';
 const APP_ID: string = '747aa0fa18d047c8b526e242142e0a6c';

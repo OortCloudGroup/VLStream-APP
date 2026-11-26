@@ -9,7 +9,7 @@ import Foundation
  */
 enum AppConfig {
     /// 后端环境名：multi=多租户生产 / single=单租户。各服务域名预设表在 H5（vue3-h5/src/config/index.js）。
-    static let vlEnv = "single"
+    static let vlEnv = "multi"
 
     /// 业务网关覆盖地址（含端口，不带末尾斜杠）。留空表示沿用 H5 的环境预设，仅现场部署需要覆盖时才填。
     static let gateway = ""
