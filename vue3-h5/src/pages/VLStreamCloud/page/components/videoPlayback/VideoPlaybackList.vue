@@ -57,10 +57,7 @@
                 </div>
               </div>
             </div>
-            <div class="play-btn">
-              <img v-if="item.status == '1'" src="@/assets/img/VLStreamCloud/spgc/playing.png" alt="" />
-              <img v-else src="@/assets/img/VLStreamCloud/spgc/no_playing.png" alt="" />
-            </div>
+            <PlayButton class="play-btn" :online="item.status == '1'" />
           </div>
         </div>
       </van-list>
@@ -73,8 +70,10 @@
     </van-pull-refresh>
     <oort-popup v-model="showDetail" position="right" style="width: 100%;height: 100%;" teleport="body">
       <!-- 详情页需要 WVP 行 id（云端录像查询）与 deviceId 序列号（事件录像过滤），传整行 -->
+      <!-- 每次打开都重建详情页：日期回到当天，不沿用上次选的日期与播放状态 -->
       <VideoPlaybackDetail
         v-if="currentDevice"
+        :key="detailKey"
         :device="currentDevice"
         @close="showDetail = false"
       />
@@ -84,6 +83,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import PlayButton from '../PlayButton.vue'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import VideoPlaybackDetail from './VideoPlaybackDetail.vue'
 import { getWvpVlsDeviceList } from '@/api/VLStreamCloud/wvp'
@@ -180,9 +180,11 @@ const onRefresh = () => {
 
 const showDetail = ref(false)
 const currentDevice = ref<any | null>(null)
+const detailKey = ref(0)
 
 const openDetail = (item: any) => {
   currentDevice.value = item
+  detailKey.value++
   showDetail.value = true
 }
 </script>
@@ -194,8 +196,8 @@ const openDetail = (item: any) => {
 
 .playback-card {
   position: relative;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
   padding: 12px;
   margin-bottom: 12px;
 }
@@ -256,34 +258,40 @@ const openDetail = (item: any) => {
 }
 
 .chip {
-  background: rgba(47, 105, 248, 1);
-  border-radius: 2px;
-  line-height: 16px;
-  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--vl-ink);
   font-size: 12px;
-  padding: 4px 12px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* 第一个胶囊是在线状态：圆点指示 */
+.chip:first-child::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--vl-success);
 }
 
 .chip.offline {
-  background: rgba(216, 216, 216, 1);
-  color: #ffffff;
+  color: var(--vl-text-2);
+
+  &::before {
+    background: #c7c7cc;
+  }
 }
 
 .play-btn {
   position: absolute;
   top: 16px;
   right: 12px;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.play-btn img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
 }
 
 // 暂无数据（同 eventPat.vue）

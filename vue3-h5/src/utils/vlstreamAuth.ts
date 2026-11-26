@@ -16,6 +16,8 @@ import Config from '@/config'
 import { getToken } from './cache'
 
 const VLSTREAM_TOKEN_KEY = 'vlstreamToken'
+// VLStream 本地（影子）用户 ID：业务表的 create_user 记录的是它，而不是平台 userId
+const VLSTREAM_USER_ID_KEY = 'vlstreamUserId'
 
 /** 换取 JWT 的接口路径，需与 buildVlsUrl 拼接结果一致，用于拦截器自我排除 */
 export const EXCHANGE_PATH = 'sso/v1/exchangeToken'
@@ -26,7 +28,12 @@ export const setVlstreamToken = (token: string) => {
   if (token) sessionStorage.setItem(VLSTREAM_TOKEN_KEY, token)
 }
 
-export const removeVlstreamToken = () => sessionStorage.removeItem(VLSTREAM_TOKEN_KEY)
+export const removeVlstreamToken = () => {
+  sessionStorage.removeItem(VLSTREAM_TOKEN_KEY)
+  sessionStorage.removeItem(VLSTREAM_USER_ID_KEY)
+}
+
+export const getVlstreamUserId = () => sessionStorage.getItem(VLSTREAM_USER_ID_KEY) || ''
 
 /** 换令牌必须绕开 service.ts，否则拦截器会递归调用自身 */
 function buildVlsUrl(interfaceName: string) {
@@ -66,6 +73,10 @@ export function ensureVlstreamToken(): Promise<string> {
     .then((res) => {
       const jwt = res.data?.data?.accessToken || res.data?.data?.token || ''
       setVlstreamToken(jwt)
+      const localUserId = res.data?.data?.user?.userId
+      if (jwt && localUserId !== undefined && localUserId !== null) {
+        sessionStorage.setItem(VLSTREAM_USER_ID_KEY, String(localUserId))
+      }
       return jwt
     })
     .catch(() => '')
@@ -74,4 +85,17 @@ export function ensureVlstreamToken(): Promise<string> {
       return jwt
     })
   return pending
+}
+
+/**
+ * 返回 VLStream 本地用户 ID（用于“我的设备”等按创建人筛选）。
+ * 旧版本缓存的 JWT 没有记录用户 ID，此时重新换取一次本地会话。
+ */
+export async function ensureVlstreamUserId(): Promise<string> {
+  if (Config.authMode === 'local') return ''
+  const cached = getVlstreamUserId()
+  if (cached && getVlstreamToken()) return cached
+  removeVlstreamToken()
+  await ensureVlstreamToken()
+  return getVlstreamUserId()
 }

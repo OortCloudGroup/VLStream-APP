@@ -2,39 +2,37 @@
  * 工作台页面
  */
 <template>
-  <div>
+  <div class="workbench-page">
+    <!-- 顶部标题固定，内容在其下方滚动 -->
+    <div class="page-header" :style="{ paddingTop: headerPaddingTop }">
+      <h1 class="page-title">
+        {{ $t('工作台') }}
+      </h1>
+    </div>
     <van-pull-refresh v-model="isLoading" class="workbench-body" @refresh="onRefresh">
       <div class="workbench-container">
-        <div class="top-bg" :style="{ backgroundImage: `url(${bgImg})` }" />
-        <!-- 顶部标题区域 -->
-        <div class="header-section" :style="{ paddingTop: headerPaddingTop }">
-          <h1 class="page-title">
-            {{ $t('工作台') }}
-          </h1>
-
+        <div class="header-section">
           <!-- 天气和个人信息卡片 -->
           <div class="weather-card">
-            <div class="weather-title">
-              <img src="@/assets/img/VLStreamCloud/qt.png" alt="" />
-              <div>
-                <div class="temperature">
-                  {{ weatherTemp }}
+            <div class="hero-top">
+              <div class="hero-text">
+                <div class="greeting">
+                  {{ greetingWithUser }}
                 </div>
                 <div class="date">
-                  {{ currentDate }} {{ currentTime }} {{ currentDay }}
+                  {{ currentDate }} · {{ currentTime }} · {{ currentDay }}
                 </div>
               </div>
-            </div>
-            <div class="weather-info">
-              <div class="greeting">
-                {{ greetingWithUser }}
+              <div class="weather-chip">
+                <img src="@/assets/img/VLStreamCloud/qt.png" alt="" />
+                <span class="temperature vl-mono">{{ weatherTemp }}</span>
               </div>
             </div>
 
             <!-- 状态卡片区域 -->
             <div class="status-cards">
               <div class="status-card pending">
-                <div class="status-number">
+                <div class="status-number vl-mono">
                   {{ pendingCount }}
                 </div>
                 <div class="status-label">
@@ -42,7 +40,7 @@
                 </div>
               </div>
               <div class="status-card approved">
-                <div class="status-number">
+                <div class="status-number vl-mono">
                   {{ approvedCount }}
                 </div>
                 <div class="status-label">
@@ -50,7 +48,7 @@
                 </div>
               </div>
               <div class="status-card all">
-                <div class="status-number">
+                <div class="status-number vl-mono">
                   {{ allCount }}
                 </div>
                 <div class="status-label">
@@ -75,7 +73,9 @@
               class="function-item"
               @click="handleFunctionClick(item)"
             >
-              <img class="function-icon" :src="item.iconSvg" alt="" />
+              <div class="function-icon">
+                <LineIcon :name="item.icon" :size="24" />
+              </div>
               <div class="function-label">
                 {{ $t(item.label) }}
               </div>
@@ -99,13 +99,13 @@
               :key="index"
               class="device-item"
             >
-              <img class="device-icon" :src="sxjImg" alt="" />
+              <div class="device-icon">
+                <LineIcon name="device" :size="18" />
+              </div>
               <div class="device-name">
                 {{ device.name }}
               </div>
-              <div class="play-btn" @click="handlePlay(device)">
-                <img class="play-icon" :src="bfImg" alt="" />
-              </div>
+              <PlayButton shape="pill" :online="device.online === true" @click="handlePlay(device)" />
             </div>
           </div>
         </div>
@@ -169,6 +169,8 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import PlayButton from '../components/PlayButton.vue'
+import { getSafeAreaTop } from '@/utils/safeArea'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store/modules/useraPaas'
@@ -176,22 +178,8 @@ import { showToast } from 'vant'
 import OortPopup from '@/components/popup/oort_popup.vue'
 import CameraDetail from '@/pages/VLStreamCloud/page/components/cameraDetail/CameraDetail.vue'
 import { getWvpVlsDeviceList } from '@/api/VLStreamCloud/wvp'
-import { listTodoProcess, listFinishedProcess, listOwnProcess } from '@/api/processui'
-import bgImg from '@/assets/img/VLStreamCloud/bg.png'
-import sxjImg from '@/assets/img/VLStreamCloud/sxj.png'
-import bfImg from '@/assets/img/VLStreamCloud/bf.png'
-import spgc from '@/assets/img/VLStreamCloud/spgc.png'
-import cjzl from '@/assets/img/VLStreamCloud/cjzl.png'
-import bqgl from '@/assets/img/VLStreamCloud/bqgl.png'
-import czrz from '@/assets/img/VLStreamCloud/czrz.png'
-import fwzx from '@/assets/img/VLStreamCloud/fwzx.png'
-import sbgl from '@/assets/img/VLStreamCloud/sbgl.png'
-import sfbp from '@/assets/img/VLStreamCloud/sfbp.png'
-import sfbz from '@/assets/img/VLStreamCloud/sfbz.png'
-import sfcs from '@/assets/img/VLStreamCloud/sfcs.png'
-import sfxl from '@/assets/img/VLStreamCloud/sfxl.png'
-import sjgl from '@/assets/img/VLStreamCloud/sjgl.png'
-import sphf from '@/assets/img/VLStreamCloud/sphf.png'
+import { todoWorkOrderList, finishedWorkOrderList, ownWorkOrderList } from '@/api/processui'
+import LineIcon from '@/pages/VLStreamCloud/page/components/LineIcon.vue'
 
 const router = useRouter()
 const store = useUserStore()
@@ -201,17 +189,10 @@ const { t, locale } = useI18n()
 const showVideoDetail = ref(false)
 const currentDevice = ref(null)
 
-// 沉浸式状态栏适配：原生壳注入 window.__safeAreaTop（CSS px），
-// 非原生环境（浏览器/PC）留少量默认留白。
+// 沉浸式状态栏适配：状态栏高度见 utils/safeArea，其下只留 12px
 const headerPaddingTop = ref('12px')
 const computeHeaderPadding = () => {
-  try {
-    const isShell = window.global && window.global.is_native_shell
-    const safeTop = isShell ? (window.__safeAreaTop || 0) : 0
-    headerPaddingTop.value = (safeTop + 12) + 'px'
-  } catch (e) {
-    headerPaddingTop.value = '12px'
-  }
+  headerPaddingTop.value = (getSafeAreaTop() + 12) + 'px'
 }
 
 // 用户名
@@ -303,62 +284,62 @@ const functionList = ref([
   {
     key: 'square',
     label: '视频广场',
-    iconSvg: spgc
+    icon: 'square'
   },
   {
     key: 'govern',
     label: '场景治理',
-    iconSvg: cjzl
+    icon: 'govern'
   },
   {
     key: 'event',
     label: '事件管理',
-    iconSvg: sjgl
+    icon: 'bell'
   },
   {
     key: 'algo',
     label: '算法超市',
-    iconSvg: sfcs
+    icon: 'algo'
   },
   {
     key: 'annotation',
     label: '算法标注',
-    iconSvg: sfbz
+    icon: 'annotation'
   },
   {
     key: 'tag',
     label: '标签管理',
-    iconSvg: bqgl
+    icon: 'tag'
   },
   {
     key: 'playback',
     label: '视频回放',
-    iconSvg: sphf
+    icon: 'playback'
   },
   {
     key: 'device',
     label: '设备管理',
-    iconSvg: sbgl
+    icon: 'device'
   },
   {
     key: 'training',
     label: '算法训练',
-    iconSvg: sfxl
+    icon: 'training'
   },
   {
     key: 'orchestration',
     label: '算法编排',
-    iconSvg: sfbp
+    icon: 'orchestration'
   },
   {
     key: 'log',
     label: '操作日志',
-    iconSvg: czrz
+    icon: 'log'
   },
   {
     key: 'service',
     label: '服务中心',
-    iconSvg: fwzx
+    icon: 'service'
   }
 ])
 
@@ -385,20 +366,23 @@ const allCount = ref(0) // 所有申请数量
 // 我的待审批列表
 const approvalList = ref([])
 
-const PROCESS_COMMON_PARAMS = {
+// 工单接口的权限码随「我的/待办/已办工单」页面一起授权（workflow:workorder:*），
+// 通用流程接口 /workflow/process/* 要求的 workflow:process:* 不在菜单目录里，普通用户无法授权。
+// categoryType 为必填（后端按它查分类名），workOrderAppAll 聚合全部工单应用。
+const WORKORDER_COMMON_PARAMS = {
   pageNum: 1,
   pageSize: 10,
-  category: '2029435351850999810',
-  categoryType: 'wfAppAll'
+  categoryType: 'WorkOrderAppAll',
+  workOrderAppAll: true
 }
 
 // 获取审批统计和列表
 const fetchApprovalData = async() => {
   try {
     const [todoRes, finishedRes, ownRes] = await Promise.all([
-      listTodoProcess(PROCESS_COMMON_PARAMS),
-      listFinishedProcess(PROCESS_COMMON_PARAMS),
-      listOwnProcess(PROCESS_COMMON_PARAMS)
+      todoWorkOrderList(WORKORDER_COMMON_PARAMS),
+      finishedWorkOrderList(WORKORDER_COMMON_PARAMS),
+      ownWorkOrderList(WORKORDER_COMMON_PARAMS)
     ])
 
     if (todoRes && todoRes.code === 200) {
@@ -417,9 +401,9 @@ const fetchApprovalData = async() => {
       allCount.value = ownRes.total || (ownRes.data && ownRes.data.total) || 0
       const rows = ownRes.rows || (ownRes.data && ownRes.data.rows) || []
       approvalList.value = rows.map(row => ({
-        id: row.procInsId || row.hisProcInsId || row.taskId,
-        deviceName: row.procDefName || row.workOrderName || '-',
-        applicant: row.startUserName || '-'
+        id: row.procInsId || row.procInstId || row.taskId || row.id,
+        deviceName: row.title || row.procDefName || '-',
+        applicant: row.startUserName || row.createBy || '-'
       }))
     } else {
       allCount.value = 0
@@ -523,10 +507,26 @@ const onRefresh = async() => {
 </script>
 
 <style lang="scss" scoped>
+.workbench-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 56px - env(safe-area-inset-bottom));
+  background: var(--vl-bg);
+}
+
+.page-header {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  padding: 0 20px;
+  background: var(--vl-bg);
+}
+
 .workbench-body {
-  height: calc(100vh - 50px);
+  flex: 1;
+  min-height: 0;
   overflow: scroll;
-  background: #fff;
+  background: var(--vl-bg);
   scrollbar-width: none;
   -ms-overflow-style: none;
 
@@ -537,22 +537,9 @@ const onRefresh = async() => {
 
 .workbench-container {
   min-height: 100%;
-  background: #F9FAFF;
-  padding: 0 20px;
-  padding-bottom: 20px;
+  background: var(--vl-bg);
+  padding: 4px 20px 24px;
   position: relative;
-}
-
-.top-bg {
-  position: absolute;
-  top: -15px;
-  left: -20px;
-  right: -20px;
-  height: 168px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  z-index: 0;
 }
 
 .header-section,
@@ -564,68 +551,72 @@ const onRefresh = async() => {
 }
 
 .page-title {
-  font-weight: 700;
-  color: #ffffff;
-  font-size: 17px;
   margin: 0;
-  padding: 0 0 10px 0;
+  padding: 0 0 12px;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--vl-ink);
 }
 
+// 概览面板：浅灰大圆角；问候语为主角，天气做成右上角小胶囊
 .weather-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 12px;
-  box-shadow: 0 4px 16px rgba(35, 60, 120, 0.06);
-  .weather-title{
-    display: flex;
-    gap: 12px;
-    margin-bottom: 8px;
-    img{
-      width: 27px;
-      height: 26.38px;
-    }
-
-    .temperature{
-      line-height: 21px;
-      font-weight: 700;
-      color: #323233;
-      font-size: 18px;
-      letter-spacing: 0.96px;
-    }
-
-    .date{
-      line-height: 14px;
-      font-weight: 700;
-      color: #999999;
-      font-size: 12px;
-      letter-spacing: 0.64px;
-    }
-  }
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius-lg);
+  padding: 20px 16px 16px;
 }
 
-.weather-icon {
-  width: 48px;
-  height: 48px;
-  margin-right: 16px;
+.hero-top {
   display: flex;
-  align-items: center;
-  justify-content: center;
-
-  svg {
-    width: 100%;
-    height: 100%;
-  }
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
-.weather-info {
-  flex: 1;
-  margin-bottom: 8px;
+.hero-text {
+  min-width: 0;
 
   .greeting {
-    line-height: 20px;
-    font-weight: 500;
-    color: #323233;
-    font-size: 15px;
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: var(--vl-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .date {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--vl-text-2);
+  }
+}
+
+.weather-chip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 10px 0 6px;
+  border-radius: 999px;
+  background: #ffffff;
+
+  img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
+
+  .temperature {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--vl-ink);
   }
 }
 
@@ -638,111 +629,108 @@ const onRefresh = async() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  align-items: center;
+  gap: 4px;
+  align-items: flex-start;
   justify-content: center;
-  height: 72px;
-  background: #fddedb;
-  border-radius: 4px;
-
-  &.pending {
-    .status-number {
-      color: rgba(254, 69, 90, 1);
-    }
-    background: rgba(253, 222, 219, 0.2);
-  }
-
-  &.approved {
-    .status-number {
-      color: rgba(30, 225, 0, 1);
-    }
-    background: rgba(30, 225, 0, 0.2);
-  }
-
-  &.all {
-    .status-number {
-      color: rgba(47, 105, 248, 1);
-    }
-    background: rgba(229, 243, 254, 0.2);
-  }
+  padding: 14px 14px 12px;
+  background: #ffffff;
+  border-radius: 16px;
 }
 
 .status-number {
-  font-size:28px;
+  font-size: 26px;
+  line-height: 32px;
   font-weight: 700;
+  color: var(--vl-ink);
 }
 
 .status-label {
-  font-size: 14px;
-  color: #000000;
-}
-
-.section-title {
-  line-height: 24px;
-  color: #969799;
   font-size: 12px;
+  color: var(--vl-text-2);
 }
 
-.functions-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  background-color: #FFFFFF;
-  border-radius: 12px;
-  padding: 16px 0;
-}
-
-.function-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 12px;
-}
-
-.function-icon {
-  width: 40px;
-  height: 40px;
-  margin-bottom: 8px;
-  display: block;
-  object-fit: contain;
-}
-
-.function-label {
-  line-height: 16px;
-  color: #323233;
-  font-size: 12px;
-  letter-spacing: 0.82px;
+// 待审批是需要处理的数字，用亮色突出
+.status-card.pending .status-number {
+  color: var(--vl-accent);
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-  margin-top: 16px;
+  margin: 28px 0 12px;
+}
+
+.section-title {
+  line-height: 22px;
+  color: var(--vl-ink);
+  font-size: 17px;
+  font-weight: 700;
 }
 
 .more-link {
-  line-height: 16px;
-  color: #1a53ff;
-  font-size: 12px;
+  line-height: 18px;
+  color: var(--vl-accent);
+  font-weight: 500;
+  font-size: 13px;
 }
 
-// 热门设备区域
+.functions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  row-gap: 18px;
+}
+
+.function-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &:active .function-icon {
+    background: var(--vl-surface-2);
+  }
+}
+
+.function-icon {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: var(--vl-surface);
+  color: var(--vl-ink);
+  transition: background-color 0.15s ease;
+}
+
+.function-label {
+  line-height: 16px;
+  color: var(--vl-ink);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+// 热门设备
 .devices-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  background-color: #FFFFFF;
-  border-radius: 12px;
+  border: 1px solid var(--vl-line);
+  border-radius: var(--vl-radius-lg);
   padding: 0 16px;
+  background: #ffffff;
+
+  &:empty {
+    display: none;
+  }
 }
 
 .device-item {
   display: flex;
   align-items: center;
-  padding: 20px 0;
-  border-bottom: 1px solid #ebedf0;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--vl-line);
 
   &:last-child {
     border-bottom: none;
@@ -750,48 +738,49 @@ const onRefresh = async() => {
 }
 
 .device-icon {
-  width: 15.99px;
-  height: 15px;
-  margin-right: 8px;
-  object-fit: contain;
+  width: 36px;
+  height: 36px;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--vl-surface);
+  color: var(--vl-ink);
+  flex-shrink: 0;
 }
 
 .device-name {
   flex: 1;
-  line-height: 19px;
-  color: #333333;
-  font-size: 14px;
-  letter-spacing: 0.75px;
+  line-height: 20px;
+  color: var(--vl-ink);
+  font-size: 15px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.play-btn {
-  display: flex;
-  .play-icon {
-    width: 58px;
-    height: 30px;
-    border-radius: 4px;
-}
-}
-
-// 我的待审批区域
+// 我的待审批
 .approval-section {
-  border-radius: 12px;
   margin-bottom: 20px;
 }
 
 .approval-table {
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--vl-line);
+  border-radius: var(--vl-radius-lg);
+  overflow: hidden;
 }
 
 .approval-header {
   display: flex;
-  padding: 10px 12px;
-  border-bottom: 1px solid #ebedf0;
-  background: rgba(250, 250, 250, 1);
+  padding: 12px 16px;
+  background: var(--vl-surface);
   line-height: 18px;
-  color: #333333;
-  font-size: 14px;
+  color: var(--vl-text-2);
+  font-size: 13px;
 }
 
 .header-cell {
@@ -814,22 +803,21 @@ const onRefresh = async() => {
 .approval-item {
   display: flex;
   align-items: center;
-  padding: 22px 12px;
+  padding: 16px;
   background: #ffffff;
-  border-bottom: 1px solid #ebedf0;
-
-  &:last-child {
-    border-bottom: none;
-  }
+  border-top: 1px solid var(--vl-line);
 }
 
 .approval-cell {
   font-size: 14px;
-  color: #323233;
+  color: var(--vl-ink);
 
   &.device-name-cell {
     flex: 1;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &.applicant-cell {
@@ -847,8 +835,9 @@ const onRefresh = async() => {
 }
 
 .approve-btn {
-  color: rgba(26, 83, 255, 1);
+  color: var(--vl-ink);
   font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
 
   &:active {
@@ -857,7 +846,7 @@ const onRefresh = async() => {
 }
 
 .reject-btn {
-  color: rgba(246, 46, 46, 1);
+  color: var(--vl-danger);
   font-size: 14px;
   cursor: pointer;
 
@@ -865,5 +854,4 @@ const onRefresh = async() => {
     opacity: 0.7;
   }
 }
-
 </style>

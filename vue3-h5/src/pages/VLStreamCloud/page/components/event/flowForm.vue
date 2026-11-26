@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { listModel } from '@/api/processui'
 
 const props = defineProps(['listObj'])
@@ -99,7 +99,7 @@ defineExpose({ form, vmFormRef, appObj, selectedOptions_1, options })
   }
 
   .title {
-    font-family: OPPOSans-M;
+    font-weight: 500;
     font-size: 12px;
     color: #999999;
     letter-spacing: 0;
@@ -135,11 +135,28 @@ defineExpose({ form, vmFormRef, appObj, selectedOptions_1, options })
 }
 
 .vf_content {
-  background-color: #F5F6F8;
+  background-color: var(--vl-bg);
   display: flex;
   flex-direction: column;
   overflow: auto;
   color: #333;
   padding: 4px 0 10px;
+}
+</style>
+
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+.eventItem.eventItem {
+  padding: 14px 16px 16px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
+
+  @include vl-form-fields;
+
+  .locationBox {
+    margin-left: 0;
+    padding: 0;
+  }
 }
 </style>

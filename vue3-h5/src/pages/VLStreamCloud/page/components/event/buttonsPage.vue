@@ -440,14 +440,14 @@ watch(() => props.work_order_data, () => {
     height: 32px;
     background: #FFFFFF;
     font-size: 14px;
-    color: #FF023C;
-    border: 1px solid rgba(255, 2, 60, 1);
+    color: #e5484d;
+    border: 1px solid rgba(229, 72, 77, 1);
     border-radius: 4px;
   }
 
   .i_bor.bl {
-    color: #027AFF;
-    border: 1px solid rgba(2, 122, 255, 1);
+    color: #1c1c1e;
+    border: 1px solid var(--vl-primary);
   }
 }
 
@@ -468,7 +468,7 @@ watch(() => props.work_order_data, () => {
     border: none;
     margin-right: 10px;
     margin-bottom: 20px;
-    background-color: #4776ff;
+    background-color: var(--vl-primary);
     color: #fff;
   }
 
@@ -480,15 +480,15 @@ watch(() => props.work_order_data, () => {
   }
 
   .btn.ora {
-    border: 1px solid #F05A1F;
-    color: #F05A1F;
+    border: 1px solid #f5a623;
+    color: #f5a623;
     padding: 4px 8px;
     background-color: transparent;
   }
 
   .btn.fin {
-    border: 1px solid #4776ff;
-    color: #4776ff;
+    border: 1px solid var(--vl-primary);
+    color: #1c1c1e;
     padding: 4px 8px;
     background-color: transparent;
   }
@@ -528,7 +528,7 @@ watch(() => props.work_order_data, () => {
 
     .on {
       flex: 1;
-      background-color: #4776ff;
+      background-color: var(--vl-primary);
       color: #fff;
       border: none;
     }
@@ -536,7 +536,7 @@ watch(() => props.work_order_data, () => {
 
   .weipai {
     flex: 1;
-    background-color: #4776ff;
+    background-color: var(--vl-primary);
     color: #fff;
     border: none;
   }
@@ -562,7 +562,7 @@ watch(() => props.work_order_data, () => {
   }
 
   .title.t1 {
-    color: #027AFF;
+    color: #1c1c1e;
   }
 
   .title.t2 {
@@ -598,12 +598,12 @@ watch(() => props.work_order_data, () => {
       width: 130px;
       height: 40px;
       font-size: 14px;
-      color: #4876ff;
-      border: 1px solid #4876ff;
+      color: #1c1c1e;
+      border: 1px solid var(--vl-primary);
       border-radius: 6px;
 
       &.on {
-        background-color: #4876ff;
+        background-color: var(--vl-primary);
         border: none;
         color: #fff;
       }
@@ -642,7 +642,7 @@ watch(() => props.work_order_data, () => {
 
   .edit_text {
     font-size: 12px;
-    color: #027AFF;
+    color: #1c1c1e;
     margin: 0 12px;
   }
 

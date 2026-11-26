@@ -151,46 +151,64 @@ const infoList = computed(() => [
 .title-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: #fff;
-  border-radius: 8px;
+  gap: 10px;
+  padding: 8px 4px 4px;
+  background: transparent;
 }
 
 .device-name {
-  font-size: 16px;
+  min-width: 0;
+  font-size: 18px;
+  line-height: 26px;
   font-weight: 700;
-  color: #333333;
+  color: var(--vl-ink);
 }
 
+/* 在线状态：圆点胶囊，与列表保持一致 */
 .status-tag {
-  padding: 0 6px;
-  border-radius: 4px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
   font-size: 12px;
-  line-height: 18px;
-  color: #00ba52;
-  background: rgba(0, 186, 82, 0.08);
-  border: 1px solid rgba(0, 186, 82, 0.15);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--vl-ink);
+  background: var(--vl-surface);
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--vl-success);
+  }
 
   &.offline {
-    color: #999999;
-    background: rgba(153, 153, 153, 0.08);
-    border-color: rgba(153, 153, 153, 0.15);
+    color: var(--vl-text-2);
+
+    &::before {
+      background: #c7c7cc;
+    }
   }
 }
 
 .info-card {
   margin-top: 12px;
-  padding: 12px 16px;
-  background: #fff;
-  border-radius: 8px;
+  padding: 14px 16px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
 }
 
 .info-row {
   display: flex;
   align-items: flex-start;
-  margin-top: 8px;
-  font-size: 14px;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 13px;
 
   &:first-child {
     margin-top: 0;
@@ -200,39 +218,45 @@ const infoList = computed(() => [
 .info-label {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  min-width: 96px;
-  line-height: 22px;
-  color: #7a7c85;
+  gap: 6px;
+  flex-shrink: 0;
+  min-width: 92px;
+  line-height: 20px;
+  color: var(--vl-text-2);
+  white-space: nowrap;
 }
 
 .info-icon {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   object-fit: contain;
+  opacity: 0.6;
 }
 
 .info-value {
   flex: 1;
-  line-height: 22px;
-  color: #333333;
+  min-width: 0;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--vl-ink);
   word-break: break-all;
 
   &.is-warning {
-    color: #ff8d22;
+    color: #f5a623;
   }
 }
 
 .section-heading {
-  margin: 12px 4px 8px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #333333;
+  margin: 20px 4px 10px;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--vl-ink);
 }
 
 .table-card {
-  background: #fff;
-  border-radius: 8px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
   padding: 4px 16px;
 }
 
@@ -302,13 +326,13 @@ const infoList = computed(() => [
   background: #f0f2f5;
 
   &.primary {
-    color: #2f69f8;
-    background: rgba(47, 105, 248, 0.1);
+    color: var(--vl-accent);
+    background: var(--vl-accent-soft);
   }
 
   &.warning {
-    color: #ff8d22;
-    background: rgba(255, 141, 34, 0.1);
+    color: #f5a623;
+    background: rgba(245, 166, 35, 0.1);
   }
 }
 
@@ -322,7 +346,7 @@ const infoList = computed(() => [
 
 .upgrade-version {
   font-size: 12px;
-  color: #ff8d22;
+  color: #f5a623;
   white-space: nowrap;
 }
 

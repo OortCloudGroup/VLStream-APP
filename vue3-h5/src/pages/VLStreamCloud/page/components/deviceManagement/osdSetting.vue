@@ -434,7 +434,7 @@ defineExpose({
 .checkbox-group {
   margin-bottom: 8px;
   --van-checkbox-label-font-size: 16px;
-  --van-checkbox-color: #1a53ff;
+  --van-checkbox-color: var(--vl-accent);
   --van-checkbox-icon-size: 18px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -469,7 +469,7 @@ defineExpose({
 
 // 字符叠加 - 复选框组+输入框样式
 .overlay-checkbox-group {
-  --van-checkbox-color: #1989fa;
+  --van-checkbox-color: var(--vl-accent);
   --van-checkbox-icon-size: 18px;
   --van-checkbox-label-font-size: 16px;
 

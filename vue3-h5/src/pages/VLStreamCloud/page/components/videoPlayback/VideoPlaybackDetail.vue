@@ -24,6 +24,7 @@
         <van-date-picker
           v-model="pickerValues"
           :columns-type="pickerColumnsType"
+          :max-date="maxDate"
           @confirm="onDateConfirm"
           @cancel="showDatePicker = false"
         />
@@ -38,12 +39,30 @@
           class="player-video"
           controls
           @loadedmetadata="onVideoLoaded"
+          @error="onVideoError"
         />
+        <!-- 当日无录像：不出现播放按钮，避免误以为可以播放 -->
+        <div v-else-if="playerState === 'empty'" class="player-status">
+          <van-icon name="video-o" class="player-status-icon" />
+          <div class="player-status-title">
+            {{ $t('当日暂无录像') }}
+          </div>
+          <div class="player-status-desc">
+            {{ $t('可切换日期查看其他录像') }}
+          </div>
+        </div>
+        <!-- 有录像但取流失败：明确提示并允许重试 -->
+        <div v-else-if="playerState === 'error'" class="player-status" @click="retryActiveClip">
+          <van-icon name="warning-o" class="player-status-icon" />
+          <div class="player-status-title">
+            {{ $t('录像加载失败') }}
+          </div>
+          <div class="player-status-desc">
+            {{ $t('点击重试') }}
+          </div>
+        </div>
         <div v-else class="player-placeholder">
           <img v-if="heroImg" :src="heroImg" alt="" class="player-img" />
-          <div class="player-overlay">
-            <img :src="playImg" alt="" class="player-icon" />
-          </div>
         </div>
         <div v-if="clipLoading" class="player-loading">
           <van-loading size="24px" vertical>
@@ -107,7 +126,7 @@ import { useUserStore } from '@/store/modules/useraPaas'
 import type { DatePickerColumnType } from 'vant'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
 import playImg from '@/assets/img/VLStreamCloud/play.png'
-import { getPlayback, getPlaybackStream } from '@/api/VLStreamCloud/videoPlayback'
+import { getPlayback, getPlaybackStream, resolveVlsDeviceIds } from '@/api/VLStreamCloud/videoPlayback'
 import { getEventListByDevice, getEventMediaViewUrl, getEventMediaDownloadUrl } from '@/api/VLStreamCloud/eventManagement'
 
 const props = defineProps<{
@@ -118,10 +137,14 @@ const emit = defineEmits(['close'])
 const store = useUserStore()
 const { t } = useI18n()
 const onBack = () => {
+  // 弹层关闭后组件仍挂载，先暂停，避免录像在后台继续播放出声
+  videoPlayer.value?.pause()
   emit('close')
 }
 
+// 默认当天；只能选到今天，未来日期不可能有录像
 const today = new Date()
+const maxDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
 const currentYear = ref(today.getFullYear())
 const currentMonth = ref(today.getMonth() + 1)
 const currentDay = ref(today.getDate())
@@ -130,6 +153,12 @@ const activeClipId = ref<number | string>('')
 const videoSrc = ref<string>('')
 const videoPlayer = ref<HTMLVideoElement | null>(null)
 const clipLoading = ref(false)
+// 首次查询完成前不展示空态，避免进入页面时闪一下「暂无录像」
+const fetched = ref(false)
+// 当前片段取流失败（接口报错、空文件、视频解码失败）
+const playError = ref(false)
+// 每次切换片段/日期自增，丢弃过期的异步结果，避免旧片段覆盖新片段
+let playSeq = 0
 
 // 底部日期选择器
 const showDatePicker = ref(false)
@@ -152,6 +181,14 @@ type ClipItem = {
 }
 
 const clips = ref<ClipItem[]>([])
+
+// 播放区状态：empty 当日无录像 / error 取流失败 / idle 其余（加载中或待播放）
+const playerState = computed<'empty' | 'error' | 'idle'>(() => {
+  if (videoSrc.value || clipLoading.value) return 'idle'
+  if (fetched.value && !clips.value.length) return 'empty'
+  if (playError.value) return 'error'
+  return 'idle'
+})
 
 const extractTime = (dateTimeStr?: any) => {
   const s = String(dateTimeStr || '')
@@ -178,7 +215,7 @@ const buildRangeParams = () => {
   }
 }
 
-// 云端录像（/vlsVideoRecord/playback 按 Long deviceId 查询，用 WVP 行 id）
+// 云端录像（/vlsVideoRecord/playback 按 vls_device_info.id 查询，由序列号换取）
 const mapRecordClip = (r: any, idx: number, fallbackName: string): ClipItem => ({
   id: r.id ?? `r${idx}`,
   kind: 'videoRecord',
@@ -205,21 +242,28 @@ const mapEventClip = (e: any, idx: number, fallbackName: string): ClipItem => ({
 
 const fetchPlayback = async() => {
   const device = props.device || {}
-  // WVP 行 id 为数字串（如 "9"），后端 playback 形参为 Long；deviceId 为设备序列号
-  const rowId = String(device.id ?? '').trim()
+  // device 为 WVP 设备行：id 是 WVP 行 id（与录像表无关），deviceId 是设备序列号
   const serial = String(device.deviceId ?? '').trim()
   const fallbackName = String(device.deviceName ?? '')
-  if (!rowId && !serial) {
+  // 切换日期/设备时先清掉上一次的播放内容，避免旧录像残留在播放区
+  playSeq++
+  setVideoSrc('')
+  playError.value = false
+  if (!serial) {
     clips.value = []
     activeClipId.value = ''
+    fetched.value = true
     return
   }
   const { dateStr, startTime, endTime } = buildRangeParams()
   clipLoading.value = true
+  let firstClip: ClipItem | null = null
   try {
+    // 录像表 device_id 为 vls_device_info.id，需先按序列号换取
+    const [vlsId] = await resolveVlsDeviceIds([serial])
     const [recordRes, eventRes]: any[] = await Promise.all([
-      rowId
-        ? getPlayback({ accessToken: store.userInfo?.accessToken, deviceId: rowId, startTime, endTime })
+      vlsId
+        ? getPlayback({ accessToken: store.userInfo?.accessToken, deviceId: vlsId, startTime, endTime })
         : Promise.resolve(null),
       serial
         ? getEventListByDevice(serial, { current: 1, size: 100 })
@@ -245,13 +289,16 @@ const fetchPlayback = async() => {
     list.sort((a, b) => String(b.start).localeCompare(String(a.start)))
     clips.value = list
     activeClipId.value = list.length ? list[0].id : ''
-    // 自动播放第一个视频
-    if (list.length > 0) {
-      playClip(list[0])
-    }
+    firstClip = list[0] || null
+  } catch (e) {
+    clips.value = []
+    activeClipId.value = ''
   } finally {
     clipLoading.value = false
+    fetched.value = true
   }
+  // 列表加载完成后再自动播放第一个，playClip 自己管理加载态
+  if (firstClip) playClip(firstClip)
 }
 
 const heroImg = computed(() => {
@@ -281,9 +328,10 @@ const setVideoSrc = (src: string) => {
 const playEventClip = async(clip: ClipItem) => {
   const mediaId = clip.mediaId || String(clip.raw?.mediaId || '')
   if (!mediaId) {
-    showToast(t('暂无录像'))
+    playError.value = true
     return
   }
+  const seq = playSeq
   clipLoading.value = true
   try {
     let url = ''
@@ -298,6 +346,7 @@ const playEventClip = async(clip: ClipItem) => {
         showToast(viewRes.msg)
       }
     }
+    if (seq !== playSeq) return
     if (url) {
       setVideoSrc(url)
       // video 由 v-if 渲染，等 DOM 更新后再触发加载，避免空引用
@@ -306,19 +355,25 @@ const playEventClip = async(clip: ClipItem) => {
         videoPlayer.value.load()
       }
     } else {
-      videoSrc.value = ''
+      setVideoSrc('')
+      playError.value = true
     }
   } catch (error) {
-    videoSrc.value = ''
+    if (seq !== playSeq) return
+    setVideoSrc('')
+    playError.value = true
   } finally {
-    clipLoading.value = false
+    if (seq === playSeq) clipLoading.value = false
   }
 }
 
 const playClip = async(clip: ClipItem) => {
+  playSeq++
   activeClipId.value = clip.id
+  playError.value = false
+  setVideoSrc('')
   if (!clip.id) {
-    videoSrc.value = ''
+    playError.value = true
     return
   }
 
@@ -327,15 +382,17 @@ const playClip = async(clip: ClipItem) => {
     return
   }
 
+  const seq = playSeq
   clipLoading.value = true
   try {
     // 调用接口获取视频流
     const params = { accessToken: store.userInfo?.accessToken }
     const res: any = await getPlaybackStream(clip.id, params)
+    if (seq !== playSeq) return
     if (res && res instanceof Blob) {
       if (res.type && res.type.includes('json')) {
         await readBlobError(res)
-        videoSrc.value = ''
+        playError.value = true
       } else if (res.size > 0) {
         setVideoSrc(URL.createObjectURL(res))
 
@@ -345,16 +402,28 @@ const playClip = async(clip: ClipItem) => {
           videoPlayer.value.load()
         }
       } else {
-        videoSrc.value = ''
+        playError.value = true
       }
     } else {
-      videoSrc.value = ''
+      playError.value = true
     }
   } catch (error) {
-    videoSrc.value = ''
+    if (seq !== playSeq) return
+    playError.value = true
   } finally {
-    clipLoading.value = false
+    if (seq === playSeq) clipLoading.value = false
   }
+}
+
+// 文件能下载但浏览器无法解码（格式不支持/文件损坏）同样视为加载失败
+const onVideoError = () => {
+  setVideoSrc('')
+  playError.value = true
+}
+
+const retryActiveClip = () => {
+  const clip = clips.value.find(c => c.id === activeClipId.value)
+  if (clip) playClip(clip)
 }
 
 const onVideoLoaded = () => {
@@ -410,7 +479,7 @@ onBeforeUnmount(() => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f9faff;
+  background: #ffffff;
 }
 
 .detail-body {
@@ -460,6 +529,33 @@ onBeforeUnmount(() => {
   color: #fff;
 }
 
+.player-status {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.player-status-icon {
+  font-size: 36px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.player-status-title {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.player-status-desc {
+  font-size: 12px;
+  line-height: 16px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
 .player-placeholder {
   position: relative;
   width: 100%;
@@ -470,20 +566,6 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.player-overlay {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-.player-icon {
-  width: 38px;
-  height: 38px;
-  object-fit: contain;
 }
 
 .list-title {
@@ -517,7 +599,7 @@ onBeforeUnmount(() => {
   position: relative;
   width: 120px;
   height: 88px;
-  border: 2px solid rgba(47, 105, 248, 0.2);
+  border: 2px solid rgba(28, 28, 30, 0.2);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -582,11 +664,11 @@ onBeforeUnmount(() => {
   gap: 4px;
   width:64px;
   height:22px;
-  background: rgba(47, 105, 248, 0.12);
+  background: var(--vl-accent-soft);
   border-radius: 4px;
   line-height: 16px;
   font-weight: 500;
-  color: #2f69f8;
+  color: var(--vl-accent);
   font-size: 12px;
   padding: 5px 6px;
   box-sizing: border-box;

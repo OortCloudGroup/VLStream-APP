@@ -195,10 +195,9 @@ const openDetail = async(row) => {
 
 .device-card {
   position: relative;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
   padding: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
 }
 
 .card-header {
@@ -254,17 +253,34 @@ const openDetail = async(row) => {
 }
 
 .chip {
-  background: rgba(47, 105, 248, 1);
-  border-radius: 2px;
-  line-height: 16px;
-  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--vl-ink);
   font-size: 12px;
-  padding: 4px 12px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* 第一个胶囊是在线状态：圆点指示 */
+.chip:first-child::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--vl-success);
 }
 
 .chip.offline {
-  background: rgba(216, 216, 216, 1);
-  color: #ffffff;
+  color: var(--vl-text-2);
+
+  &::before {
+    background: #c7c7cc;
+  }
 }
 
 .fab {
@@ -274,11 +290,11 @@ const openDetail = async(row) => {
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  background: #2f69f8;
+  background: var(--vl-accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 24px rgba(47, 105, 248, 0.35);
+  box-shadow: 0 10px 24px rgba(255, 106, 0, 0.32);
   z-index: 20;
 }
 

@@ -1167,7 +1167,7 @@ onMounted(() => {
 .add-govern {
   height: 100vh;
   overflow: hidden;
-  background: #f3f3f3;
+  background: var(--vl-bg);
 }
 
 .add_content {
@@ -1286,7 +1286,7 @@ onMounted(() => {
 }
 
 .butActive {
-  background-color: #2f69f8;
+  background-color: var(--vl-primary);
   color: #fff;
 }
 
@@ -1357,11 +1357,11 @@ onMounted(() => {
   align-items: flex-start;
   padding: 10px;
   margin: 10px;
-  background: #f0f9ff;
-  border: 1px solid #b3d8ff;
+  background: #f4f4f6;
+  border: 1px solid #d1d1d6;
   border-radius: 6px;
   font-size: 12px;
-  color: #1f84f0;
+  color: #1c1c1e;
   line-height: 20px;
   font-weight: 400;
   gap: 8px;
@@ -1369,7 +1369,7 @@ onMounted(() => {
 
   .van-icon {
     font-size: 16px;
-    color: #409eff;
+    color: var(--vl-accent);
     flex-shrink: 0;
     margin-top: 2px;
   }
@@ -1378,7 +1378,7 @@ onMounted(() => {
 .section {
   padding: 16px;
   background: #fff;
-  margin-top: 12px;
+  border-top: 8px solid var(--vl-surface);
 }
 
 .section-header {
@@ -1446,7 +1446,7 @@ onMounted(() => {
 }
 
 .custom-required {
-  color: #ee0a24;
+  color: #e5484d;
   font-size: 14px;
   margin-right: 4px;
 }
@@ -1472,9 +1472,13 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.camera-popup-cancel,
+.camera-popup-cancel {
+  color: var(--vl-text-2);
+}
+
 .camera-popup-confirm {
-  color: #1989fa;
+  color: var(--vl-accent);
+  font-weight: 600;
 }
 
 .camera-popup-title {
@@ -1506,9 +1510,13 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.area-popup-cancel,
+.area-popup-cancel {
+  color: var(--vl-text-2);
+}
+
 .area-popup-confirm {
-  color: #1989fa;
+  color: var(--vl-accent);
+  font-weight: 600;
 }
 
 .area-popup-title {
@@ -1539,13 +1547,13 @@ onMounted(() => {
   padding: 4px 8px;
   text-align: center;
   border-radius: 14px;
-  background: #f2f4f8;
+  background: #f4f4f6;
   color: #646566;
   font-size: 13px;
 }
 
 .day-chip.active {
-  background: rgba(47, 105, 248, 1);
+  background: var(--vl-primary);
   color: #fff;
 }
 
@@ -1568,7 +1576,61 @@ onMounted(() => {
 }
 
 .area-input-confirm {
-  color: #1989fa;
+  color: var(--vl-accent);
 }
 </style>
 
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+.add-govern.add-govern {
+  @include vl-section-form('.add_content');
+
+  /* 循环周期：分段胶囊 */
+  .timeButBox {
+    display: flex;
+    width: 100%;
+    margin: 0 0 12px;
+    padding: 3px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border-radius: 999px;
+  }
+
+  .timeBut {
+    flex: 1;
+    width: auto;
+    margin: 0;
+    font-size: 13px;
+    line-height: 30px;
+    color: var(--vl-text-2);
+    background: transparent;
+    border-radius: 999px;
+  }
+
+  .butActive {
+    color: #ffffff;
+    font-weight: 600;
+    background: var(--vl-primary);
+  }
+
+  .timeSelectBox {
+    width: 100%;
+    background: #ffffff;
+    border: 0;
+    border-radius: var(--vl-radius-sm);
+    overflow: hidden;
+  }
+
+  .tipBox {
+    margin: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--vl-text-2);
+    background: var(--vl-surface);
+    border: 0;
+    border-radius: 10px;
+  }
+}
+</style>

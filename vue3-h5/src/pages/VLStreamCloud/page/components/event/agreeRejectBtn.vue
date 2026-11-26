@@ -218,14 +218,14 @@ watch(() => props.act, (val) => {
     height: 32px;
     background: #FFFFFF;
     font-size: 14px;
-    color: #FF023C;
-    border: 1px solid rgba(255, 2, 60, 1);
+    color: #e5484d;
+    border: 1px solid rgba(229, 72, 77, 1);
     border-radius: 4px;
   }
 
   .i_bor.bl {
-    color: #027AFF;
-    border: 1px solid rgba(2, 122, 255, 1);
+    color: #1c1c1e;
+    border: 1px solid var(--vl-primary);
   }
 }
 
@@ -246,7 +246,7 @@ watch(() => props.act, (val) => {
     border: none;
     margin-right: 10px;
     margin-bottom: 20px;
-    background-color: #4776ff;
+    background-color: var(--vl-primary);
     color: #fff;
   }
 
@@ -258,15 +258,15 @@ watch(() => props.act, (val) => {
   }
 
   .btn.ora {
-    border: 1px solid #F05A1F;
-    color: #F05A1F;
+    border: 1px solid #f5a623;
+    color: #f5a623;
     padding: 4px 8px;
     background-color: transparent;
   }
 
   .btn.fin {
-    border: 1px solid #4776ff;
-    color: #4776ff;
+    border: 1px solid var(--vl-primary);
+    color: #1c1c1e;
     padding: 4px 8px;
     background-color: transparent;
   }
@@ -306,7 +306,7 @@ watch(() => props.act, (val) => {
 
     .on {
       flex: 1;
-      background-color: #4776ff;
+      background-color: var(--vl-primary);
       color: #fff;
       border: none;
     }
@@ -314,7 +314,7 @@ watch(() => props.act, (val) => {
 
   .weipai {
     flex: 1;
-    background-color: #4776ff;
+    background-color: var(--vl-primary);
     color: #fff;
     border: none;
   }
@@ -340,7 +340,7 @@ watch(() => props.act, (val) => {
   }
 
   .title.t1 {
-    color: #027AFF;
+    color: #1c1c1e;
   }
 
   .title.t2 {
@@ -376,12 +376,12 @@ watch(() => props.act, (val) => {
       width: 130px;
       height: 40px;
       font-size: 14px;
-      color: #4876ff;
-      border: 1px solid #4876ff;
+      color: #1c1c1e;
+      border: 1px solid var(--vl-primary);
       border-radius: 6px;
 
       &.on {
-        background-color: #4876ff;
+        background-color: var(--vl-primary);
         border: none;
         color: #fff;
       }
@@ -420,7 +420,7 @@ watch(() => props.act, (val) => {
 
   .edit_text {
     font-size: 12px;
-    color: #027AFF;
+    color: #1c1c1e;
     margin: 0 12px;
   }
 
@@ -433,7 +433,7 @@ watch(() => props.act, (val) => {
 .addIcon {
   align-items: flex-start;
   flex-wrap: wrap;
-  color: #4776ff;
+  color: #1c1c1e;
   font-size: 22px;
   padding-bottom: 10px;
 
@@ -508,8 +508,8 @@ watch(() => props.act, (val) => {
     line-height: 14px;
 
     &.van-radio__icon--checked {
-      //border: 1px solid #4776ff;
-      //background-color: #4776ff;
+      //border: 1px solid #1c1c1e;
+      //background-color: #1c1c1e;
       //color: #fff;
     }
   }

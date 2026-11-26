@@ -1,7 +1,5 @@
 <template>
   <div class="video-page">
-    <div class="top-bg" :style="{ backgroundImage: `url(${bgImg})` }" />
-
     <div class="video-header">
       <div class="top-bar">
         <div class="top-title">
@@ -156,7 +154,6 @@ import AlgorithmRepo from '@/pages/VLStreamCloud/page/components/algorithmReposi
 import SmartAnalysis from '@/pages/VLStreamCloud/page/components/intelligentAnalysis/SmartAnalysis.vue'
 import VideoFilterPanel from '@/pages/VLStreamCloud/page/components/Filter/VideoFilterPanel.vue'
 import MyVideo from '@/pages/VLStreamCloud/page/components/myVideo/MyVideo.vue'
-import bgImg from '@/assets/img/VLStreamCloud/bg.png'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -234,40 +231,29 @@ const onMenuSelect = (action) => {
 
 <style lang="scss" scoped>
 .video-page {
-  height: calc(100vh - 50px);
+  height: calc(100vh - 56px - env(safe-area-inset-bottom));
   position: relative;
   padding: 0 16px 24px;
   display: flex;
   flex-direction: column;
-  background: #F9FAFF;
-}
-
-.top-bg {
-  position: absolute;
-  top: -15px;
-  left: -20px;
-  right: -20px;
-  height: 200px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  z-index: 0;
+  background: #ffffff;
 }
 
 .top-bar {
   position: relative;
   z-index: 1;
-  // 原生壳 edge-to-edge 下让出状态栏（--vl-safe-top 由 shellStatusBar 注入，浏览器为 0）
-  padding-top: calc(28px + var(--vl-safe-top, 0px));
+  padding-top: calc(12px + var(--vl-safe-top, 0px));
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .top-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--vl-ink);
 }
 
 .top-actions {
@@ -332,28 +318,27 @@ const onMenuSelect = (action) => {
 }
 
 .top-tabs :deep(.van-tab) {
-  padding: 0 10px 0;
-  font-size: 16px;
+  padding: 0 2px;
+  font-size: 15px;
   font-weight: 500;
-  color: rgba(51, 51, 51, 0.55);
+  color: var(--vl-text-2);
+}
+
+/* 胶囊式标签：选中项为近黑底白字 */
+.top-tabs :deep(.van-tab__text) {
+  padding: 7px 14px;
+  border-radius: 999px;
+  line-height: 20px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .top-tabs :deep(.van-tab--active) {
-  color: #222;
+  color: #ffffff;
   font-weight: 700;
-  position: relative;
 }
 
-.top-tabs :deep(.van-tab--active::after) {
-  content: '';
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 2px;
-  width: 18px;
-  height: 6px;
-  border-radius: 6px;
-  background: #2f69f8;
+.top-tabs :deep(.van-tab--active .van-tab__text) {
+  background: var(--vl-primary);
 }
 
 .status-tabs {
@@ -363,11 +348,11 @@ const onMenuSelect = (action) => {
 }
 
 .status-tabs :deep(.van-tab--active .van-tab__text) {
-  color: #2f69f8;
+  color: var(--vl-accent);
 }
 
 .status-tabs :deep(.van-tabs__line) {
-  background: #2f69f8;
+  background: var(--vl-accent);
 }
 
 .mode-tabs {
@@ -389,7 +374,7 @@ const onMenuSelect = (action) => {
   text-align: center;
 
   &.active {
-    color: #1a53ff;
+    color: #1c1c1e;
 
     &::after {
       content: '';
@@ -400,7 +385,7 @@ const onMenuSelect = (action) => {
       width: 46px;
       height: 4px;
       border-radius: 4px;
-      background: #1a53ff;
+      background: var(--vl-primary);
     }
   }
 }

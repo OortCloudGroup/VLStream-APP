@@ -51,7 +51,7 @@
         <path
           d="M0,75 C100,20 150,130 200,75 S300,130 350,75 S400,130 450,75 C500,20 550,75 600,75 L800,75"
           fill="none"
-          stroke="#1989fa"
+          stroke="#ff6a00"
           stroke-width="2"
         />
       </svg>
@@ -157,15 +157,15 @@ defineExpose({
 
 // 白色卡片容器
 .card-container {
-  background-color: #fff;
-  border-radius: 12px;
+  background-color: var(--vl-surface);
+  border-radius: var(--vl-radius);
   padding: 16px 16px 0 16px;
   margin-bottom: 20px;
 }
 
 // 复选框组样式
 .checkbox-group {
-  --van-checkbox-color: #1989fa;
+  --van-checkbox-color: var(--vl-accent);
   --van-checkbox-icon-size: 18px;
   --van-checkbox-label-font-size: 16px;
   margin-bottom: 25px;

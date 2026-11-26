@@ -112,7 +112,7 @@ const onBack = () => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f9faff;
+  background: #ffffff;
 }
 
 .detail-body {
@@ -163,7 +163,7 @@ const onBack = () => {
 }
 
 .content-tabs {
-  --van-tabs-bottom-bar-color: #2f69f8;
+  --van-tabs-bottom-bar-color: var(--vl-accent);
   padding: 0 16px;
 
   :deep(.van-tabs__nav) {
@@ -182,7 +182,7 @@ const onBack = () => {
 
   :deep(.van-tab--active) {
     line-height: 24px;
-    color: #2f69f8;
+    color: var(--vl-accent);
     font-size: 16px;
   }
 }

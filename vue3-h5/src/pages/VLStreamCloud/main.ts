@@ -17,6 +17,7 @@ const VueApp = createApp(App)
 // 表单渲染
 import Vant from 'vant'	// 引入vant库
 import 'vant/lib/index.css'	// 引入vant样式
+import '@/styles/vl-theme.scss' // 黑白极简主题（覆盖 Vant 变量）
 VueApp.use(Vant) // 全局注册vant
 
 import VmFormRender from '@/components/VForm/index.js'

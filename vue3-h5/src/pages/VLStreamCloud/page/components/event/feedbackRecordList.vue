@@ -124,171 +124,113 @@ onMounted(() => {
 })
 </script>
 
-<style scoped lang="scss">
-.feedbackRecordList-page {
-  //background-color: #fff;
-  height: calc(100vh - 220px);
-  padding: 20px 0;
-  overflow: auto;
-}
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
 
-.fkInfoBox {
-  width: calc(100% - 32px);
-  //height: 100%;
-  flex-direction: column;
-  align-items: flex-start;
-  //flex-width: wa;
-  padding: 0 16px 20px;
+.feedbackRecordList-page.feedbackRecordList-page {
+  width: 100%;
+  height: auto;
+  padding: 0;
+  background: transparent;
 
-  .van-list {
+  .fkInfoBox {
+    display: block;
     width: 100%;
-
-    // 左边样式
-    .info-item {
-      background-color: #fff;
-      border-left: 1px dashed rgba(3, 120, 255, 1);
-      padding-left: 10px;
-      margin-bottom: 2px;
-      position: relative;
-
-      &.last {
-        &:before {
-          position: absolute;
-          content: '';
-          top: 8px;
-          left: -7px;
-          background: #FFFFFF;
-          width: 8px;
-          height: 100%;
-        }
-      }
-
-      // 短白线
-      &:first-child {
-        &:before {
-          position: absolute;
-          content: '';
-          top: 0px;
-          left: -7px;
-          background: #FFFFFF;
-          width: 8px;
-          height: 8px;
-        }
-      }
-
-      // 圈
-      &:after {
-        position: absolute;
-        content: '';
-        top: 7px;
-        left: -7px;
-        background: #FFFFFF;
-        width: 9px;
-        height: 9px;
-        border-radius: 50%;
-        border: 2px solid rgba(3, 120, 255, 1);
-      }
-    }
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
   }
-}
 
-.info-item {
+  :deep(.van-list) {
+    width: 100%;
+  }
+
+  @include vl-timeline;
+  @include vl-empty;
+
+  .info-content_out {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 10px;
+    padding: 0;
+  }
+
+  .info-content {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--vl-ink);
+  }
+
   .info-content-avatar {
     width: 28px;
     height: 28px;
-    vertical-align: middle;
+    margin: 0;
     border-radius: 50%;
-    margin-right: 4px;
+    overflow: hidden;
+  }
+
+  .time {
+    flex-shrink: 0;
+    margin: 0;
+    font-size: 12px;
+    color: var(--vl-text-3);
+    font-variant-numeric: tabular-nums;
   }
 
   .info-lable {
+    display: flex;
     align-items: flex-start;
-    padding-bottom: 10px;
-    font-family: SourceHanSansSC-Regular;
-    font-size: 14px;
-    line-height: 16px;
-    color: #333333;
-    letter-spacing: 0;
-    font-weight: 400;
+    gap: 8px;
+    margin: 0;
+    padding: 0 0 8px;
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--vl-ink);
+    word-break: break-all;
+
+    &:last-child {
+      padding-bottom: 0;
+    }
 
     > img {
-      width: 20px;
-      height: 20px;
-      margin-right: 6px;
-    }
-
-    .infoPhotoBox {
-      flex-wrap: wrap;
-    }
-
-    .infoPhoto {
-      margin-bottom: 8px;
+      width: 16px;
+      height: 16px;
+      margin: 2px 0 0;
+      opacity: 0.55;
       flex-shrink: 0;
-      width: 66px;
-      height: 66px;
-      border-radius: 4px;
-      margin-right: 8px;
-      background-color: #D8D8D8;
+    }
+  }
 
-      > img {
-        width: 100%;
-        height: 100%;
-        border-radius: 4px;
-        margin-right: 8px;
-      }
+  .infoPhotoBox {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 0;
+  }
+
+  .infoPhoto {
+    width: auto;
+    height: auto;
+    aspect-ratio: 1;
+    margin: 0;
+    border-radius: var(--vl-radius-sm);
+    overflow: hidden;
+    background: var(--vl-surface-2);
+
+    :deep(img) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
   }
 }
-
-.info-content_out {
-  padding-bottom: 10px;
-  justify-content: space-between;
-
-  .time {
-    font-family: SourceHanSansSC-Regular;
-    font-size: 12px;
-    color: #515A6E;
-    letter-spacing: 0;
-    text-align: right;
-    font-weight: 400;
-  }
-}
-
-.infoAni {
-  flex-direction: column;
-  height: 100px;
-  //flex: 1;
-
-  .qu {
-    background: #FFFFFF;
-    border: 2px solid rgba(3, 120, 255, 1);
-  }
-
-  .dot {
-    border-left: 2px solid purple;
-  }
-}
-
-// 暂无数据
-.no_data {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  width: 100%;
-
-  img {
-    width: 162px;
-    height: auto;
-  }
-
-  span {
-    margin: 4px 0;
-    font-size: 16px;
-    color: #999;
-    text-align: center;
-  }
-}
-
 </style>

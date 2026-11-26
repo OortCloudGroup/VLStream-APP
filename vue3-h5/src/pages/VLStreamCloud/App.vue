@@ -47,7 +47,7 @@ syncShellSafeAreaCssVar()
 // shell status bar with it while it is visible (no-op in browsers)
 watch(showLoginDev, (visible) => {
   if (visible) {
-    pushStatusBar('#EEF3FF', '#000000')
+    pushStatusBar('#FFFFFF', '#000000')
   } else {
     popStatusBar()
   }
@@ -123,11 +123,12 @@ const loginSuccess = async() => {
     isInitFinsh.value = true
     return
   }
-  let res = await getAppInfoFromHttp()
-  if (res.code === 200) {
-    showLoginDev.value = false
-    isInitFinsh.value = true
-  }
+  // 应用信息只用于反馈工单里的包名，PC 端也不取；新用户租户未开通本应用时平台返回
+  // not found，不能因此卡在登录页。先进入应用，后台再取，取不到退回原生壳注入的静态值。
+  Config.appInfo = Config.appInfo || (window.__VL_STATIC__ && window.__VL_STATIC__.appInfo) || {}
+  showLoginDev.value = false
+  isInitFinsh.value = true
+  getAppInfoFromHttp()
 }
 
 // Native shell home-page double-back exit hint: the shell only dispatches a
@@ -157,10 +158,11 @@ onUnmounted(() => {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: var(--vl-font);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
+  color: var(--vl-text);
+  background: var(--vl-bg);
   width:100vw;
   height: 100vh;
 }

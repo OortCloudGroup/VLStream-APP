@@ -1,43 +1,16 @@
 <template>
-  <van-tabbar v-model="active" route active-color="#1976D2" inactive-color="#999">
-    <van-tabbar-item to="/workbench">
-      <span>{{ $t('工作台') }}</span>
+  <van-tabbar v-model="active" route class="vl-tabbar">
+    <van-tabbar-item
+      v-for="tab in tabs"
+      :key="tab.to"
+      :to="tab.to"
+      :badge="tab.to === '/event' ? eventBadge : ''"
+    >
+      <span>{{ $t(tab.label) }}</span>
       <template #icon="props">
-        <van-icon
-          name="home-o"
-          :color="props.active ? '#1976D2' : '#999'"
-          size="20"
-        />
-      </template>
-    </van-tabbar-item>
-    <van-tabbar-item to="/video">
-      <span>{{ $t('视频') }}</span>
-      <template #icon="props">
-        <van-icon
-          name="video-o"
-          :color="props.active ? '#1976D2' : '#999'"
-          size="20"
-        />
-      </template>
-    </van-tabbar-item>
-    <van-tabbar-item to="/event" :badge="eventBadge">
-      <span>{{ $t('事件') }}</span>
-      <template #icon="props">
-        <van-icon
-          name="orders-o"
-          :color="props.active ? '#1976D2' : '#999'"
-          size="20"
-        />
-      </template>
-    </van-tabbar-item>
-    <van-tabbar-item to="/my">
-      <span>{{ $t('我的') }}</span>
-      <template #icon="props">
-        <van-icon
-          name="user-o"
-          :color="props.active ? '#1976D2' : '#999'"
-          size="20"
-        />
+        <span class="tab-icon" :class="{ active: props.active }">
+          <LineIcon :name="tab.icon" :size="22" :stroke="props.active ? 2.2 : 1.8" />
+        </span>
       </template>
     </van-tabbar-item>
   </van-tabbar>
@@ -47,6 +20,14 @@
 import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { unreadEventCount, refreshUnreadEventCount } from './event/eventBadge'
+import LineIcon from './LineIcon.vue'
+
+const tabs = [
+  { to: '/workbench', label: '工作台', icon: 'home' },
+  { to: '/video', label: '视频', icon: 'video' },
+  { to: '/event', label: '事件', icon: 'event' },
+  { to: '/my', label: '我的', icon: 'user' }
+]
 
 const route = useRoute()
 const active = ref(0)
@@ -95,16 +76,33 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-:deep(.van-tabbar) {
-  border-top: 1px solid #ebedf0;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+.vl-tabbar {
+  border-top: 1px solid var(--vl-line);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
 }
 
 :deep(.van-tabbar-item) {
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--vl-text-3);
 
-  .van-icon {
-    margin-bottom: 4px;
+  &.van-tabbar-item--active {
+    color: var(--vl-accent);
+    font-weight: 700;
+    background: transparent;
+  }
+}
+
+.tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+  color: var(--vl-text-3);
+
+  &.active {
+    color: var(--vl-accent);
   }
 }
 </style>

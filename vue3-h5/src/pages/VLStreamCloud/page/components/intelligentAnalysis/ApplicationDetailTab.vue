@@ -197,13 +197,13 @@ const completeTimeText = computed(() => {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 16px 0;
-  background: #f9faff;
+  background: #ffffff;
 }
 
 .detail-card {
   position: relative;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
   padding: 12px;
 }
 

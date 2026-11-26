@@ -9,7 +9,7 @@
 <template>
   <div
     class="nav_banner_container"
-    :class="isFull?'nav_banner_container_full':'nav_banner_container_nor'"
+    :class="[isFull?'nav_banner_container_full':'nav_banner_container_nor', { nav_banner_light: isLight && !bgOpacity }]"
     :style="bgOpacity?'background-color:rgba(0, 0, 0,0)':''"
   >
     <div class="nav_banner" :style="bgOpacity ? 'background-color:rgba(0, 0, 0, 0)' : `background-color: ${bgColor}`">
@@ -19,12 +19,12 @@
           <!--        <img v-if="exit" src="@/assets/img/cha.png">-->
           <!--        <img v-if="!exit" src="@/assets/img/exit_circle.png">-->
           <template v-if="!exit">
-            <van-icon v-if="color" name="arrow-left" />
+            <van-icon v-if="color || isLight" name="arrow-left" :color="titleColor" />
             <img v-else src="@/assets/img/nav_icon_back22.png" />
           </template>
         </div>
       </div>
-      <div class="nav_banner_body" :style="{ color: color }">
+      <div class="nav_banner_body" :style="{ color: titleColor }">
         {{ title }}
       </div>
       <div v-if="searchShow" class="nav_banner_search">
@@ -119,7 +119,7 @@ export default {
     // 背景色
     bgColor: {
       type: String,
-      default: '#1156a6'
+      default: '#ffffff'
     },
     // 标题颜色
     color: {
@@ -148,12 +148,25 @@ export default {
       searchVis: false
     }
   },
+  computed: {
+    // 浅色背景（黑白主题默认白底）时，标题、图标与状态栏切换为深色
+    isLight() {
+      const hex = (this.bgColor || '').replace('#', '')
+      if (!/^[0-9a-fA-F]{6}$/.test(hex)) return false
+      const [r, g, b] = [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16))
+      return (0.299 * r + 0.587 * g + 0.114 * b) > 186
+    },
+    titleColor() {
+      if (this.isLight) return '#1c1c1e'
+      return this.color || ''
+    }
+  },
   created() {
     this.isFull = this.isFullscreen
     this.left_title = this.title
     // Align the shell status bar with the banner background (no-op in browsers)
     if (!this.bgOpacity) {
-      pushStatusBar(this.bgColor, '#FFFFFF')
+      pushStatusBar(this.bgColor, this.isLight ? '#000000' : '#FFFFFF')
     }
     if (this.isBackEvent) {
       // 这里做一个监听， 用来是pop类的弹框出现在页面中是，点击物理返回键时会触发返回而不是. 注意这里pop类 包含 pop， imageview(函数触发)
@@ -236,7 +249,46 @@ export default {
 :deep(.van-search__content){
   border-radius: 20px;
 }
-$main_color: #1156a6;
+$main_color: #1c1c1e;
+
+/* 白底导航：深色标题 / 图标，底部细分隔线 */
+.nav_banner_light {
+  border-bottom: 1px solid var(--vl-line);
+
+  .nav_banner .nav_banner_body {
+    font-weight: 600;
+    font-size: 17px;
+  }
+
+  .nav_banner_img img,
+  .nav_banner_search img,
+  .more img,
+  .nav_banner_right_home_imgs {
+    filter: brightness(0);
+    opacity: 0.88;
+  }
+
+  .slot_span span {
+    color: var(--vl-ink);
+  }
+
+  :deep(.nav_banner_right .van-icon) {
+    color: var(--vl-ink) !important;
+  }
+
+  ._line {
+    background-color: var(--vl-line);
+  }
+
+  .nav_banner_right_home {
+    border: 1px solid var(--vl-line);
+    border-radius: 999px;
+  }
+
+  .nav_banner_right_home_img_bg {
+    display: none;
+  }
+}
 .slot_span {
   display: flex;
   justify-content: center;

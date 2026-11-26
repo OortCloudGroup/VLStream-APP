@@ -1,6 +1,7 @@
 package com.oort.vlstream;
 
 import android.app.Activity;
+import android.content.pm.PackageInfo;
 import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -141,8 +142,20 @@ public class NativeBridgePlugin extends Plugin {
         info.put("app_id", "747aa0fa18d047c8b526e242142e0a6c");
         info.put("app_secret", "3a97f4f65b204a3a96071746fa42936a");
         info.put("applabel", "VLStreamCloud");
-        info.put("version", "1.0.0");
+        info.put("version", appVersionName());
         return info;
+    }
+
+    /** 安装包真实版本号（build.gradle versionName），保证 H5「关于」页与应用版本一致。 */
+    private String appVersionName() {
+        try {
+            PackageInfo pi = getContext().getPackageManager()
+                    .getPackageInfo(getContext().getPackageName(), 0);
+            if (pi.versionName != null && !pi.versionName.isEmpty()) return pi.versionName;
+        } catch (Exception ignore) {
+            // fall through to the default
+        }
+        return "1.0.0";
     }
 
     /**
@@ -349,16 +362,15 @@ public class NativeBridgePlugin extends Plugin {
             return;
         }
         Window window = activity.getWindow();
-        // Light content color (e.g. white icons on a dark bar) → dark system icons are wrong;
-        // appearance flag is the inverse of the content color luminance.
-        boolean lightIcons = isLightColor(contentColor);
+        // setAppearanceLightStatusBars(true) = 浅色状态栏 + 深色图标：#000000 图标 -> true，#FFFFFF 图标 -> false。
+        boolean darkIcons = !isLightColor(contentColor);
         // Window/View API 必须在 UI 线程调用（Capacitor 插件方法默认运行在 bridge 线程）。
         activity.runOnUiThread(() -> {
             // Edge-to-edge：背景固定近透明黑（H5 内容透出），各 API 版本视觉统一。
             window.setStatusBarColor(0x01000000);
             WindowInsetsControllerCompat controller =
                     new WindowInsetsControllerCompat(window, window.getDecorView());
-            controller.setAppearanceLightStatusBars(lightIcons);
+            controller.setAppearanceLightStatusBars(darkIcons);
             call.resolve();
         });
     }

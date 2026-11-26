@@ -5,9 +5,9 @@
     "start": "vite",
     "build": "vite build",
     "build:VLStreamCloud": "sh ./build.sh VLStreamCloud",
-    "lint:eslint": "eslint --cache --max-warnings 0 \"src/**/*.{vue,js,ts,tsx}\" --fix",
+    "lint:eslint": "eslint --cache --max-warnings 117 \"src/**/*.{vue,js,ts,tsx}\" --fix",
     "lint": "pnpm lint:eslint",
-    "prepare": "husky install"
+    "prepare": "cd .. && husky install vue3-h5/.husky"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",

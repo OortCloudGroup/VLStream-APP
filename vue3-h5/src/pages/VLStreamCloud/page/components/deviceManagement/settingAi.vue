@@ -111,7 +111,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .setting-ai-page {
   height: 100vh;
-  background-color: #f7f8fa;
+  background-color: var(--vl-bg);
   display: flex;
   flex-direction: column;
 }
@@ -132,7 +132,7 @@ onMounted(() => {
   align-items: center;
   gap: 4px;
   border-radius: 18px;
-  background: #2f69f8;
+  background: var(--vl-primary);
   color: #ffffff;
   font-size: 12px;
   padding: 10px 16px;
@@ -155,7 +155,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f9faff;
+  background: var(--vl-surface);
   border-radius: 4px;
   padding: 16px 20px;
   font-size:14px;

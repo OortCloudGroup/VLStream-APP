@@ -215,7 +215,7 @@ const onBack = () => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f9faff;
+  background: #ffffff;
 }
 
 .dispatch-content {
@@ -250,7 +250,7 @@ const onBack = () => {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: #1a53ff;
+  color: #1c1c1e;
   font-size: 12px;
 
   img {
@@ -260,10 +260,9 @@ const onBack = () => {
 }
 
 .table-card {
-  background: #fff;
-  border-radius: 14px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
   overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
   margin: 12px 12px 0;
 }
 
@@ -271,7 +270,7 @@ const onBack = () => {
   display: grid;
   grid-template-columns: 40px 1.3fr 1.2fr 0.8fr;
   padding: 10px 12px;
-  background: #fafafa;
+  background: var(--vl-surface-2);
   line-height: 18px;
   color: #333333;
   font-size: 14px;
@@ -307,9 +306,9 @@ const onBack = () => {
 }
 
 .status-tag.online {
-  color: rgba(0, 186, 82, 1);
-  border-color: rgba(0, 186, 82, 0.15);
-  background: rgba(0, 186, 82, 0.08);
+  color: rgba(48, 164, 108, 1);
+  border-color: rgba(48, 164, 108, 0.15);
+  background: rgba(48, 164, 108, 0.08);
 }
 
 .status-tag.offline {
@@ -349,10 +348,42 @@ const onBack = () => {
 
 .footer-bar {
   padding: 10px 16px 24px;
-  background: #f9faff;
+  background: #ffffff;
 }
 
 .push-btn {
   font-size: 16px;
+}
+</style>
+
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+.algo-dispatch.algo-dispatch {
+  @include vl-device-table(24px minmax(0, 1fr) minmax(0, 1.4fr) 56px);
+
+  .col.checkbox {
+    display: flex;
+    align-items: center;
+  }
+
+  .list-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 4px 10px;
+  }
+
+  .list-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--vl-ink);
+  }
+
+  .all-push {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--vl-primary);
+  }
 }
 </style>

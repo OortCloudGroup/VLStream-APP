@@ -90,6 +90,24 @@ const routes = [
     }
   },
   {
+    path: '/profileEdit',
+    name: 'profileEdit',
+    meta: { title: '个人信息' },
+    component: () => import('@/pages/VLStreamCloud/page/my/profileEdit.vue')
+  },
+  {
+    path: '/passwordEdit',
+    name: 'passwordEdit',
+    meta: { title: '登录密码' },
+    component: () => import('@/pages/VLStreamCloud/page/my/passwordEdit.vue')
+  },
+  {
+    path: '/myDevices',
+    name: 'myDevices',
+    meta: { title: '我的设备' },
+    component: () => import('@/pages/VLStreamCloud/page/my/myDevices.vue')
+  },
+  {
     path: '/myWorkorder',
     name: 'myWorkorder',
     meta: { title: '我的工单' },
@@ -147,15 +165,11 @@ const router = createRouter({
 
 // Status bar stays in the window avoid area; align its background with the top
 // area of the active routed page (see utils/shellStatusBar.ts). Tab pages are
-// covered by bg.png at the top; other routed pages sit under a NavHeaderBanner
-// (#1156a6) which pushes its own overlay style on mount.
-const TAB_ROUTE_NAMES = ['Workbench', 'Video', 'Event', 'My']
-router.afterEach((to) => {
-  if (TAB_ROUTE_NAMES.includes(to.name)) {
-    setRootStatusBar('#306AF8', '#FFFFFF')
-  } else {
-    setRootStatusBar('#1156A6', '#FFFFFF')
-  }
+// white at the top; other routed pages sit under a white NavHeaderBanner
+// which pushes its own overlay style on mount.
+router.afterEach(() => {
+  // Monochrome theme: every routed page starts with a white top area
+  setRootStatusBar('#FFFFFF', '#000000')
 })
 
 export default router

@@ -1,8 +1,5 @@
 <template>
   <div class="my-page">
-    <!-- 顶部背景 -->
-    <div class="top-bg" :style="{ backgroundImage: `url(${bgImg})` }" />
-
     <div class="my-header">
       <div class="top-title">
         {{ $t('我的') }}
@@ -11,9 +8,9 @@
 
     <div class="my-content">
       <!-- 用户信息卡片 -->
-      <div class="profile-card">
-        <div class="avatar" @click="onChangeAvatar">
-          <img v-if="customAvatar" :src="customAvatar" class="avatar-img" alt="" />
+      <div class="profile-card" @click="onProfileClick">
+        <div class="avatar" @click.stop="onAvatarClick">
+          <img v-if="avatarSrc" :src="avatarSrc" class="avatar-img" alt="" />
           <div v-else class="avatar-img avatar-generated" :style="{ background: avatarColor }">
             {{ avatarLetter }}
           </div>
@@ -23,10 +20,11 @@
             <span class="name">{{ displayName }}</span>
             <span class="phone">{{ displayPhone }}</span>
           </div>
-          <div class="dept">
+          <div v-if="displayDept" class="dept">
             {{ displayDept }}
           </div>
         </div>
+        <LineIcon v-if="!isLocalAuth" name="chevron" :size="18" class="menu-arrow" />
       </div>
 
       <!-- 菜单列表 -->
@@ -39,11 +37,11 @@
         >
           <div class="menu-left">
             <div class="menu-icon-wrapper">
-              <img :src="item.icon" alt="" class="menu-icon-img" />
+              <LineIcon :name="item.icon" :size="20" />
             </div>
             <span class="menu-title">{{ item.title }}</span>
           </div>
-          <img :src="arrowImg" alt="" class="menu-arrow-img" />
+          <LineIcon name="chevron" :size="18" class="menu-arrow" />
         </div>
       </div>
     </div>
@@ -90,34 +88,66 @@ import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store/modules/useraPaas'
 import { getAppLocale, setAppLocale } from '@/lang/index'
 import config from '@/config'
-import bgImg from '@/assets/img/VLStreamCloud/bg.png'
-import helpImg from '@/assets/img/VLStreamCloud/mine/bz.png'
-import aboutImg from '@/assets/img/VLStreamCloud/mine/gywm.png'
-import arrowImg from '@/assets/img/VLStreamCloud/mine/jt.png'
-import settingImg from '@/assets/img/VLStreamCloud/mine/sz.png'
+import LineIcon from '@/pages/VLStreamCloud/page/components/LineIcon.vue'
+import { getUserInfo } from '@/api/login/indexapaas'
 
 const { t } = useI18n()
 
 // 用户信息
 const store = useUserStore()
 const router = useRouter()
-const displayName = computed(() => store.userInfo?.userName || '--')
-const displayPhone = computed(() => store.userInfo?.phone || '--')
-const displayDept = computed(() => store.userInfo?.deptName || '--')
+// 单租户集群没有 apaas-sso 的个人信息接口，资料编辑、密码、我的设备只在多租户提供
+const isLocalAuth = config.authMode === 'local'
+const displayName = computed(() => store.userInfo?.userName || store.userInfo?.user_name || '--')
+// 手机号中间四位打码展示
+const displayPhone = computed(() => {
+  const phone = String(store.userInfo?.phone || '')
+  if (!phone) return '--'
+  return /^\d{7,}$/.test(phone) ? phone.slice(0, 3) + '****' + phone.slice(-4) : phone
+})
+const displayDept = computed(() => store.userInfo?.deptName || '')
+
+// 登录接口只返回名字，手机号、部门、头像从平台资料补齐（脱敏手机号用于展示）
+const refreshProfile = async() => {
+  if (isLocalAuth || !store.token) return
+  try {
+    const res = await getUserInfo({ accessToken: store.token })
+    const data = res && res.code === 200 ? res.data : null
+    if (!data) return
+    const ex = data.user_detail?.ex_data || {}
+    const deptName = (data.dept_list || []).map(x => x.deptinfo?.dept_name || x.dept_name).filter(Boolean).join(' / ')
+    store.setUserInfo({
+      userName: data.user_name || store.userInfo?.userName,
+      phone: ex.phone || data.phone || '',
+      deptName,
+      photo: data.photo || ''
+    })
+  } catch (e) {
+    // 拉取失败保留登录时的信息
+  }
+}
+refreshProfile()
 
 // 菜单配置
 const menuItems = computed(() => [
-  { key: 'help', title: t('帮助'), icon: helpImg },
-  { key: 'about', title: t('关于我们'), icon: aboutImg },
-  { key: 'settings', title: t('设置'), icon: settingImg }
+  ...(isLocalAuth ? [] : [
+    { key: 'devices', title: t('我的设备'), icon: 'device' },
+    { key: 'password', title: t('登录密码'), icon: 'lock' }
+  ]),
+  { key: 'help', title: t('帮助'), icon: 'help' },
+  { key: 'about', title: t('关于我们'), icon: 'info' },
+  { key: 'settings', title: t('设置'), icon: 'settings' }
 ])
 
-// ========= 头像（默认由用户名生成，支持本地更换） =========
-const AVATAR_COLORS = ['#2f69f8', '#00ba52', '#ff8d1e', '#e33645', '#7b61ff', '#00b8d4']
+// ========= 头像 =========
+// 多租户：用平台资料里的头像（在“个人信息”里上传更换）；单租户：默认由用户名生成，支持本地更换
+// 黑白主题：头像统一用深浅不同的中性色
+const AVATAR_COLORS = ['#ff6a00', '#f2780c', '#e8590c', '#ff8a33']
 const avatarStorageKey = computed(() => `vlstream_avatar_${store.userInfo?.userName || 'default'}`)
 const customAvatar = ref(localStorage.getItem(avatarStorageKey.value) || '')
+const avatarSrc = computed(() => (isLocalAuth ? customAvatar.value : (store.userInfo?.photo || '')))
 const avatarLetter = computed(() => {
-  const name = (store.userInfo?.userName || '').trim()
+  const name = (store.userInfo?.userName || store.userInfo?.user_name || '').trim()
   return name ? name.charAt(0).toUpperCase() : 'U'
 })
 const avatarColor = computed(() => {
@@ -135,7 +165,15 @@ const avatarActions = computed(() => (customAvatar.value
   ? [{ name: t('更换头像'), key: 'change' }, { name: t('恢复默认'), key: 'reset' }]
   : [{ name: t('更换头像'), key: 'change' }]))
 
-const onChangeAvatar = () => {
+const onProfileClick = () => {
+  if (!isLocalAuth) router.push('/profileEdit')
+}
+
+const onAvatarClick = () => {
+  if (!isLocalAuth) {
+    router.push('/profileEdit')
+    return
+  }
   showAvatarActions.value = true
 }
 
@@ -191,6 +229,14 @@ const settingsActions = computed(() => [
 ])
 
 const onMenuClick = (item) => {
+  if (item.key === 'devices') {
+    router.push('/myDevices')
+    return
+  }
+  if (item.key === 'password') {
+    router.push('/passwordEdit')
+    return
+  }
   if (item.key === 'help') {
     router.push('/contactUS')
     return
@@ -266,34 +312,23 @@ const onLanguageSelect = (action) => {
 <style lang="scss" scoped>
 .my-page {
   min-height: 100vh;
-  background: #F9FAFF;
+  background: var(--vl-bg);
   position: relative;
-  padding: 0 16px 24px;
-}
-
-.top-bg {
-  position: absolute;
-  top: -15px;
-  left: -20px;
-  right: -20px;
-  height: 200px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  z-index: 0;
+  padding: 0 20px 24px;
 }
 
 .my-header {
   position: relative;
   z-index: 1;
-  // 原生壳 edge-to-edge 下让出状态栏（--vl-safe-top 由 shellStatusBar 注入，浏览器为 0）
-  padding-top: calc(28px + var(--vl-safe-top, 0px));
+  padding-top: calc(12px + var(--vl-safe-top, 0px));
 }
 
 .top-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--vl-ink);
 }
 
 .my-content {
@@ -305,9 +340,9 @@ const onLanguageSelect = (action) => {
 .profile-card {
   display: flex;
   align-items: center;
-  padding: 16px;
-  background:#f7f7f7;
-  border-radius: 8px;
+  padding: 20px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius-lg);
 }
 
 .avatar {
@@ -315,8 +350,8 @@ const onLanguageSelect = (action) => {
 }
 
 .avatar-img {
-  width: 50px;
-  height: 50px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -346,25 +381,43 @@ const onLanguageSelect = (action) => {
 }
 
 .name {
-  color: #333333;
-  font-size: 16px;
+  color: var(--vl-ink);
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .phone {
-  color: #333333;
-  font-size: 16px;
+  color: var(--vl-text-2);
+  font-size: 14px;
+  font-family: var(--vl-font-mono);
 }
 
 .dept {
-  color: #666666;
-  font-size: 12px;
+  color: var(--vl-text-2);
+  font-size: 13px;
+}
+
+.menu-list {
+  margin-top: 16px;
+  border: 1px solid var(--vl-line);
+  border-radius: var(--vl-radius-lg);
+  overflow: hidden;
 }
 
 .menu-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px;
+  padding: 14px 16px;
+  background: #ffffff;
+
+  & + .menu-item {
+    border-top: 1px solid var(--vl-line);
+  }
+
+  &:active {
+    background: var(--vl-surface);
+  }
 }
 
 .menu-left {
@@ -374,28 +427,23 @@ const onLanguageSelect = (action) => {
 }
 
 .menu-icon-wrapper {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-}
-
-.menu-icon-img {
-  width: 34px;
-  height: 34px;
-  object-fit: contain;
+  border-radius: 50%;
+  background: var(--vl-surface);
+  color: var(--vl-ink);
 }
 
 .menu-title {
-  color: #333333;
-  font-size: 14px;
+  color: var(--vl-ink);
+  font-size: 15px;
+  font-weight: 500;
 }
 
-.menu-arrow-img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
+.menu-arrow {
+  color: var(--vl-text-3);
 }
 </style>

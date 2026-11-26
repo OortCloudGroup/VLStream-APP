@@ -207,7 +207,7 @@ onBeforeUnmount(stopPlayer)
 <style scoped lang="scss">
 .camera-detail {
   height: 100vh;
-  background: #f6f8ff;
+  background: var(--vl-bg);
   display: flex;
   flex-direction: column;
 }
@@ -254,8 +254,15 @@ onBeforeUnmount(stopPlayer)
 }
 
 .retry-btn {
+  height: 32px;
+  margin-top: 4px;
+  padding: 0 16px;
+  font-size: 13px;
   color: #fff;
-  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: transparent;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .tab-header {
@@ -274,7 +281,7 @@ onBeforeUnmount(stopPlayer)
   padding-bottom: 6px;
 
   &.active {
-    color: #2f69f8;
+    color: var(--vl-accent);
     font-weight: 500;
   }
 }
@@ -287,7 +294,7 @@ onBeforeUnmount(stopPlayer)
   width: 32px;
   height: 3px;
   border-radius: 999px;
-  background: #1c6cff;
+  background: var(--vl-primary);
 }
 
 .tab-body {

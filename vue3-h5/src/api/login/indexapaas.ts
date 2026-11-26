@@ -157,3 +157,62 @@ export function sendLoginSmsCode(data) {
 export function myOpinionList(data) {
   return commonFunc('sso/v1/myOpinionList', data, 'post')
 }
+
+// ---- 多租户登录 V2（与 T-OORT.SH/login-page 保持一致）----
+
+/** 获取临时登录凭证 V2：identity_type/identifier/credential 统一结构，支持账密与验证码登录 */
+export function getLoginCodeV2(data: any) {
+  return commonFunc('sso/v2/getLoginCode', data, 'post')
+}
+
+/** 双因子第二步 / 不同密码租户的再次校验 */
+export function fastLogin(data: any) {
+  return commonFunc('sso/v1/fastLogin', data, 'post')
+}
+
+/** 登录发送邮箱验证码 */
+export function sendLoginEmailCode(data: any) {
+  return commonFunc('sso/v1/sendLoginEmailCode', data, 'post')
+}
+
+/** 双因子：获取账号可用的其他验证方式 */
+export function getUserOtherLogin(data: any) {
+  return commonFunc('sso/v1/getUserOtherLogin', data, 'post')
+}
+
+/** 认证配置列表（按 types 取短信/邮箱的 config_code） */
+export function authConfigList(data: any) {
+  return commonFunc('sso/v1/configList', data, 'post')
+}
+
+/** 生成滑块验证码（captcha_type 1），返回 slide_id 与缺口 ypos；图片走 captcha/v1/{id}.png?slide=bg|slice */
+export function generateCaptcha(data: any) {
+  return commonFunc('sso/v1/generateCaptcha', data, 'post')
+}
+
+// ---- 我的：个人信息与密码（与 apaas-web 个人中心一致）----
+
+/** 编辑个人信息：user_name / photo / ex_data 等，未传的 ex_data 字段会被清空，需带上原值 */
+export function userEdit(data: any) {
+  return commonFunc('sso/v1/userEdit', data, 'post')
+}
+
+/** 获取密码加密公钥（resetPassword / initPassword 使用） */
+export function getPublicKey(data: any) {
+  return commonFunc('sso/v1/getPublicKey', data, 'post')
+}
+
+/** 初设密码（账号尚无登录密码时，如验证码注册的新用户），需同时设定登录账号 */
+export function initPassword(data: any) {
+  return commonFunc('sso/v1/initPassword', data, 'post')
+}
+
+/** 租户密码策略 */
+export function getPasswordPolicy(data: any) {
+  return commonFunc('passwordPolicy/v1/get', data, 'post')
+}
+
+/** 按租户密码策略校验新密码，返回 { valid, errors } */
+export function validatePasswordPolicy(data: any) {
+  return commonFunc('passwordPolicy/v1/validate', data, 'post')
+}

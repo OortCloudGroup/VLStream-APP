@@ -344,11 +344,11 @@ onMounted(() => {
 }
 
 :deep(.van-tab--active .van-tab__text){
-  color: #2f69f8;
+  color: var(--vl-accent);
 }
 
 :deep(.van-tabs__line){
-  background:#2f69f8;
+  background:var(--vl-accent);
 }
 
 .task-list {
@@ -360,8 +360,8 @@ onMounted(() => {
 
 .task-card {
   position: relative;
-  background:#ffffff;
-  border-radius:8px;
+  background:var(--vl-surface);
+  border-radius:var(--vl-radius);
   padding: 12px;
   margin-bottom: 12px;
 }
@@ -383,19 +383,19 @@ onMounted(() => {
 .status-stamp {
   padding: 4px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(59, 130, 246, 0.4);
-  color: #2563eb;
+  border: 1px solid rgba(28, 28, 30, 0.4);
+  color: #1c1c1e;
   font-size: 12px;
 }
 
 .status-stamp.done {
-  border-color: rgba(16, 185, 129, 0.4);
-  color: #059669;
+  border-color: rgba(48, 164, 108, 0.4);
+  color: #30a46c;
 }
 
 .status-stamp.failed {
-  border-color: rgba(239, 68, 68, 0.4);
-  color: #ef4444;
+  border-color: rgba(229, 72, 77, 0.4);
+  color: #e5484d;
 }
 
 .status-img {
@@ -480,11 +480,11 @@ onMounted(() => {
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  background: #2f69f8;
+  background: var(--vl-accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 24px rgba(47, 105, 248, 0.35);
+  box-shadow: 0 10px 24px rgba(255, 106, 0, 0.32);
   z-index: 20;
 }
 

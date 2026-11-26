@@ -1196,7 +1196,7 @@ const updateInterval = (value: string | number) => {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  border: 1px solid #2278ff;
+  border: 1px solid var(--vl-primary);
   background: #fff;
   overflow: hidden;
 }
@@ -1210,8 +1210,8 @@ const updateInterval = (value: string | number) => {
   margin: 2px;
 
   &.act {
-    color: #2278ff;
-    background: rgba(34, 120, 255, 0.12);
+    color: #1c1c1e;
+    background: rgba(28, 28, 30, 0.12);
     border-radius: 999px;
   }
 }
@@ -1292,7 +1292,7 @@ const updateInterval = (value: string | number) => {
   position: absolute;
   top: 0;
   height: 100%;
-  background: #27b4ff;
+  background: var(--vl-primary);
   border-radius: 4px;
   overflow: visible;
 }
@@ -1323,7 +1323,7 @@ const updateInterval = (value: string | number) => {
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 77, 79, 0.9);
+  background: rgba(229, 72, 77, 0.9);
   border-radius: 50%;
   cursor: pointer;
   opacity: 1;
@@ -1423,8 +1423,8 @@ const updateInterval = (value: string | number) => {
 }
 
 .edit_delete_btn {
-  color: #ff4d4f;
-  border-color: #ff4d4f;
+  color: #e5484d;
+  border-color: #e5484d;
 }
 
 // 复制弹窗样式
@@ -1479,8 +1479,8 @@ const updateInterval = (value: string | number) => {
 }
 
 .copy_cancel_btn {
-  color: #ff4d4f;
-  border-color: #ff4d4f;
+  color: #e5484d;
+  border-color: #e5484d;
 }
 </style>
 

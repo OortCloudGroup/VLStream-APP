@@ -113,17 +113,16 @@ const onAdd = () => {
 }
 
 .table-card {
-  background: #fff;
-  border-radius: 14px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
   overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
 }
 
 .table-head {
   display: grid;
   grid-template-columns: 1.2fr 1fr 0.8fr;
   padding: 16px 18px;
-  background: rgba(250, 250, 250, 1);
+  background: var(--vl-surface-2);
   font-size: 16px;
   font-weight: 600;
   color: rgba(51, 51, 51, 0.65);
@@ -144,16 +143,16 @@ const onAdd = () => {
 }
 
 .status-tag {
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 14px;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .status-tag.online {
-  color: rgba(0, 186, 82, 1);
-  border-color: rgba(0, 186, 82, 0.15);
-  background: rgba(0, 186, 82, 0.08);
+  color: rgba(48, 164, 108, 1);
+  border-color: rgba(48, 164, 108, 0.15);
+  background: rgba(48, 164, 108, 0.08);
 }
 
 .status-tag.offline {
@@ -169,11 +168,11 @@ const onAdd = () => {
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  background: #2f69f8;
+  background: var(--vl-accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 24px rgba(47, 105, 248, 0.35);
+  box-shadow: 0 10px 24px rgba(255, 106, 0, 0.32);
   z-index: 20;
 }
 

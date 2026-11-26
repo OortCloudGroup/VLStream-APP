@@ -1,0 +1,404 @@
+/*
+ * VLStream 橙色主题
+ * 白底、浅灰圆角面板、橙色主色胶囊按钮、粗体黑色标题；
+ * 橙色同时用于选中态、指示条、关键数字、链接、浮动按钮
+ * 在 Vant 样式之后全局引入，统一覆盖组件主题变量
+ */
+
+:root {
+  /* 品牌色板 */
+  --vl-primary: #ff6a00;      // 主色：主按钮 / 选中 / 品牌
+  --vl-primary-press: #e65f00; // 主色按下态
+  --vl-primary-soft: rgba(255, 106, 0, 0.1); // 主色浅底
+  --vl-ink: #1c1c1e;          // 标题 / 正文
+  --vl-ink-2: #3a3a3c;        // 次级强调
+  --vl-text: #1c1c1e;
+  --vl-text-2: #6e6e73;       // 说明文字
+  --vl-text-3: #a1a1a6;       // 占位 / 弱提示
+  --vl-bg: #ffffff;           // 页面底色
+  --vl-surface: #f4f4f6;      // 面板 / 输入框
+  --vl-surface-2: #ebebef;    // 按下态 / 分组底
+  --vl-line: #e5e5ea;         // 分隔线 / 描边
+  --vl-accent: var(--vl-primary);            // 亮色（与主色一致）
+  --vl-accent-soft: var(--vl-primary-soft);
+  --vl-accent-press: var(--vl-primary-press);
+  --vl-danger: #e5484d;
+  --vl-success: #30a46c;
+  --vl-warning: #f5a623;
+  --vl-radius-lg: 24px;
+  --vl-radius: 18px;
+  --vl-radius-sm: 12px;
+  --vl-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+  --vl-font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'HarmonyOS Sans SC', 'MiSans', 'Noto Sans SC', 'Helvetica Neue', Arial, sans-serif;
+  --vl-font-mono: 'SF Mono', 'JetBrains Mono', Menlo, Consolas, 'Roboto Mono', monospace;
+
+  /* Vant 全局变量 */
+  --van-primary-color: var(--vl-primary);
+  --van-blue: var(--vl-primary);
+  --van-orange: var(--vl-primary);
+  --van-success-color: var(--vl-success);
+  --van-danger-color: var(--vl-danger);
+  --van-warning-color: var(--vl-warning);
+  --van-text-color: var(--vl-text);
+  --van-text-color-2: var(--vl-text-2);
+  --van-text-color-3: var(--vl-text-3);
+  --van-border-color: var(--vl-line);
+  --van-active-color: var(--vl-surface-2);
+  --van-background: var(--vl-surface);
+  --van-background-2: #ffffff;
+  --van-base-font: var(--vl-font);
+  --van-radius-md: 10px;
+  --van-radius-lg: 16px;
+
+  /* 按钮：胶囊形 */
+  --van-button-radius: 999px;
+  --van-button-default-height: 44px;
+  --van-button-normal-font-size: 15px;
+  --van-button-primary-background: var(--vl-primary);
+  --van-button-primary-border-color: var(--vl-primary);
+  --van-button-default-border-color: var(--vl-line);
+  --van-button-default-color: var(--vl-ink);
+  --van-button-plain-background: #ffffff;
+
+  /* 导航栏：白底黑字 */
+  --van-nav-bar-background: #ffffff;
+  --van-nav-bar-icon-color: var(--vl-ink);
+  --van-nav-bar-text-color: var(--vl-ink);
+  --van-nav-bar-title-text-color: var(--vl-ink);
+  --van-nav-bar-title-font-size: 17px;
+  --van-nav-bar-arrow-size: 20px;
+
+  /* 标签页 / 底部导航 */
+  --van-tabs-bottom-bar-color: var(--vl-accent);
+  --van-tabs-bottom-bar-width: 20px;
+  --van-tabs-bottom-bar-height: 3px;
+  --van-tab-text-color: var(--vl-text-2);
+  --van-tab-active-text-color: var(--vl-ink);
+  --van-tab-font-size: 15px;
+  --van-tabbar-item-active-color: var(--vl-accent);
+  --van-tabbar-item-text-color: var(--vl-text-3);
+  --van-tabbar-height: 56px;
+
+  /* 表单 / 选择类 */
+  --van-cell-group-inset-radius: var(--vl-radius);
+  --van-checkbox-checked-icon-color: var(--vl-accent);
+  --van-radio-checked-icon-color: var(--vl-accent);
+  --van-switch-on-background: var(--vl-accent);
+  --van-slider-active-background: var(--vl-accent);
+  --van-stepper-button-round-theme-color: var(--vl-accent);
+  --van-picker-confirm-action-color: var(--vl-accent);
+  --van-calendar-range-edge-background: var(--vl-accent);
+  --van-calendar-selected-day-background: var(--vl-accent);
+  --van-calendar-range-middle-color: var(--vl-accent);
+  --van-dropdown-menu-title-active-text-color: var(--vl-accent);
+  --van-dropdown-menu-option-active-color: var(--vl-accent);
+  --van-tree-select-item-active-color: var(--vl-accent);
+  --van-search-content-background: var(--vl-surface);
+  --van-loading-spinner-color: var(--vl-text-3);
+  --van-pull-refresh-head-text-color: var(--vl-text-3);
+  --van-progress-color: var(--vl-accent);
+  --van-circle-color: var(--vl-accent);
+  --van-steps-active-color: var(--vl-accent);
+  --van-step-active-color: var(--vl-accent);
+  --van-step-process-text-color: var(--vl-accent);
+  --van-cascader-active-color: var(--vl-accent);
+  --van-index-bar-index-active-color: var(--vl-accent);
+  --van-rate-icon-full-color: var(--vl-accent);
+  --van-action-sheet-item-disabled-text-color: var(--vl-text-3);
+  --van-empty-description-color: var(--vl-text-3);
+  --van-dialog-radius: var(--vl-radius-lg);
+  --van-dialog-confirm-button-text-color: var(--vl-accent);
+  --van-popup-round-radius: var(--vl-radius-lg);
+  --van-action-sheet-item-height: 54px;
+  --van-tag-primary-color: var(--vl-primary);
+  --van-tag-radius: 999px;
+  --van-toast-background: rgba(28, 28, 30, 0.88);
+  --van-toast-radius: 14px;
+  --van-badge-background: var(--vl-danger);
+  --van-notice-bar-background: var(--vl-surface);
+  --van-notice-bar-text-color: var(--vl-ink);
+}
+
+html,
+body {
+  background: var(--vl-bg);
+  color: var(--vl-text);
+  font-family: var(--vl-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 导航栏：去掉蓝色底线，标题加粗 */
+.van-nav-bar {
+  .van-nav-bar__title {
+    font-weight: 600;
+  }
+
+  &.van-hairline--bottom::after {
+    border-color: var(--vl-line);
+  }
+}
+
+/* 主按钮去掉渐变与彩色阴影 */
+.van-button--primary {
+  background: var(--vl-primary);
+  border-color: var(--vl-primary);
+  box-shadow: none;
+
+  &:active {
+    background: var(--vl-primary-press);
+    border-color: var(--vl-primary-press);
+  }
+}
+
+.van-button--default {
+  border-color: var(--vl-line);
+}
+
+.van-button--plain.van-button--primary {
+  background: #ffffff;
+  color: var(--vl-primary);
+  border-color: var(--vl-primary);
+}
+
+/* 底部导航细线 */
+.van-tabbar {
+  box-shadow: none;
+}
+
+/* 单元格分组：浅灰面板感 */
+.van-cell-group--inset {
+  border-radius: var(--vl-radius);
+}
+
+/* 弹窗 */
+.van-dialog__header {
+  font-weight: 600;
+  color: var(--vl-ink);
+}
+
+.van-dialog__confirm {
+  font-weight: 600;
+}
+
+/* 动作面板选中 / 取消 */
+.van-action-sheet__cancel {
+  color: var(--vl-text-2);
+}
+
+/* 数值等宽 */
+.vl-mono {
+  font-family: var(--vl-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 通用：大标题 / 胶囊标签 */
+.vl-page-title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--vl-ink);
+}
+
+.vl-section-title {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--vl-ink);
+}
+
+/* ============ 精致化细节 ============ */
+
+::selection {
+  background: var(--vl-accent-soft);
+}
+
+/* 输入光标用亮色 */
+input,
+textarea {
+  caret-color: var(--vl-accent);
+}
+
+/* 隐藏滚动条，保留滚动；阻止橡皮筋穿透 */
+* {
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  overscroll-behavior-y: none;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: 0.1px;
+}
+
+/* 按压反馈：卡片微缩、按钮变暗（只作用于可点元素的常见类名，低优先级） */
+:where([class*='-card'], [class$='-item'], .function-item, .menu-item, .device-item, .task-item, .play-btn, .fab) {
+  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.18s ease, opacity 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where([class*='-card'], .task-item, .device-item):active {
+  transform: scale(0.985);
+}
+
+:where(.fab, .play-btn):active {
+  transform: scale(0.94);
+}
+
+.van-button {
+  transition: transform 0.15s ease, opacity 0.15s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &::before {
+    display: none; // 去掉 Vant 默认的灰色按压蒙层，改用缩放
+  }
+}
+
+/* 列表加载 / 结束提示：轻量灰字，结束时左右细线 */
+.van-list__loading,
+.van-list__finished-text,
+.van-list__error-text {
+  font-size: 12px;
+  line-height: 48px;
+  color: var(--vl-text-3);
+  letter-spacing: 1px;
+}
+
+.van-list__finished-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  &::before,
+  &::after {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--vl-line);
+  }
+}
+
+.van-loading__spinner {
+  color: var(--vl-text-3);
+}
+
+/* 子级标签页：选中加粗，指示条圆头 */
+.van-tab--active {
+  font-weight: 700;
+}
+
+.van-tabs__line {
+  border-radius: 999px;
+}
+
+/* 空状态 */
+.van-empty__description {
+  font-size: 13px;
+  color: var(--vl-text-3);
+}
+
+/* 底部导航与固定底栏适配 iPhone 底部安全区 */
+.van-tabbar {
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: content-box;
+}
+
+/* 动作面板 / 弹层：标题更克制，选项更舒展 */
+.van-action-sheet__item {
+  font-size: 16px;
+  color: var(--vl-ink);
+}
+
+.van-action-sheet__gap {
+  height: 8px;
+  background: var(--vl-surface);
+}
+
+.van-popup--bottom.van-popup--round {
+  overflow: hidden;
+}
+
+/* 输入类：聚焦时底色加深一档 */
+.van-field__control::placeholder {
+  color: var(--vl-text-3);
+}
+
+.van-search__content {
+  border-radius: 999px;
+}
+
+/* 开关：更饱满 */
+.van-switch {
+  --van-switch-background: #e5e5ea;
+}
+
+/* Toast 毛玻璃 */
+.van-toast {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ============ 页面切换过渡 ============ */
+.vl-page-enter-active,
+.vl-page-leave-active {
+  transition: opacity 0.2s ease, transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.vl-page-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.vl-page-leave-to {
+  opacity: 0;
+}
+
+/* 状态胶囊（在线 / 离线等）：圆点 + 文字 */
+.vl-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #ffffff;
+  color: var(--vl-ink);
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--vl-success);
+  }
+
+  &.is-off {
+    color: var(--vl-text-2);
+
+    &::before {
+      background: #c7c7cc;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

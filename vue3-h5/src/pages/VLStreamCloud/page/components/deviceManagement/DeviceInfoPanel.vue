@@ -161,10 +161,10 @@ const openConfigRecord = () => {
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  background:rgba(255, 141, 34, 0.12);
+  background:rgba(245, 166, 35, 0.12);
   border-radius: 4px;
   line-height: 18px;
-  color:#ff8d22;
+  color:#f5a623;
   font-size:12px;
   padding: 0 6px;
   font-weight: 400;
@@ -219,10 +219,10 @@ const openConfigRecord = () => {
   .bottom-action-item {
     background: rgba(216, 216, 216, 0);
     border: 1px solid;
-    border-color: #1a53ff;
+    border-color: var(--vl-primary);
     border-radius: 20px;
     padding: 10px 20px;
-    color: #1a53ff;
+    color: #1c1c1e;
     font-size: 14px;
   }
 }

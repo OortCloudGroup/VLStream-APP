@@ -93,9 +93,8 @@ const eventBuiltFn = () => {
   }
 
   .card-but {
-    font-family: MicrosoftYaHei;
     font-size: 12px;
-    color: #2F69F8;
+    color: var(--vl-accent);
     letter-spacing: 0;
     font-weight: 400;
     display: flex;
@@ -110,7 +109,6 @@ const eventBuiltFn = () => {
     margin-top: 8px;
 
     .label {
-      font-family: 'SourceHanSansSC-Regular', sans-serif;
       font-size: 13px;
       color: #B1B9C5;
       font-weight: 400;
@@ -118,7 +116,6 @@ const eventBuiltFn = () => {
     }
 
     .value {
-      font-family: 'SourceHanSansSC-Regular', sans-serif;
       font-size: 13px;
       color: #3D3D3D;
       font-weight: 500;
@@ -126,14 +123,13 @@ const eventBuiltFn = () => {
     }
 
     .biaoti {
-      font-family: SourceHanSansSC-Medium;
+      font-weight: 500;
       font-size: 14px;
       color: #3D3D3D;
       font-weight: 500;
     }
 
     .neirong {
-      font-family: SourceHanSansSC-Regular;
       font-size: 14px;
       color: #666666;
       font-weight: 400;
@@ -149,11 +145,11 @@ const eventBuiltFn = () => {
     margin-top: 24px;
 
     div {
-      border: 1px solid rgba(1, 93, 252, 1);
+      border: 1px solid var(--vl-primary);
       border-radius: 24px;
-      font-family: OPPOSans-M;
+      font-weight: 500;
       font-size: 14px;
-      color: #015DFC;
+      color: #1c1c1e;
       text-align: center;
       font-weight: 500;
       padding: 15px 32px 15px 32px;
@@ -167,11 +163,11 @@ const eventBuiltFn = () => {
     margin-top: 24px;
 
     div {
-      border: 1px solid rgba(1, 93, 252, 1);
+      border: 1px solid var(--vl-primary);
       border-radius: 24px;
-      font-family: OPPOSans-M;
+      font-weight: 500;
       font-size: 14px;
-      color: #015DFC;
+      color: #1c1c1e;
       text-align: center;
       font-weight: 500;
       padding: 15px 1.5px 15px 1.5px;
@@ -180,8 +176,8 @@ const eventBuiltFn = () => {
 }
 
 .status-tag {
-  background-color: #fdf3d2;
-  color: #EC6C14;
+  background-color: #f4f4f6;
+  color: #f5a623;
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 4px;
@@ -201,32 +197,32 @@ const eventBuiltFn = () => {
 }
 
 .status-tag {
-  background-color: #fdf3d2;
-  color: #EC6C14;
+  background-color: #f4f4f6;
+  color: #f5a623;
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 4px;
 }
 
 .status-tag1 {
-  background-color: #ebfff2;
-  color: #14EC41;
+  background-color: #f4f4f6;
+  color: #30a46c;
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 4px;
 }
 
 .status-tag2 {
-  background-color: #fff6ed;
-  color: #EC2E14;
+  background-color: #f4f4f6;
+  color: #e5484d;
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 4px;
 }
 
 .status-tag3 {
-  background-color: #edf3ff;
-  color: #2DB5FF;
+  background-color: #f4f4f6;
+  color: #1c1c1e;
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 4px;
@@ -241,7 +237,6 @@ const eventBuiltFn = () => {
   line-height: 11px;
 
   .label {
-    font-family: 'SourceHanSansSC-Regular', sans-serif;
     font-size: 13px;
     color: #B1B9C5;
     font-weight: 400;
@@ -251,7 +246,6 @@ const eventBuiltFn = () => {
   }
 
   .value {
-    font-family: 'SourceHanSansSC-Regular', sans-serif;
     font-size: 13px;
     color: #3D3D3D;
     font-weight: 500;
@@ -369,32 +363,30 @@ const eventBuiltFn = () => {
   height: 30px;
   padding: 16px;
   margin: 16px 16px 0;
-  background: #E7EDFF;
+  background: #f4f4f6;
   border-radius: 8px;
   justify-content: space-between;
 
   .t1 {
-    font-family: MicrosoftYaHeiSemibold;
+    font-weight: 600;
     font-size: 15.84px;
-    color: #3F70FF;
+    color: #1c1c1e;
     letter-spacing: 0;
     font-weight: 600;
   }
 
   .t2 {
-    font-family: MicrosoftYaHei;
     font-size: 12px;
-    color: #3F70FF;
+    color: #1c1c1e;
     letter-spacing: 0;
     font-weight: 400;
   }
 
   .btn{
-    background-image: linear-gradient(0deg, #20B83E 0%, #50FF73 100%);
-    box-shadow: 0px 4px 6px 0px rgba(32,184,62,0.3);
-    border-radius: 15px;
+    background: var(--vl-primary);
+    box-shadow: none;
+    border-radius: 999px;
     padding: 6px 10px;
-    font-family: MicrosoftYaHei;
     font-size: 12px;
     color: #FFFFFF;
     letter-spacing: 0;
@@ -403,6 +395,90 @@ const eventBuiltFn = () => {
     >.van-icon{
       font-size: 14px;
       margin-left: 6px;
+    }
+  }
+}
+</style>
+
+<style lang="scss" scoped>
+.feedbackRecord-page.feedbackRecord-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--vl-bg);
+  overflow: hidden;
+
+  .content {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    padding: 0;
+    overflow-y: auto;
+    background: var(--vl-bg);
+  }
+
+  :deep(.van-tabs__wrap) {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+
+  :deep(.van-tabs__nav) {
+    background: var(--vl-bg);
+  }
+
+  :deep(.van-tabs__wrap) {
+    border-bottom: 1px solid var(--vl-line);
+  }
+
+  :deep(.van-tab__panel) {
+    padding: 12px 16px 24px;
+  }
+
+  /* 添加反馈引导卡 */
+  .eventBuiltBox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: auto;
+    height: auto;
+    margin: 0 0 16px;
+    padding: 16px;
+    background: var(--vl-primary-soft);
+    border: 0;
+    border-radius: var(--vl-radius);
+
+    .t1 {
+      font-size: 15px;
+      line-height: 22px;
+      font-weight: 700;
+      color: var(--vl-ink);
+    }
+
+    .t2 {
+      margin-top: 2px;
+      font-size: 12px;
+      line-height: 18px;
+      color: var(--vl-text-2);
+    }
+
+    .btn {
+      position: static;
+      flex-shrink: 0;
+      width: auto;
+      height: 34px;
+      margin: 0;
+      padding: 0 14px;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffffff;
+      background: var(--vl-primary);
+      border-radius: 999px;
+      white-space: nowrap;
     }
   }
 }

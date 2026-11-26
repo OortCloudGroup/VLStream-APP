@@ -43,6 +43,7 @@ import { onMounted, ref, watch } from 'vue'
 import { useUserStore } from '@/store/modules/useraPaas'
 import playImg from '@/assets/img/VLStreamCloud/play.png'
 import { getPlayback, getPlaybackStream } from '@/api/VLStreamCloud/intelligentAnalysis'
+import { resolveVlsDeviceIds } from '@/api/VLStreamCloud/videoPlayback'
 
 interface TaskInfo {
   id: number | string
@@ -133,10 +134,12 @@ const fetchPlayback = async() => {
   const { startTime, endTime } = buildRangeParams()
   const allRecords: any[] = []
 
-  for (const deviceIdText of idList) {
+  // 录像表 device_id 为 vls_device_info.id，序列号需先换成 vls 主键，匹配不到的跳过
+  const vlsIds = (await resolveVlsDeviceIds(idList)).filter((id: string) => !!id)
+  for (const vlsId of Array.from(new Set(vlsIds))) {
     const params = {
       accessToken: store.userInfo?.accessToken,
-      deviceId: deviceIdText,
+      deviceId: vlsId,
       startTime,
       endTime
     }
@@ -203,7 +206,7 @@ watch(
 
 <style scoped lang="scss">
 .video-list-tab {
-  background: #f9faff;
+  background: #ffffff;
   margin-top: 16px;
 }
 
@@ -222,7 +225,7 @@ watch(
   position: relative;
   width: 120px;
   height: 88px;
-  border: 2px solid rgba(47, 105, 248, 0.2);
+  border: 2px solid rgba(28, 28, 30, 0.2);
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
@@ -288,11 +291,11 @@ watch(
   gap: 4px;
   width: 64px;
   height: 22px;
-  background: rgba(47, 105, 248, 0.12);
+  background: var(--vl-accent-soft);
   border-radius: 4px;
   line-height: 16px;
   font-weight: 500;
-  color: #2f69f8;
+  color: var(--vl-accent);
   font-size: 12px;
   padding: 5px 6px;
   box-sizing: border-box;

@@ -305,8 +305,8 @@ const updateEvery = (value: string) => {
           border-radius: 2px;
 
           &.van-radio__icon--checked {
-            background-color: #409eff;
-            border-color: #409eff;
+            background-color: var(--vl-accent);
+            border-color: var(--vl-accent);
           }
         }
       }
@@ -332,8 +332,8 @@ const updateEvery = (value: string) => {
         border-radius: 2px;
 
         &.van-checkbox__icon--checked {
-          background-color: #409eff;
-          border-color: #409eff;
+          background-color: var(--vl-accent);
+          border-color: var(--vl-accent);
         }
       }
     }
@@ -372,7 +372,7 @@ const updateEvery = (value: string) => {
       font-size: 12px;
 
       &:focus {
-        border-color: #409eff;
+        border-color: var(--vl-accent);
       }
     }
   }
@@ -396,18 +396,18 @@ const updateEvery = (value: string) => {
   align-items: flex-start;
   // width: 100%;
   padding: 16px 16px;
-  background: #f0f9ff;
-  border: 1px solid #b3d8ff;
+  background: #f4f4f6;
+  border: 1px solid #d1d1d6;
   border-radius: 6px;
   font-size: 12px;
-  color: #1F84F0;
+  color: #1c1c1e;
   line-height: 20px;
   font-weight: 400;
   gap: 8px;
 
   .van-icon {
     font-size: 16px;
-    color: #409eff;
+    color: var(--vl-accent);
     flex-shrink: 0;
     margin-top: 2px;
   }
@@ -430,7 +430,7 @@ const updateEvery = (value: string) => {
   height: 20px;
 }
 .custom-required {
-  color: #ee0a24;
+  color: #e5484d;
   font-size: 14px;
   margin-left: 5px;
 }
@@ -454,14 +454,13 @@ const updateEvery = (value: string) => {
   background-color: #F6F6F6;
   text-align: center;
   margin: 10px 5px;
-  font-family: AppleSystemUIFont;
   font-size: 12px;
   color: #999999;
   font-weight: 400;
 
 }
 .butActive {
-  background-color: #2F69F8;
+  background-color: var(--vl-primary);
   color: #fff;
 }
 .selectionCriteria{

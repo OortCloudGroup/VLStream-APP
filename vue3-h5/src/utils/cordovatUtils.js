@@ -38,25 +38,28 @@ export const getAppInfo = async() => {
 
 import { useUserStoreHook } from '@/store/modules/useraPaas'
 import { idbysecretdetail } from '@/api/admin_platform'
+/**
+ * 从平台取应用信息（包名等）。失败（如新用户租户未开通本应用，平台返回 not found）
+ * 时返回 null 而不是抛错，调用方据此降级，不能因此挡住登录。
+ */
 export const getAppInfoFromHttp = async(params = {}) => {
   const appid = params.appid || Config.appId
   const appsecret = params.appsecret || Config.secretKey
-  return new Promise((resolve, reject) => {
-    const store = useUserStoreHook()
-    const params = {
+  const store = useUserStoreHook()
+  try {
+    const res = await idbysecretdetail({
       accessToken: store.token,
       app_id: appid,
       app_secret: appsecret,
       uuid: store.userInfo.userId
-    }
-    idbysecretdetail(params).then(res => {
-      if (res.code === 200) {
-        Config.appInfo = res.data
-        Config.apppackage = res.data.apppackage
-        resolve(res)
-      } else {
-        reject()
-      }
     })
-  })
+    if (res && res.code === 200 && res.data) {
+      Config.appInfo = res.data
+      Config.apppackage = res.data.apppackage
+      return res
+    }
+  } catch (e) {
+    // 网络或网关错误同样降级
+  }
+  return null
 }

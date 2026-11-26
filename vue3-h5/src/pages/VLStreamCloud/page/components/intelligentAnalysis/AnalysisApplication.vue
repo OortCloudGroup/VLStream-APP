@@ -572,7 +572,7 @@ onMounted(() => {
 .analysis-application {
   height: 100vh;
   overflow: hidden;
-  background: #f3f3f3;
+  background: var(--vl-bg);
   display: flex;
   flex-direction: column;
 }
@@ -656,6 +656,7 @@ onMounted(() => {
 .section {
   padding: 16px;
   background: #fff;
+  border-top: 8px solid var(--vl-surface);
 }
 
 .section-header {
@@ -826,9 +827,13 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.camera-popup-cancel,
+.camera-popup-cancel {
+  color: var(--vl-text-2);
+}
+
 .camera-popup-confirm {
-  color: #1989fa;
+  color: var(--vl-accent);
+  font-weight: 600;
 }
 
 .camera-popup-title {
@@ -859,9 +864,13 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.area-popup-cancel,
+.area-popup-cancel {
+  color: var(--vl-text-2);
+}
+
 .area-popup-confirm {
-  color: #1989fa;
+  color: var(--vl-accent);
+  font-weight: 600;
 }
 
 .area-popup-title {
@@ -938,6 +947,14 @@ onMounted(() => {
 }
 
 .area-input-confirm {
-  color: #1989fa;
+  color: var(--vl-accent);
+}
+</style>
+
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+.analysis-application.analysis-application {
+  @include vl-section-form('.application-content');
 }
 </style>

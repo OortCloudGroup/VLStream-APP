@@ -45,7 +45,12 @@
           class="layout-icon"
           @click="changeLayout(mode.value)"
         >
-          <img :src="activeLayout === mode.value ? mode.activeImg : mode.img" alt="" class="layout-img" />
+          <img
+            :src="activeLayout === mode.value ? mode.activeImg : mode.img"
+            alt=""
+            class="layout-img"
+            :class="{ 'is-active': activeLayout === mode.value }"
+          />
         </div>
       </div>
 
@@ -134,10 +139,7 @@
               </div>
             </div>
           </div>
-          <div class="play-btn">
-            <img v-if="item.status == '1'" src="@/assets/img/VLStreamCloud/spgc/playing.png" alt="" />
-            <img v-else src="@/assets/img/VLStreamCloud/spgc/no_playing.png" alt="" />
-          </div>
+          <PlayButton class="play-btn" :online="item.status == '1'" />
         </div>
       </div>
     </div>
@@ -154,6 +156,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import PlayButton from '../PlayButton.vue'
 import { useI18n } from 'vue-i18n'
 import { getWvpVlsDeviceList, getWvpVlsDeviceDetail, getWvpVlsDeviceStreams, createWvpVlsDevicePreview } from '@/api/VLStreamCloud/wvp'
 import { CameraRtcPlayer, parseCameraRtcTarget } from '@/utils/cameraRtc'
@@ -592,15 +595,15 @@ const openDetail = (item: any) => {
   height: calc(100% + 24px);
   margin: 0 -16px -24px;
   overflow: hidden;
-  background: #000;
+  background: var(--vl-bg);
 }
 
 /* 布局切换浮在视频上方 */
 .layout-row {
   position: absolute;
-  top: 10px;
-  left: 12px;
-  right: 12px;
+  top: 14px;
+  left: 26px;
+  right: 26px;
   z-index: 4;
   display: flex;
   align-items: center;
@@ -608,22 +611,43 @@ const openDetail = (item: any) => {
   gap: 8px;
 }
 
+/* 深色毛玻璃胶囊：图标统一白色，选中项加白色底圈 */
 .layout-buttons {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
+  gap: 2px;
+  padding: 4px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(6px);
+  background: rgba(20, 20, 22, 0.55);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.12);
 }
 
 .layout-icon {
-  width: 22px;
-  height: 22px;
+  width: 30px;
+  height: 30px;
+  padding: 7px;
+  box-sizing: border-box;
+  border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.2s ease;
+
+  &:has(.is-active) {
+    background: rgba(255, 255, 255, 0.95);
+  }
+}
+
+.layout-img {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
+.layout-img.is-active {
+  filter: brightness(0);
+  opacity: 1;
 }
 
 .layout-img {
@@ -633,12 +657,13 @@ const openDetail = (item: any) => {
 }
 
 .more-icon {
-  width: 26px;
-  height: 26px;
-  padding: 5px;
+  width: 22px;
+  height: 22px;
+  padding: 8px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(6px);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   box-sizing: content-box;
   object-fit: contain;
 }
@@ -652,7 +677,7 @@ const openDetail = (item: any) => {
   align-items: center;
   padding: 8px 10px;
   font-size: 14px;
-  color: #111827;
+  color: #1c1c1e;
 }
 
 .mode-menu-icon {
@@ -663,14 +688,19 @@ const openDetail = (item: any) => {
 }
 
 /* 预览分屏铺满整个内容区 */
+/* 预览区做成圆角大卡片，画面之间 2px 细缝 */
 .preview-grid {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 4px;
+  left: 16px;
+  right: 16px;
+  bottom: 64px;
   display: grid;
+  gap: 2px;
   overflow: hidden;
+  border-radius: var(--vl-radius-lg);
+  background: #0b0b0c;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
   transition: all 0.3s ease;
 }
 
@@ -795,7 +825,7 @@ const openDetail = (item: any) => {
   width: 100%;
   height: 100%;
   position: relative;
-  background: #000;
+  background: #161618;
   overflow: hidden;
 }
 
@@ -811,12 +841,13 @@ const openDetail = (item: any) => {
   z-index: 3;
   width: 20px;
   height: 20px;
-  border-radius: 6px;
+  border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(20, 20, 22, 0.5);
+  backdrop-filter: blur(8px);
 }
 
 .cell-fullscreen-btn:active {
@@ -833,17 +864,18 @@ const openDetail = (item: any) => {
   font-size: 11px;
   line-height: 16px;
   text-align: center;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.45);
+  color: rgba(255, 255, 255, 0.85);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
 }
 
 .preview-empty {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-size: 16px;
-  background: #000;
+  color: rgba(255, 255, 255, 0.32);
+  font-size: 13px;
+  letter-spacing: 2px;
+  background: #161618;
 }
 
 /* 设备列表抽屉 */
@@ -856,9 +888,9 @@ const openDetail = (item: any) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #F9FAFF;
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -4px 20px rgba(17, 24, 39, 0.14);
+  background: #ffffff;
+  border-radius: var(--vl-radius-lg) var(--vl-radius-lg) 0 0;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.08);
   transition: height 0.25s ease;
 }
 
@@ -883,7 +915,7 @@ const openDetail = (item: any) => {
   width: 44px;
   height: 4px;
   border-radius: 999px;
-  background: rgba(17, 24, 39, 0.18);
+  background: rgba(28, 28, 30, 0.18);
 }
 
 .drawer-title {
@@ -902,8 +934,8 @@ const openDetail = (item: any) => {
 
 .device-card {
   position: relative;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--vl-surface);
+  border-radius: var(--vl-radius);
   padding: 12px;
   margin-bottom: 12px;
 }
@@ -927,10 +959,10 @@ const openDetail = (item: any) => {
   justify-content: flex-start;
   align-items: center;
   box-sizing: border-box;
-  background: rgba(255, 141, 34, 0.12);
+  background: rgba(245, 166, 35, 0.12);
   border-radius: 4px;
   line-height: 18px;
-  color: #ff8d22;
+  color: #f5a623;
   font-size: 12px;
   padding: 0 6px;
 }
@@ -974,7 +1006,7 @@ const openDetail = (item: any) => {
 }
 
 .chip {
-  background: rgba(47, 105, 248, 1);
+  background: rgba(28, 28, 30, 1);
   border-radius: 2px;
   line-height: 16px;
   color: #ffffff;
@@ -991,16 +1023,14 @@ const openDetail = (item: any) => {
   position: absolute;
   top: 16px;
   right: 12px;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
+</style>
 
-.play-btn img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+<style lang="scss" scoped>
+@use '@/styles/vl-mixins' as *;
+
+/* 设备列表标签与其它设备卡片保持一致 */
+.card-footer.card-footer {
+  @include vl-chips;
 }
 </style>

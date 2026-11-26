@@ -24,7 +24,7 @@ export default class EntryAbility extends UIAbility {
       mainWin.setWindowLayoutFullScreen(false);
       // Light status bar background with dark icons, matching the H5 page background
       const barProps: window.SystemBarProperties = {
-        statusBarColor: '#F9FAFF',
+        statusBarColor: '#FFFFFF',
         statusBarContentColor: '#000000'
       };
       mainWin.setWindowSystemBarProperties(barProps);

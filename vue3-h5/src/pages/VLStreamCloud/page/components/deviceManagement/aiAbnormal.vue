@@ -90,7 +90,7 @@ const onBack = () => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f7f8fa;
+  background-color: var(--vl-bg);
 }
 
 .audio-content {
@@ -98,7 +98,7 @@ const onBack = () => {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 16px;
-  background: #F9FAFF;
+  background: #ffffff;
 }
 
 .tab-header {
@@ -120,7 +120,7 @@ const onBack = () => {
 
   &.active {
     font-weight:500;
-    color:#2f69f8;
+    color:var(--vl-accent);
   }
 }
 
@@ -132,11 +132,11 @@ const onBack = () => {
   width: 24px;
   height: 3px;
   border-radius: 999px;
-  background:#2f69f8;
+  background:var(--vl-accent);
 }
 
 .tab-body {
-  background: #F9FAFF;
+  background: #ffffff;
   padding: 0 12px 20px;
 }
 

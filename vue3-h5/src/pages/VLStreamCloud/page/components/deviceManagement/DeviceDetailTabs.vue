@@ -147,7 +147,7 @@ watch(
 <style scoped lang="scss">
 .device-detail {
   height: 100vh;
-  background: #f6f8ff;
+  background: var(--vl-bg);
   display: flex;
   flex-direction: column;
 }
@@ -196,7 +196,7 @@ watch(
   cursor: pointer;
 
   &.active {
-    color:#2f69f8;
+    color:var(--vl-accent);
     font-weight:500;
   }
 }
@@ -209,12 +209,12 @@ watch(
   width: 32px;
   height: 3px;
   border-radius: 999px;
-  background: #1c6cff;
+  background: var(--vl-primary);
 }
 
 .tab-body {
   flex: 1;
-  background: #f6f8ff;
+  background: var(--vl-bg);
   padding: 12px 12px 24px;
 }
 </style>
