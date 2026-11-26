@@ -157,3 +157,35 @@ export function sendLoginSmsCode(data) {
 export function myOpinionList(data) {
   return commonFunc('sso/v1/myOpinionList', data, 'post')
 }
+
+// ---- 多租户登录 V2（与 T-OORT.SH/login-page 保持一致）----
+
+/** 获取临时登录凭证 V2：identity_type/identifier/credential 统一结构，支持账密与验证码登录 */
+export function getLoginCodeV2(data: any) {
+  return commonFunc('sso/v2/getLoginCode', data, 'post')
+}
+
+/** 双因子第二步 / 不同密码租户的再次校验 */
+export function fastLogin(data: any) {
+  return commonFunc('sso/v1/fastLogin', data, 'post')
+}
+
+/** 登录发送邮箱验证码 */
+export function sendLoginEmailCode(data: any) {
+  return commonFunc('sso/v1/sendLoginEmailCode', data, 'post')
+}
+
+/** 双因子：获取账号可用的其他验证方式 */
+export function getUserOtherLogin(data: any) {
+  return commonFunc('sso/v1/getUserOtherLogin', data, 'post')
+}
+
+/** 认证配置列表（按 types 取短信/邮箱的 config_code） */
+export function authConfigList(data: any) {
+  return commonFunc('sso/v1/configList', data, 'post')
+}
+
+/** 生成滑块验证码（captcha_type 1），返回 slide_id 与缺口 ypos；图片走 captcha/v1/{id}.png?slide=bg|slice */
+export function generateCaptcha(data: any) {
+  return commonFunc('sso/v1/generateCaptcha', data, 'post')
+}

@@ -17,7 +17,9 @@ import {
   verifyToken,
   logout,
   resetPassword,
-  getLoginCode
+  getLoginCode,
+  getLoginCodeV2,
+  fastLogin
 } from '@/api/login/indexapaas'
 import { localLogin } from '@/api/login/localAuth'
 import {
@@ -90,16 +92,75 @@ export const useUserStore = defineStore('user', () => {
     })
   }
 
-  // apaas-sso登录
+  /**
+   * 多租户 V2 登录载荷：RSA 加密 identity_type/identifier/credential，
+   * current_step=2 时是双因子/不同密码租户的第二步（带 auth_token 与 login_step）。
+   * 逻辑与 T-OORT.SH/login-page 的 getLoginV2 / getFastLogin 一致。
+   */
+  const LOGIN_RSA_PUBLIC_KEY =
+    'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAzd2eYqgC6A3CvQN982C7s3xo2zjL97b0lHkfcAFEy50YHg+g5QD6RbvZt0NTQVOoC5Vv867lp0UBrwAslNCjt92QyxKkGLU+10UClkCJsiHpxy/J7AOOpS0wMGao80uWN94EZEsP/FKFfGNz3lJcZRtg4TGCMgXQGlKxBcYJDor/zK/06asTBGp4IxvTDAKTuMP+u88y5nQTUpKPnPstwmiLfqZLOSE3y4kIA7VC98GxPY8SqLZ7b9HzLSNoZNXKvA9US7A2F8/A97b8tExXsGPOodMQzrLFVr840ZV2WgpxJHqobqYReGhGMN4JdjfGlUvHyhYaCyOcSWalWuLh18cDQkum8yUrw5Tki8r8VPDTEZhsOXcq46cMr4437HGYeDA2ib7TOArFq1d0DD9Z0DAsjNfhgqqIP9A9kXrs6JIRrkz82skco2WQ5NUdpLT3yaAiXTxmFaajQGVIhFG24VL8CTloRo3FZmy9vMlUseCKmhfCBFbhUG9r7HOuhkO+jY4yfItE8BIrClbkQBAzMBMTuRM84VQQ4MnYlbdT3uSt5Qw5WmGIxsAKk93o8Hyhrg/OX8FCwntw2h5AjGDGn/H5H0TDAp8vX0NJgh4xhOpNT8pshuX7W1vcqr42sqOjM/mbRPV3s+tT4ynY0xQLuqp0P7GW3fu0fT0/OeHPwcsCAwEAAQ=='
+  const buildLoginV2Param = (loginData, extra: Record<string, any> = {}) => {
+    const encrypt = new JSEncrypt()
+    encrypt.setPublicKey(LOGIN_RSA_PUBLIC_KEY)
+    const json: Record<string, any> = {
+      timestamp: Math.floor(new Date().getTime() / 1000),
+      client: loginData.client || 'pcweb',
+      login_type: loginData.login_type || 1,
+      config_code: loginData.config_code || '',
+      identity_type: loginData.identity_type,
+      identifier: loginData.identifier,
+      credential: loginData.credential,
+      ...extra
+    }
+    if (loginData.code) {
+      json.code = loginData.code
+      json.captchaID = loginData.captchaID
+    }
+    const tjson = encrypt.encrypt(JSON.stringify(json)) as string
+    if (loginData.current_step === 2) {
+      return {
+        auth_token: loginData.auth_token,
+        current_step: loginData.current_step,
+        login_step: loginData.login_step,
+        userInfo: tjson
+      }
+    }
+    return { select_type: loginData.select_type, userInfo: tjson }
+  }
+
+  /* 临时登录 V2：返回临时 token，后续 getUserTenants → login 选租户 */
+  const getLoginV2 = (loginData): Promise<any> => {
+    const extra: Record<string, any> = {}
+    if (loginData.loginfrom) extra.loginfrom = loginData.loginfrom
+    return getLoginCodeV2(buildLoginV2Param(loginData, extra))
+  }
+
+  /* 双因子第二步 / 不同密码租户校验 */
+  const getFastLogin = (loginData): Promise<any> => {
+    const extra: Record<string, any> = { client: 'pcweb', login_type: 1 }
+    if (loginData.to_tenant_id) extra.to_tenant_id = loginData.to_tenant_id
+    if (loginData.to_user_id) extra.to_user_id = loginData.to_user_id
+    if (loginData.is_password_different_account) {
+      extra.is_password_different_account = loginData.is_password_different_account
+    }
+    return fastLogin(buildLoginV2Param(loginData, extra))
+  }
+
+  /** 登录成功后建立会话（login / fastLogin 共用） */
+  const applyLoginResult = (data) => {
+    removeVlstreamToken()
+    setToken(data.accessToken)
+    setTenantId(data.tenantId)
+    token.value = data.accessToken
+    userInfo.value = data
+  }
+
+  // apaas-sso登录（选租户）。返回 441 表示需要双因子，此时不能建立会话
   const login = (loginData) => {
     return new Promise((resolve, reject) => {
       loginSSO(loginData)
         .then((res) => {
-          removeVlstreamToken()
-          setToken(res.data.accessToken)
-          setTenantId(res.data.tenantId)
-          token.value = res.data.accessToken
-          userInfo.value = res.data
+          if (res.code === 200) applyLoginResult(res.data)
           resolve(res)
         })
         .catch((error) => {
@@ -222,6 +283,9 @@ export const useUserStore = defineStore('user', () => {
   return {
     setUserInfo,
     getLogin,
+    getLoginV2,
+    getFastLogin,
+    applyLoginResult,
     login,
     setStoreToken,
     token,
