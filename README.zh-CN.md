@@ -128,6 +128,16 @@ pnpm start          # 等同于 vite
 
 > 默认运行的项目由 [`vue3-h5/.env`](./vue3-h5/.env) 中的 `VITE_PROJECT_DIR` 决定，当前为 `VLStreamCloud`。
 
+在本机多租户环境调试移动端时，可在 `vue3-h5/` 下通过 PowerShell 启动独立的 5180 端口。
+
+```powershell
+$env:VITE_VL_ENV = 'multi'
+$env:VITE_VL_LOCAL_MULTI = 'true'
+pnpm start --port 5180 --strictPort
+```
+
+打开 `http://127.0.0.1:5180/`。VLS 和 WVP 分别转发至本机 `8094` 和 `9081`。平台 SSO、地图、上传等其他服务沿用各自的环境预设地址。此开关仅用于开发服务。
+
 ## 多项目机制
 
 `vue3-h5` 是一个**单页面多项目集合**工程：通过 `.env` 切换当前开发项目，通过 `package.json` 脚本 + `build.sh` 编译指定项目。每次切换项目后需重新编译运行。

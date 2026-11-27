@@ -11,7 +11,7 @@
   @Author 兰舰 (UI redesign)
 -->
 <template>
-  <div class="login_page" :style="{ paddingTop: safeAreaTop, paddingBottom: '16px' }">
+  <div class="login_page" :style="{ paddingTop: safeAreaTop }">
     <!-- 品牌区 -->
     <div class="brand_area">
       <img class="brand_logo" src="@/assets/img/login_logo.png" alt="VLStream Cloud" />
@@ -28,15 +28,17 @@
 
       <!-- 登录方式切换（平台开启了多种方式时出现） -->
       <div v-if="loginWays.length > 1" class="way_tabs">
-        <div
+        <button
           v-for="item in loginWays"
           :key="item.key"
+          type="button"
           class="way_tab"
           :class="{ active: loginWay === item.way }"
+          :aria-pressed="loginWay === item.way"
           @click="changeLoginWay(item.way)"
         >
           {{ $t(item.label) }}
-        </div>
+        </button>
       </div>
 
       <!-- 账号密码 -->
@@ -128,7 +130,6 @@
             {{ countdownOf(wayCodeType) > 0 ? countdownOf(wayCodeType) + 's' : $t('获取验证码') }}
           </van-button>
         </div>
-        <div class="aux_row" />
       </template>
 
       <van-button
@@ -193,12 +194,16 @@
 
     <!-- 华为审核 7.5 项要求：默认不勾选的空白复选框 + 用户主动勾选同意，禁止"登录即表示同意"式默认同意表述 -->
     <div class="privacy_agree">
-      <span class="agree_box" :class="{ checked: agreePrivacy }" @click="agreePrivacy = !agreePrivacy">
-        <van-icon v-if="agreePrivacy" name="success" />
-      </span>
-      <span class="agree_text">
-        {{ $t('我已阅读并同意') }}<span class="policy_link" @click="openPrivacyPolicy">《{{ $t('用户协议和隐私政策') }}》</span>
-      </span>
+      <label class="agree_label">
+        <input v-model="agreePrivacy" class="agree_input" type="checkbox" />
+        <span class="agree_box" aria-hidden="true">
+          <van-icon v-if="agreePrivacy" name="success" />
+        </span>
+        {{ $t('我已阅读并同意') }}
+      </label>
+      <button type="button" class="policy_link" @click="openPrivacyPolicy">
+        《{{ $t('用户协议和隐私政策') }}》
+      </button>
     </div>
 
     <!-- 租户选择弹窗 -->
@@ -1031,9 +1036,10 @@ $text_main: var(--vl-ink);
 $text_sub: var(--vl-text-2);
 
 .login_page {
-  min-height: 100vh;
-  max-height: 100%;
+  box-sizing: border-box;
+  height: 100%;
   width: 100%;
+  padding: 0 clamp(16px, 5.56vw, 20px) max(16px, env(safe-area-inset-bottom));
   background: var(--vl-bg);
   display: flex;
   flex-direction: column;
@@ -1046,6 +1052,7 @@ $text_sub: var(--vl-text-2);
 /* 品牌区 */
 .brand_area {
   width: 100%;
+  flex: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1096,13 +1103,14 @@ $text_sub: var(--vl-text-2);
 
 /* 表单卡片 */
 .form_card {
-  align-self: stretch;
-  margin: 0 20px;
+  flex: none;
+  width: 100%;
+  max-width: 400px;
   box-sizing: border-box;
   background: #fff;
   border: 1px solid var(--vl-line);
-  border-radius: var(--vl-radius-lg);
-  padding: 28px 20px 24px;
+  border-radius: min(var(--vl-radius-lg), 24px);
+  padding: 24px clamp(16px, 5vw, 20px) 20px;
   box-shadow: var(--vl-shadow);
   position: relative;
   z-index: 1;
@@ -1110,10 +1118,11 @@ $text_sub: var(--vl-text-2);
 
 .form_card_title {
   font-size: 24px;
+  line-height: 1.25;
   font-weight: 800;
   letter-spacing: -0.3px;
   color: $text_main;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 
 .field_group {
@@ -1123,6 +1132,8 @@ $text_sub: var(--vl-text-2);
 }
 
 :deep(.login_field) {
+  --van-cell-line-height: 24px;
+  --van-field-icon-size: 20px;
   background: var(--vl-surface);
   border-radius: 16px;
   padding: 12px 16px;
@@ -1130,39 +1141,47 @@ $text_sub: var(--vl-text-2);
 
   .van-field__left-icon {
     color: $text_main;
-    font-size: 20px;
     margin-right: 10px;
   }
 
   .van-field__right-icon {
     color: $text_sub;
-    font-size: 20px;
     padding-left: 8px;
   }
 
   input {
     color: $text_main;
-    font-size: 15px;
+    font-size: 16px;
   }
 
   input::placeholder {
-    color: var(--vl-text-3);
+    color: $text_sub;
+  }
+
+  &.captcha_field {
+    --van-field-icon-size: 18px;
+    padding-inline: 12px 8px;
+
+    .van-field__left-icon {
+      margin-right: 6px;
+    }
   }
 }
 
 .captcha_row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   margin-top: 14px;
 }
 
 .captcha_field {
   flex: 1;
+  min-width: 0;
 }
 
 .captcha_img {
-  width: 110px;
+  width: 100px;
   height: 44px;
   border-radius: 16px;
   object-fit: cover;
@@ -1174,7 +1193,6 @@ $text_sub: var(--vl-text-2);
   align-items: center;
   justify-content: space-between;
   margin-top: 16px;
-  margin-bottom: 22px;
 }
 
 .auto_login {
@@ -1207,6 +1225,7 @@ $text_sub: var(--vl-text-2);
 }
 
 .login_btn {
+  margin-top: 16px;
   height: 50px;
   border-radius: 999px;
   border: none;
@@ -1223,47 +1242,76 @@ $text_sub: var(--vl-text-2);
 }
 
 .privacy_agree {
-  margin-top: 20px;
+  flex: none;
+  margin-top: 8px;
   margin-bottom: auto;
   display: flex;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
   position: relative;
   z-index: 1;
-  padding: 0 4px;
+  color: $text_sub;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.agree_label,
+.policy_link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.agree_label {
+  gap: 8px;
+  position: relative;
+}
+
+.agree_input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
 }
 
 .agree_box {
   flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  margin-top: 1px;
+  box-sizing: border-box;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  border: 1.5px solid #cfd4de;
+  border: 1.5px solid $text_sub;
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
   font-size: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &.checked {
-    background: $brand;
-    border-color: $brand;
-  }
 }
 
-.agree_text {
-  margin-left: 8px;
-  font-size: 12px;
-  line-height: 18px;
-  color: var(--vl-text-3);
+.agree_input:checked + .agree_box {
+  background: $brand;
+  border-color: $brand;
 }
 
 .policy_link {
-  color: $brand;
-  cursor: pointer;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: $text_main;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.agree_input:focus-visible + .agree_box,
+.policy_link:focus-visible,
+.way_tab:focus-visible {
+  outline: 2px solid $text_main;
+  outline-offset: 2px;
 }
 
 /* 租户选择弹窗 */
@@ -1389,12 +1437,13 @@ $text_sub: var(--vl-text-2);
 }
 
 .code_btn {
-  width: 110px;
+  width: 100px;
   height: 44px;
+  padding: 0 8px;
   border-radius: 16px;
   border: none;
   background: var(--vl-surface);
-  color: $brand;
+  color: $text_main;
   font-size: 14px;
   font-weight: 600;
   flex-shrink: 0;
@@ -1439,26 +1488,76 @@ $text_sub: var(--vl-text-2);
 .way_tabs {
   display: flex;
   padding: 4px;
-  margin: -8px 0 18px;
+  margin: 0 0 14px;
   border-radius: 999px;
   background: var(--vl-surface);
 }
 
 .way_tab {
   flex: 1;
-  height: 34px;
-  line-height: 34px;
-  text-align: center;
+  min-width: 0;
+  min-height: 44px;
+  padding: 4px;
+  border: 0;
   border-radius: 999px;
+  background: transparent;
+  font: inherit;
   font-size: 14px;
+  line-height: 1.2;
   color: $text_sub;
-  transition: all 0.2s ease;
+  cursor: pointer;
 
   &.active {
     background: #fff;
     color: $text_main;
     font-weight: 700;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+}
+
+@media (max-height: 520px) {
+  .brand_area {
+    padding: 4px 0 12px;
+  }
+
+  .brand_logo {
+    width: 124px;
+    margin-bottom: 0;
+  }
+
+  .brand_subtitle {
+    margin-top: 2px;
+  }
+
+  .form_card {
+    padding-block: 14px 16px;
+  }
+
+  .form_card_title,
+  .way_tabs {
+    margin-bottom: 10px;
+  }
+
+  .field_group {
+    gap: 8px;
+  }
+
+  :deep(.login_field) {
+    padding-block: 10px;
+  }
+
+  .aux_row,
+  .captcha_row,
+  .login_btn {
+    margin-top: 10px;
+  }
+
+  .login_btn {
+    height: 44px;
+  }
+
+  .privacy_agree {
+    margin-top: 4px;
   }
 }
 </style>

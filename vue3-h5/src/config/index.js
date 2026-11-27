@@ -95,8 +95,9 @@ export function applyVlEnv(name) {
   const key = String(name || '').trim().toLowerCase()
   const preset = VL_ENV_PRESETS[key]
   if (preset) {
+    const useLocalMulti = import.meta.env.DEV && import.meta.env.VITE_VL_LOCAL_MULTI === 'true' && key === 'multi'
     config.vlEnv = key
-    config.URL = preset.URL
+    config.URL = useLocalMulti ? `${window.location.origin}/` : preset.URL
     config.platformURL = preset.platformURL
     config.cameraRtcSocketURL = preset.cameraRtcSocketURL
     config.authMode = preset.authMode

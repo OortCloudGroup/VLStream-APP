@@ -37,6 +37,8 @@ export default defineConfig(({ command, mode }) => {
   console.log('--------------------当前运行项目---', path.resolve(__dirname, './src/' + proDir))
   console.log('---------------------------------------------------------------')
   const projectPath = 'pages/' + proDir
+  const useLocalMulti = command === 'serve' && env.VITE_VL_LOCAL_MULTI === 'true' &&
+    (env.VITE_VL_ENV || 'multi').trim().toLowerCase() === 'multi'
 
   if (command === 'serve') {
     // dev 独有配置
@@ -184,7 +186,7 @@ export default defineConfig(({ command, mode }) => {
             mediaQuery: false, // 允许在媒体查询中转换`px`
             minPixelValue: 1, // 小于或等于`1px`时不转换为视窗单位
             replace: true, // 是否直接更换属性值而不添加备用属性
-            exclude: [], // 忽略某些文件夹下的文件或特定文件
+            exclude: [/[/\\]LoginDev\.vue(?:\?|$)/], // 登录页限制控件尺寸，避免横屏随视口宽度放大
             landscape: false, // 是否添加根据landscapeWidth生成的媒体查询条件 @media (orientation: landscape)
             landscapeUnit: 'vw', // 横屏时使用的单位
             landscapeWidth: 640 // 横屏时使用的视窗宽度
@@ -196,15 +198,20 @@ export default defineConfig(({ command, mode }) => {
       // ...
     },
     server: {
-      host: '0.0.0.0',
+      host: useLocalMulti ? '127.0.0.1' : '0.0.0.0',
       port: 8080, // 将开发服务器端口设置为 8080
-      proxy: {
-        // '/workflow': {
-        //   target: 'http://192.168.88.54:8080',
-        //   changeOrigin: true,
-        //   rewrite: path => path.replace(/^\/workflow/, '')
-        // }
-      }
+      proxy: useLocalMulti ? {
+        '^/bus/(?:apaas-)?vls-server/': {
+          target: 'http://127.0.0.1:8094',
+          changeOrigin: true,
+          rewrite: url => url.replace(/^\/bus\/(?:apaas-)?vls-server/, '')
+        },
+        '^/bus/(?:apaas-)?wvp-server/': {
+          target: 'http://127.0.0.1:9081',
+          changeOrigin: true,
+          rewrite: url => url.replace(/^\/bus\/(?:apaas-)?wvp-server/, '')
+        }
+      } : undefined
     }
   }
 })
