@@ -68,15 +68,33 @@
       <div class="table-card">
         <div v-for="item in upgrades" :key="item.firmwareId" class="upgrade-row">
           <span>{{ item.fileName || 'RootFS' }}</span>
+          <van-button size="small" :disabled="busy || !detail?.canUpgrade" @click="firmware(item)">
+            {{ $t('升级') }}
+          </van-button>
           <span class="upgrade-version">{{ item.currentVersion }} → {{ item.latestVersion }}</span>
         </div>
       </div>
     </template>
+    <div v-if="detail?.latestTask" class="info-card">
+      <strong>{{ $t('最近 OTA 任务') }}</strong>
+      <p>{{ detail.latestTask.targetVersion }} · {{ detail.latestTask.deployStatus }}</p>
+      <p v-if="detail.latestTask.failureReason">
+        {{ detail.latestTask.failureReason }}
+      </p>
+      <van-button size="small" :disabled="busy" @click="$emit('refresh')">
+        {{ $t('刷新') }}
+      </van-button>
+      <van-button v-if="activeStates.includes(detail.latestTask.deployStatus)" size="small" :disabled="busy" @click="firmware(null)">
+        {{ $t('终止任务') }}
+      </van-button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { computed, onBeforeUnmount, ref } from 'vue'
+import { showConfirmDialog, showToast } from 'vant'
+import { deployDeviceFirmware, cancelDeviceFirmware } from '@/api/VLStreamCloud/wvp'
 import { useI18n } from 'vue-i18n'
 import sbid from '@/assets/img/VLStreamCloud/sbgl/sbid.png'
 import sbbq from '@/assets/img/VLStreamCloud/sbgl/sbbq.png'
@@ -111,6 +129,30 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['refresh'])
+const busy = ref(false)
+const activeStates = ['CREATED', 'PUBLISHED', 'ACCEPTED', 'DOWNLOADING', 'VERIFYING', 'INSTALLING', 'REBOOTING']
+async function firmware(candidate) {
+  if (busy.value) return
+  busy.value = true
+  try {
+    const rowId = props.device.id
+    const requestId = props.detail.latestTask?.requestId
+    const message = candidate ? t('升级到 {version} 后设备将重启。', { version: candidate.latestVersion })
+      : t('请确认设备已停止升级。终止平台任务只会解除任务锁。')
+    await showConfirmDialog({ title: t(candidate ? '固件升级' : '终止任务'), message })
+    if (rowId !== props.device.id) return
+    const result = candidate ? await deployDeviceFirmware(rowId, candidate.firmwareId) : await cancelDeviceFirmware(rowId, requestId)
+    if (result?.code === 200) {
+      showToast(t(candidate ? '升级指令已下发' : '平台任务已终止'))
+      emit('refresh')
+    }
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') showToast(error.message || t('操作失败'))
+  } finally {
+    busy.value = false
+  }
+}
 const now = ref(Date.now())
 const clock = setInterval(() => {
   now.value = Date.now()

@@ -5,14 +5,14 @@
         <div class="top-title">
           {{ $t('视频') }}
         </div>
-        <div class="top-actions">
+        <div v-if="activeTopTab !== 'device'" class="top-actions">
           <img class="action-icon" :src="ssImg" alt="" @click="onSearch" />
           <img class="action-icon" :src="sxImg" alt="" @click="onFilter" />
         </div>
       </div>
 
       <van-search
-        v-if="showSearch"
+        v-if="showSearch && activeTopTab !== 'device'"
         v-model="keyword"
         class="header-search"
         shape="round"
@@ -50,24 +50,9 @@
           />
         </van-tabs>
       </template>
-
-      <template v-else-if="activeTopTab === 'device'">
-        <van-tabs
-          v-model:active="activeDeviceMode"
-          class="status-tabs"
-          line-width="28"
-        >
-          <van-tab
-            v-for="tab in modeTabs"
-            :key="tab.value"
-            :title="$t(tab.label)"
-            :name="tab.value"
-          />
-        </van-tabs>
-      </template>
     </div>
 
-    <div class="video-content" :class="{ 'video-content--square': activeTopTab === 'square' }">
+    <div class="video-content" :class="{ 'video-content--square': activeTopTab === 'square', 'video-content--devices': activeTopTab === 'device' }">
       <!-- 视频广场 -->
       <template v-if="activeTopTab === 'square'">
         <VideoSquare :keyword="keyword" />
@@ -101,20 +86,7 @@
 
       <!-- 设备管理 -->
       <template v-else-if="activeTopTab === 'device'">
-        <template v-if="activeDeviceMode !== 'map'">
-          <van-list
-            v-model:loading="loading"
-            :finished="finished"
-            :finished-text="$t('没有更多了')"
-            class="video-list"
-            @load="onLoad"
-          >
-            <DeviceManage :active-mode="activeDeviceMode" :keyword="keyword" :tag-name="filterTagName || ''" />
-          </van-list>
-        </template>
-        <template v-else>
-          <DeviceManage style="width: 100%;height: 100%" :active-mode="activeDeviceMode" :keyword="keyword" :tag-name="filterTagName || ''" />
-        </template>
+        <DeviceProtocolConsole />
       </template>
 
       <!-- 其它 tab 占位 -->
@@ -140,14 +112,12 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { List as VanList } from 'vant'
-import config from '@/config'
 import ssImg from '@/assets/img/VLStreamCloud/ss.png'
 import sxImg from '@/assets/img/VLStreamCloud/sx.png'
 import sx2Img from '@/assets/img/VLStreamCloud/sx2.png'
 import NowGovern from '@/pages/VLStreamCloud/page/components/scenarioManagement/NowGovern.vue'
 import LoopGovern from '@/pages/VLStreamCloud/page/components/scenarioManagement/LoopGovern.vue'
-import DeviceManage from '@/pages/VLStreamCloud/page/components/deviceManagement/DeviceManage.vue'
+import DeviceProtocolConsole from '../components/deviceManagement/DeviceProtocolConsole.vue'
 import VideoSquare from '@/pages/VLStreamCloud/page/components/videoPlaza/VideoSquare.vue'
 import VideoPlaybackList from '@/pages/VLStreamCloud/page/components/videoPlayback/VideoPlaybackList.vue'
 import AlgorithmRepo from '@/pages/VLStreamCloud/page/components/algorithmRepository/AlgorithmRepo.vue'
@@ -175,30 +145,12 @@ const subTabs = ref([
 ])
 const activeSubTab = ref('now')
 
-const modeTabsAll = [
-  { label: '列表模式', value: 'list' },
-  { label: '地图模式', value: 'map' },
-  { label: '卡片模式', value: 'card' }
-]
-// 单租户集群没有底图服务（apaas-map-server），地图模式会是一片裂图，直接不提供入口
-const modeTabs = ref(config.authMode === 'local' ? modeTabsAll.filter(tab => tab.value !== 'map') : modeTabsAll)
-const activeDeviceMode = ref('list')
-
-const loading = ref(false)
-const finished = ref(false)
 const showFilter = ref(false)
-const filterTagName = ref(null)
 const showSearch = ref(false)
 const keyword = ref('')
 const showMenu = ref(false)
 
 const menuActions = computed(() => topTabs.value.map(tab => ({ name: t(tab.label), value: tab.value })))
-
-const onLoad = () => {
-  // 这里可以根据业务追加数据，当前直接标记为加载完成
-  loading.value = false
-  finished.value = true
-}
 
 const onSearch = () => {
   showSearch.value = !showSearch.value
@@ -211,7 +163,6 @@ const onFilter = () => {
 
 const onFilterConfirm = (filters) => {
   keyword.value = (filters.keyword || '').trim()
-  filterTagName.value = filters.tagName || null
   // 关键字与标签都来自筛选面板，打开搜索框让用户能看到当前生效的条件
   showSearch.value = !!keyword.value
   showFilter.value = false
@@ -290,6 +241,7 @@ const onMenuSelect = (action) => {
 }
 
 /* 视频广场：视频铺满内容区，滚动只发生在抽屉列表内部 */
+.video-content--devices { margin-inline:-16px; min-height:0; overflow:hidden; }
 .video-content--square {
   overflow: hidden;
 }

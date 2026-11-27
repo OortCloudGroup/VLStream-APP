@@ -58,3 +58,19 @@ export function createWvpVlsDevicePreview(rowId, streamId) {
 export function getWvpVideoDeviceCatalog(params) {
   return commonFunc('/video/device/list', params, 'GET')
 }
+
+export function getVlsClassificationTree(categoryType: string) {
+  return commonFunc('/device/classification/tree', { categoryType, protocolType: 'VLSTREAM' }, 'GET')
+}
+
+export function deployDeviceFirmware(rowId, firmwareId) {
+  return commonFunc(`/vlstream/device/${rowId}/firmware-upgrades`, { firmwareId })
+}
+
+export function cancelDeviceFirmware(rowId, requestId) {
+  return commonFunc(`/vlstream/device/${rowId}/firmware-upgrades/${encodeURIComponent(requestId)}/cancel`, {})
+}
+
+export function claimWvpDevice(payload: { type: string; deviceId: string; claimProof: string }) {
+  return commonFunc('/vlstream/device/claim', payload)
+}

@@ -6,7 +6,7 @@
 <template>
   <div class="camera-detail">
     <nav-header-banner :title="$t('摄像头详情')" :is-call-back="true" @call-back="onBack">
-      <span class="header-action" @click="showApply = true">{{ $t('申请使用') }}</span>
+      <span v-if="!management" class="header-action" @click="showApply = true">{{ $t('申请使用') }}</span>
     </nav-header-banner>
 
     <div class="detail-body">
@@ -34,6 +34,10 @@
         </div>
       </div>
 
+      <label v-if="streams.length > 1" class="stream-picker">{{ $t('视频流') }}
+        <select v-model="selectedStream" @change="startPlayback"><option v-for="stream in streams" :key="stream.id" :value="stream.id">{{ stream.channelId || stream.streamName || stream.id }}</option></select>
+      </label>
+
       <div class="tab-header">
         <div
           class="tab-item"
@@ -53,8 +57,9 @@
         </div>
       </div>
 
+      <ProtocolActions v-if="management && detail?.device" :key="device.id" :device="device" />
       <div class="tab-body">
-        <CameraInfoPanel v-if="activeTab === 'info'" :device="device" :detail="detail" :streams="streams" />
+        <CameraInfoPanel v-if="activeTab === 'info'" :device="device" :detail="detail" :streams="streams" @refresh="refreshDetail" />
         <PTZPanel v-else :camera="device" />
       </div>
     </div>
@@ -68,20 +73,24 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { showToast } from 'vant'
 import { useI18n } from 'vue-i18n'
 import NavHeaderBanner from '@/components/navHeaderBanner/index.vue'
 import VideoApplyForm from '@/pages/VLStreamCloud/page/components/videoPlaza/VideoApplyForm.vue'
 import CameraInfoPanel from '@/pages/VLStreamCloud/page/components/deviceManagement/CameraInfoPanel.vue'
+import ProtocolActions from '../deviceManagement/ProtocolActions.vue'
 import PTZPanel from '@/pages/VLStreamCloud/page/components/deviceManagement/PTZPanel.vue'
 import {
   createWvpVlsDevicePreview,
   getWvpVlsDeviceDetail,
   getWvpVlsDeviceStreams
 } from '@/api/VLStreamCloud/wvp'
+import { addZlmLanCandidate, resolveZlmPlaybackUrl } from '@/utils/zlmPlaybackUrl'
 import { CameraRtcPlayer, parseCameraRtcTarget } from '@/utils/cameraRtc'
 
 const props = defineProps({
   // WVP 设备行（列表里的记录，id 是行 id）
+  management: Boolean,
   camera: {
     type: Object,
     required: true
@@ -96,6 +105,16 @@ const activeTab = ref('info')
 const showApply = ref(false)
 const detail = ref(null)
 const streams = ref([])
+const selectedStream = ref(null)
+async function refreshDetail() {
+  const id = props.camera.id
+  try {
+    const result = await getWvpVlsDeviceDetail(id)
+    if (props.camera.id === id && result?.code === 200) detail.value = result.data
+  } catch (error) {
+    showToast(error.message || t('设备加载失败'))
+  }
+}
 const playbackState = ref('loading')
 const playbackMessage = ref('')
 const videoRef = ref(null)
@@ -142,17 +161,20 @@ const startPlayback = async() => {
   try {
     const detailRes = await getWvpVlsDeviceDetail(row.id)
     if (current !== generation) return
-    detail.value = detailRes?.data || null
+    if (detailRes?.code !== 200) throw new Error(detailRes?.msg || t('设备加载失败'))
+    detail.value = detailRes.data
+    const streamsRes = await getWvpVlsDeviceStreams(row.id)
+    if (current !== generation) return
+    if (streamsRes?.code !== 200) throw new Error(streamsRes?.msg || t('视频源加载失败'))
+    const list = Array.isArray(streamsRes?.data) ? streamsRes.data : []
+    streams.value = list
     if (detail.value?.device?.online !== true) {
       playbackState.value = 'offline'
       playbackMessage.value = t('设备离线，无法播放')
       return
     }
-    const streamsRes = await getWvpVlsDeviceStreams(row.id)
-    if (current !== generation) return
-    const list = Array.isArray(streamsRes?.data) ? streamsRes.data : []
-    streams.value = list
-    const stream = list.find(item => item.defaultStream) || list[0]
+    const stream = list.find(item => item.id === selectedStream.value) || list.find(item => item.defaultStream) || list[0]
+    selectedStream.value = stream?.id
     if (!stream) {
       failPlayback(t('设备没有上报可用视频流'))
       return
@@ -161,12 +183,14 @@ const startPlayback = async() => {
     if (current !== generation) return
     const preview = previewRes?.data || {}
     const target = preview.playMode === 'cameraRTC' && preview.url ? parseCameraRtcTarget(preview.url) : null
-    if (!target) {
-      failPlayback(t('WVP 未返回可用播放地址'))
-      return
-    }
     await nextTick()
     if (current !== generation || !videoRef.value) return
+    if (!target) {
+      const address = (location.protocol === 'https:' ? preview.rtcs : preview.rtc) || preview.webrtcUrl
+      if (!address) throw new Error(t('WVP 未返回可用播放地址'))
+      await playZlm(address, current)
+      return
+    }
     player = new CameraRtcPlayer({
       videoElement: videoRef.value,
       deviceId: target.cameraId,
@@ -193,9 +217,39 @@ const startPlayback = async() => {
   }
 }
 
+async function playZlm(address, current) {
+  const pc = new RTCPeerConnection()
+  const controller = new AbortController()
+  const element = videoRef.value
+  player = { stop() { controller.abort(); pc.close(); element.srcObject = null } }
+  pc.ontrack = event => {
+    if (current !== generation) return
+    element.srcObject = event.streams[0] || new MediaStream([event.track])
+    element.onplaying = () => {
+      if (current === generation) { playbackState.value = 'playing'; playbackMessage.value = '' }
+    }
+  }
+  pc.onconnectionstatechange = () => {
+    if (current === generation && pc.connectionState === 'failed') failPlayback(t('播放失败'))
+  }
+  pc.addTransceiver('video', { direction: 'recvonly' })
+  pc.addTransceiver('audio', { direction: 'recvonly' })
+  const offer = await pc.createOffer()
+  if (current !== generation) return
+  await pc.setLocalDescription(offer)
+  const endpoint = resolveZlmPlaybackUrl(address)
+  const result = await fetch(endpoint, { method: 'POST', body: offer.sdp, credentials: 'omit',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, signal: controller.signal })
+  const answer = await result.json()
+  if (current !== generation) return
+  if (!result.ok || answer.code !== 0 || !answer.sdp) throw new Error(t('媒体协商失败'))
+  await pc.setRemoteDescription({ type: 'answer', sdp: addZlmLanCandidate(answer.sdp, undefined, endpoint) })
+}
+
 watch(
   () => props.camera?.id,
   () => {
+    selectedStream.value = null
     if (props.camera?.id) startPlayback()
   },
   { immediate: true }
@@ -205,6 +259,8 @@ onBeforeUnmount(stopPlayer)
 </script>
 
 <style scoped lang="scss">
+.stream-picker { display:flex; align-items:center; justify-content:space-between; padding:0 16px; }
+.stream-picker select { min-height:44px; max-width:70%; }
 .camera-detail {
   height: 100vh;
   background: var(--vl-bg);
