@@ -8,7 +8,7 @@ export async function managementRequest(path, { wvp = false, method = 'get', par
     url: config.URL + config.gateWay + service + path, method, params, data,
     ...(headers ? { headers: { ...config.headers, ...headers }} : {}),
     timeout: 120000, silentError: true, responseType: media ? 'blob' : 'json'
-  })
+  }).catch(reason => { throw reason instanceof Error ? reason : new Error(String(reason || '设备服务连接失败')) })
   if (media && result instanceof Blob) {
     if (!result.type.includes('json')) return result
     const response = JSON.parse(await result.text())

@@ -19,7 +19,7 @@ export function menuAllowed(path, permissions) {
 }
 
 export async function wvp(path, options = {}) {
-  const result = await request({ ...options, url: config.URL + config.gateWay + 'apaas-wvp-server' + path, silentError: true })
+  const result = await request({ ...options, url: config.URL + config.gateWay + 'apaas-wvp-server' + path, silentError: true }).catch(reason => { throw reason instanceof Error ? reason : new Error(String(reason || '设备服务连接失败')) })
   let body = result
   while (body && typeof body === 'object' && Object.hasOwn(body, 'code')) {
     if (Number(body.code) !== 200) throw new Error(body.msg || '设备服务请求失败')

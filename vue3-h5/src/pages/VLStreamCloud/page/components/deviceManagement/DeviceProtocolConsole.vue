@@ -18,7 +18,7 @@
       <van-search v-model="keyword" shape="round" :placeholder="$t('搜索名称或设备标识')" clearable />
       <DeviceManage v-if="kind === 'vls'" :keyword="keyword" />
       <ProtocolDirectory v-else :key="kind" :kind="kind" :keyword="keyword" />
-      <van-action-sheet v-model:show="showPicker" :title="$t(picker === 'page' ? '国标功能' : '选择协议')" :actions="choices" :cancel-text="$t('取消')" @select="choose" />
+      <van-action-sheet v-model:show="showPicker" :duration="0" :title="$t(picker === 'page' ? '国标功能' : '选择协议')" :actions="choices" :cancel-text="$t('取消')" @select="choose" />
     </template>
   </section>
 </template>

@@ -170,6 +170,7 @@ async function edit(row) {
 async function save() {
   if (working.value) return
   if (required.value.some(key => !String(form.value[key] || '').trim())) { sheetError.value = t('请填写必填项'); return }
+  sheetError.value = ''
   working.value = true
   try {
     const row = selected.value
